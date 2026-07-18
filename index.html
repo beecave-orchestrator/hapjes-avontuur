@@ -518,6 +518,65 @@
       }
     };
 
+    // Static xAI Dutch v1 speech playback.
+    // No runtime TTS, no API keys: only pre-generated local MP3s keyed by stable IDs.
+    // Mirrors audio/manifest.json (do not regenerate without updating both).
+    const SPEECH_BASE = "audio/";
+    const SPEECH_MAP = {
+      start: "start.mp3",
+      msg_01: "msg_01.mp3",
+      msg_02: "msg_02.mp3",
+      msg_03: "msg_03.mp3",
+      msg_04: "msg_04.mp3",
+      msg_05: "msg_05.mp3",
+      msg_06: "msg_06.mp3",
+      msg_07: "msg_07.mp3",
+      msg_08: "msg_08.mp3",
+      msg_09: "msg_09.mp3",
+      msg_10: "msg_10.mp3",
+      reward_3: "reward_3.mp3",
+      reward_5: "reward_5.mp3",
+      reward_10: "reward_10.mp3",
+      reward_15: "reward_15.mp3",
+      reward_20: "reward_20.mp3"
+    };
+
+    let speechAudio = null;
+
+    // Lazily create the Audio element inside the first user gesture so the
+    // browser's autoplay policy unlocks playback. Returns the shared element.
+    function ensureSpeechAudio() {
+      if (!speechAudio) {
+        speechAudio = new Audio();
+        speechAudio.preload = "auto";
+        speechAudio.volume = 1.0;
+      }
+      return speechAudio;
+    }
+
+    function stopSpeech() {
+      if (!speechAudio) return;
+      const p = speechAudio.pause();
+      if (p && typeof p.catch === "function") p.catch(function () {});
+      speechAudio.currentTime = 0;
+    }
+
+    // Play a clip by stable ID. No-op when sound is off, when the ID is
+    // unknown, or when the browser refuses the gesture (caught silently).
+    function playSpeech(id) {
+      if (!soundOn) return;
+      const file = SPEECH_MAP[id];
+      if (!file) return;
+
+      const audio = ensureSpeechAudio();
+      stopSpeech();
+      audio.src = SPEECH_BASE + file;
+      const p = audio.play();
+      if (p && typeof p.catch === "function") {
+        p.catch(function () { /* autoplay rejected; next gesture retries */ });
+      }
+    }
+
     function hapGenomen() {
       hapjes++;
       combo++;
@@ -529,6 +588,14 @@
 
       const randomMessage = messages[Math.floor(Math.random() * messages.length)];
       document.getElementById("message").textContent = randomMessage;
+
+      // Resolve the matching clip: manifest freezes msg_01..msg_10 against
+      // messages[] order, so the spoken clip always matches the shown text.
+      const msgIndex = messages.indexOf(randomMessage);
+      if (msgIndex >= 0) {
+        const id = "msg_" + String(msgIndex + 1).padStart(2, "0");
+        playSpeech(id);
+      }
 
       if (hapjes % 5 === 0) {
         playLevelSound();
@@ -579,6 +646,9 @@
       document.getElementById("rewardText").textContent = reward.text;
       document.getElementById("reward").classList.add("show");
 
+      // Rewards are frozen as one clip per hapjes threshold (title + body).
+      playSpeech("reward_" + hapjes);
+
       playRewardSound();
       maakConfetti();
     }
@@ -606,6 +676,9 @@
 
       updateUI();
       playPopSound();
+
+      // Reset returns to the start line; play the matching start clip.
+      playSpeech("start");
     }
 
     function toggleSound() {
@@ -613,7 +686,12 @@
       document.getElementById("soundButton").textContent = soundOn ? "🔊" : "🔇";
 
       if (soundOn) {
+        // First "on" gesture unlocks audio playback for the session.
+        // Creating/resuming the Audio element here satisfies autoplay policy.
+        ensureSpeechAudio();
         playPopSound();
+      } else {
+        stopSpeech();
       }
     }
 

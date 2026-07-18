@@ -6,13 +6,13 @@ Live (from `main`): https://beecave-orchestrator.github.io/hapjes-avontuur/
 
 ## What’s in this branch (`feat/xai-static-tts`)
 
-This branch adds **v1 pre-generated Dutch speech assets** only. Game JS is not wired to play them yet (integration is a separate task).
+This branch adds **v1 pre-generated Dutch speech assets** and wires them into the game. The 🔊 toggle now gates both the existing Web Audio SFX beeps and static speech playback. No runtime TTS, no API keys.
 
 | Path | Purpose |
 | --- | --- |
-| `index.html` | Game UI + Web Audio SFX beeps (unchanged behaviour) |
+| `index.html` | Game UI + Web Audio SFX beeps + static speech playback (wired) |
 | `audio/*.mp3` | 16 static Dutch voice clips |
-| `audio/manifest.json` | Stable ID → path + exact Dutch source text map |
+| `audio/manifest.json` | Stable ID -> path + exact Dutch source text map |
 | `scripts/generate_xai_dutch_v1.py` | Offline regenerator (Hermes xAI TTS) |
 | `scripts/build_manifest.py` | Rebuilds `audio/manifest.json` from disk |
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
@@ -22,13 +22,14 @@ This branch adds **v1 pre-generated Dutch speech assets** only. Game JS is not w
 - **No runtime TTS** in the browser.
 - **No API keys**, tokens, or provider calls from the page.
 - Speech is generated **offline**, committed as MP3, hosted like any other static file on GitHub Pages.
-- Existing 🔊 toggle + Web Audio oscillator SFX stay as-is until integration wires speech playback behind the same `soundOn` flag.
+- The 🔊 toggle gates both the oscillator SFX and the static speech: off = silent, on = plays the matching clip.
+- A single shared `Audio` element is lazily created inside the first user gesture (toggleSound / hapGenomen / resetGame) so the browser autoplay policy unlocks playback. `stopSpeech()` runs before each new clip so rapid taps never overlap speech.
 
 ```
 build-time (Hermes / xAI OAuth)     runtime (GitHub Pages)
-──────────────────────────────     ──────────────────────
-Dutch lines + language=nl    →     audio/*.mp3 + manifest.json
-                                 →  (future) JS plays by stable ID
+──────────────────────────────      ──────────────────────
+Dutch lines + language=nl    ->     audio/*.mp3 + manifest.json
+                                    index.html plays by stable ID
 ```
 
 ## Frozen v1 line inventory
@@ -83,8 +84,7 @@ Checks: every manifest key has a playable MP3 path, headers look like MPEG, byte
 
 ## Out of scope here
 
-- Wiring `Audio` / preload / stop-previous into `index.html`
-- PR to `main` / GitHub Pages deploy of speech
+- PR to `main` / GitHub Pages deploy of speech (handled separately)
 - Changing Hermes global TTS defaults
 - OpenAI / Edge alternate voice boards
 
