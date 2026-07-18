@@ -1,0 +1,8 @@
+# Local TTS generation scratch (never commit)
+audio/_generation_run.json
+audio/_smoke.mp3
+audio/*.tmp
+
+# Python
+scripts/__pycache__/
+*.py[cod]
