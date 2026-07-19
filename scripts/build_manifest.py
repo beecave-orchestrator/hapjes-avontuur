@@ -36,7 +36,7 @@ ENTRIES = [
     {
         "id": "msg_03",
         "category": "encouragement",
-        "text": "Supergoed bezig!",
+        "text": "Super goed bezig!",
         "file": "msg_03.mp3",
         "source": "messages[2]",
     },

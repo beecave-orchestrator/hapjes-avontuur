@@ -29,7 +29,7 @@
     "start_reset": 1,
     "encouragement": 10,
     "reward": 5,
-    "total_bytes": 297216
+    "total_bytes": 296640
   },
   "clips": {
     "start": {
@@ -68,12 +68,12 @@
     "msg_03": {
       "id": "msg_03",
       "category": "encouragement",
-      "text": "Supergoed bezig!",
+      "text": "Super goed bezig!",
       "file": "msg_03.mp3",
       "path": "audio/msg_03.mp3",
       "source": "messages[2]",
-      "bytes": 11520,
-      "sha256": "88fa6eba177389add3678b7caa187d0843e6934477a200143ec7491d95d93d50",
+      "bytes": 10944,
+      "sha256": "a3e35417d0a1b784e1e885d276339e9e519afb751ba9271e81bd0dd1e6bada02",
       "format": "mp3"
     },
     "msg_04": {
@@ -251,5 +251,5 @@
     },
     "start_reset_id": "start"
   },
-  "built_at_utc": "2026-07-18T20:14:07Z"
+  "built_at_utc": "2026-07-19T12:01:14Z"
 }
