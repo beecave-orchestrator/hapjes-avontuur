@@ -78,6 +78,14 @@
       cursor: pointer;
     }
 
+    .ai-note {
+      margin: 14px 2px 0;
+      text-align: center;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: rgba(45, 42, 74, 0.62);
+    }
+
     .sound-btn:active {
       transform: translateY(4px);
       box-shadow: 0 1px 0 #d8a733;
@@ -446,6 +454,10 @@
       <button class="small-btn" onclick="veranderEten()">Ander eten</button>
       <button class="small-btn" onclick="resetGame()">Opnieuw</button>
     </section>
+
+    <p class="ai-note" role="note">
+      Stemgeluid is AI-gegenereerd.
+    </p>
   </main>
 
   <div class="reward" id="reward">
@@ -471,7 +483,7 @@
     const messages = [
       "Wat een kanjerhap!",
       "Je bord wordt al leger!",
-      "Supergoed bezig!",
+      "Super goed bezig!",
       "Hapjesheld gespot!",
       "Daar word je groot en sterk van!",
       "Jij bent echt goed in dit spel!",
@@ -518,8 +530,8 @@
       }
     };
 
-    // Static xAI Dutch v1 speech playback.
-    // No runtime TTS, no API keys: only pre-generated local MP3s keyed by stable IDs.
+    // Static OpenAI Dutch speech playback (pre-generated offline).
+    // No runtime TTS, no API keys: only local MP3s keyed by stable IDs.
     // Mirrors audio/manifest.json (do not regenerate without updating both).
     const SPEECH_BASE = "audio/";
     const SPEECH_MAP = {
