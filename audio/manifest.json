@@ -1,35 +1,42 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "game": "hapjes-avontuur",
   "locale": "nl-NL",
   "architecture": "static-pregenerated",
   "runtime_tts": false,
   "browser_api_keys": false,
+  "ai_generated_speech": true,
   "generation": {
-    "provider": "xai",
-    "endpoint": "POST /v1/tts",
-    "voice_id": "ara",
-    "language": "nl",
-    "language_note": "Per-call language override language=nl. Global Hermes tts.xai.language was not changed (remains profile default).",
-    "sample_rate_hz": 24000,
-    "bit_rate_bps": 64000,
+    "provider": "openai",
+    "endpoint": "POST /v1/audio/speech",
+    "model": "gpt-4o-mini-tts",
+    "voice": "marin",
+    "locale": "nl-NL",
+    "response_format": "mp3",
+    "instructions": "Speak warmly, clearly, and encouragingly in Dutch for young children. Use a calm, moderate pace. Sound friendly and proud, never rushed or harsh.",
     "codec": "mp3",
+    "sample_rate_hz": 24000,
+    "bit_rate_bps": 128000,
     "channels": "mono",
-    "auto_speech_tags": false,
-    "generated_at_utc": "2026-07-18T20:11:37Z",
-    "tooling": "scripts/generate_xai_dutch_v1.py via Hermes tools.tts_tool._generate_xai_tts (xAI OAuth; no secrets in repo)"
+    "container": "mp3",
+    "probe_note": "Codec parameters measured with ffprobe on the committed MP3s; not copied from a prior xAI pack.",
+    "generated_at_utc": "2026-07-19T19:22:25Z",
+    "tooling": "scripts/generate_openai_dutch_v1.py via OpenAI audio.speech (gpt-4o-mini-tts, voice=marin); credentials via OPENAI_API_KEY / BWS only",
+    "supersedes": "xAI ara Dutch v1 static pack (main prior to this revision)"
   },
   "decisions": {
-    "reward_title_body": "Each reward is ONE clip combining title + body (\"{title} {body}\") for a single modal announcement. Separate title/body files were not generated for v1.",
+    "reward_title_body": "Each reward is ONE clip combining title + body (\"{title} {body}\") for a single modal announcement. Separate title/body files were not generated.",
     "stable_ids": "start; msg_01..msg_10 match messages[] order; reward_{3,5,10,15,20} match rewards keys / badge thresholds.",
-    "out_of_v1": "Level names, chrome labels, SFX beeps remain Web Audio; no JS playback wiring in this asset stage."
+    "msg_03_wording": "User-approved split wording \"Super goed bezig!\" (not the single-token Supergoed form).",
+    "provider_choice": "Full replacement with OpenAI gpt-4o-mini-tts voice marin after unsatisfactory Dutch quality from the prior xAI set.",
+    "disclosure": "Visible in-game note that speech is AI-generated (OpenAI TTS usage policy)."
   },
   "counts": {
     "clips": 16,
     "start_reset": 1,
     "encouragement": 10,
     "reward": 5,
-    "total_bytes": 297216
+    "total_bytes": 849792
   },
   "clips": {
     "start": {
@@ -39,9 +46,18 @@
       "file": "start.mp3",
       "path": "audio/start.mp3",
       "source": "initial #message + resetGame()",
-      "bytes": 13632,
-      "sha256": "a9afad1d36edf8bdab61d88eefd91341c8a3b33f86e9071b20b88d73945997a5",
-      "format": "mp3"
+      "bytes": 40320,
+      "sha256": "c1eb5b48eeb16cdb0641936b370499737122f888078fa1f633b127fc47dcae31",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 2.52,
+        "container": "mp3"
+      }
     },
     "msg_01": {
       "id": "msg_01",
@@ -50,9 +66,18 @@
       "file": "msg_01.mp3",
       "path": "audio/msg_01.mp3",
       "source": "messages[0]",
-      "bytes": 10560,
-      "sha256": "606b1fde2479e3280e6b36f25a1b1ddb6070dd31f65b0cd4edc90efa33216713",
-      "format": "mp3"
+      "bytes": 28032,
+      "sha256": "730925880e69d10864e3797663daf231a22901bed29bc9c87eb0e620928fc822",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 1.752,
+        "container": "mp3"
+      }
     },
     "msg_02": {
       "id": "msg_02",
@@ -61,20 +86,38 @@
       "file": "msg_02.mp3",
       "path": "audio/msg_02.mp3",
       "source": "messages[1]",
-      "bytes": 12864,
-      "sha256": "53b32f98384f46b6aa72cff3806622ba3129e09bc6777b2c8523fd1100e292b5",
-      "format": "mp3"
+      "bytes": 33792,
+      "sha256": "20d9ac4702097a757e3873e4fdf166b83ac8c903b64e794c6a659200234052f0",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 2.112,
+        "container": "mp3"
+      }
     },
     "msg_03": {
       "id": "msg_03",
       "category": "encouragement",
-      "text": "Supergoed bezig!",
+      "text": "Super goed bezig!",
       "file": "msg_03.mp3",
       "path": "audio/msg_03.mp3",
       "source": "messages[2]",
-      "bytes": 11520,
-      "sha256": "88fa6eba177389add3678b7caa187d0843e6934477a200143ec7491d95d93d50",
-      "format": "mp3"
+      "bytes": 28800,
+      "sha256": "5415bd60a86d53fa53c24cc42b38a56528c7ec993e76826e1f308a2ad44dfb2f",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 1.8,
+        "container": "mp3"
+      }
     },
     "msg_04": {
       "id": "msg_04",
@@ -83,9 +126,18 @@
       "file": "msg_04.mp3",
       "path": "audio/msg_04.mp3",
       "source": "messages[3]",
-      "bytes": 12480,
-      "sha256": "32902d07c56db9ee6b6af67c3f781ae13107c167cebc5d08044e76a570161069",
-      "format": "mp3"
+      "bytes": 30720,
+      "sha256": "46e5e4e6c15d1f7bb7a3bd2fc18708b244f5eddacdcb15f83d62e44692035204",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 1.92,
+        "container": "mp3"
+      }
     },
     "msg_05": {
       "id": "msg_05",
@@ -94,9 +146,18 @@
       "file": "msg_05.mp3",
       "path": "audio/msg_05.mp3",
       "source": "messages[4]",
-      "bytes": 15936,
-      "sha256": "6f700992a7d0034295164ded49c25209384d470a423dca2edf45be98da19cf30",
-      "format": "mp3"
+      "bytes": 52224,
+      "sha256": "e1d61a50f644cb0c085dc500be80f7aacdccbcb2f3ed9dfc1ab28c41a1d55fc9",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 3.264,
+        "container": "mp3"
+      }
     },
     "msg_06": {
       "id": "msg_06",
@@ -105,9 +166,18 @@
       "file": "msg_06.mp3",
       "path": "audio/msg_06.mp3",
       "source": "messages[5]",
-      "bytes": 16128,
-      "sha256": "f12a1f5b1a0f0756b46306ea3384d87493ddc210241435e56b1c9d2136b5ede9",
-      "format": "mp3"
+      "bytes": 48768,
+      "sha256": "bdd4844813438c816b0c072d476c84cd2a75cc0a65078fac336f7300f84f53ec",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 3.048,
+        "container": "mp3"
+      }
     },
     "msg_07": {
       "id": "msg_07",
@@ -116,9 +186,18 @@
       "file": "msg_07.mp3",
       "path": "audio/msg_07.mp3",
       "source": "messages[6]",
-      "bytes": 12288,
-      "sha256": "5e9a13f8c47512be8480ec39a8bb87cd32339fa099ce16e0ae6e509a9c308e9a",
-      "format": "mp3"
+      "bytes": 36864,
+      "sha256": "b3a2f603c4d2178f50179a3e82d08628cc01f408126b7f417755652fc7e2b7fd",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 2.304,
+        "container": "mp3"
+      }
     },
     "msg_08": {
       "id": "msg_08",
@@ -127,9 +206,18 @@
       "file": "msg_08.mp3",
       "path": "audio/msg_08.mp3",
       "source": "messages[7]",
-      "bytes": 11520,
-      "sha256": "dfabef700a0673c11bd7ca10b958b84eccd741ccaa7b1adad1c27c41796db9fe",
-      "format": "mp3"
+      "bytes": 51456,
+      "sha256": "dd1ef3817b0aa29f48fb678bb4d9569882a614d1c02e5226c74947732d5c47b8",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 3.216,
+        "container": "mp3"
+      }
     },
     "msg_09": {
       "id": "msg_09",
@@ -138,9 +226,18 @@
       "file": "msg_09.mp3",
       "path": "audio/msg_09.mp3",
       "source": "messages[8]",
-      "bytes": 13248,
-      "sha256": "2549fb02dd61a0254d460698939c356c35865b91a39d4dec000a3ade93690800",
-      "format": "mp3"
+      "bytes": 35328,
+      "sha256": "3765127f439db2a6cdfef38e06cecdb5f2eb09bd90c698eba8851c937db8744d",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 2.208,
+        "container": "mp3"
+      }
     },
     "msg_10": {
       "id": "msg_10",
@@ -149,9 +246,18 @@
       "file": "msg_10.mp3",
       "path": "audio/msg_10.mp3",
       "source": "messages[9]",
-      "bytes": 19200,
-      "sha256": "5737c68f09d507b3849432520831b7716d01207423ba9302d638dc6df656b540",
-      "format": "mp3"
+      "bytes": 59520,
+      "sha256": "29b534e6ebd36f573942db105d760a0940b49f77f54f84148c73536e446a13a0",
+      "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 3.72,
+        "container": "mp3"
+      }
     },
     "reward_3": {
       "id": "reward_3",
@@ -160,9 +266,18 @@
       "file": "reward_3.mp3",
       "path": "audio/reward_3.mp3",
       "source": "rewards[3] title+text",
-      "bytes": 28224,
-      "sha256": "20e65bbee9af8eb9dc59ea454ed9012e976d933bdf272776ce4e55218565ce0e",
+      "bytes": 89088,
+      "sha256": "66cbd18097a3efba82c6e383116d119c2e906fea1134c98fd8d6d6cc1dc6af54",
       "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 5.568,
+        "container": "mp3"
+      },
       "hapjes": 3,
       "title": "Ster verdiend!",
       "body": "Je hebt 3 hapjes gehaald. Superknap!",
@@ -175,9 +290,18 @@
       "file": "reward_5.mp3",
       "path": "audio/reward_5.mp3",
       "source": "rewards[5] title+text",
-      "bytes": 32832,
-      "sha256": "7fb904068133e81895f424d12e93b9da34a613941d9ba96915dc626419f99e9e",
+      "bytes": 86400,
+      "sha256": "2474888548206148e6fb1e26ecba5289b5741bc90934375556e028270e30cad1",
       "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 5.4,
+        "container": "mp3"
+      },
       "hapjes": 5,
       "title": "Level omhoog!",
       "body": "5 hapjes! De eenhoorn is trots op jou.",
@@ -190,9 +314,18 @@
       "file": "reward_10.mp3",
       "path": "audio/reward_10.mp3",
       "source": "rewards[10] title+text",
-      "bytes": 28992,
-      "sha256": "83cb5acf74d2d686e43c71a20f4d89b2a3b2c415e1cdfcec6a511f4b041abeb8",
+      "bytes": 70656,
+      "sha256": "2f5d5502f7bf73bfad22569b251cb3c2aeb36bb2796668c5d5c333e8274498dd",
       "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 4.416,
+        "container": "mp3"
+      },
       "hapjes": 10,
       "title": "Beker gewonnen!",
       "body": "10 hapjes! Jij bent een echte kampioen.",
@@ -205,9 +338,18 @@
       "file": "reward_15.mp3",
       "path": "audio/reward_15.mp3",
       "source": "rewards[15] title+text",
-      "bytes": 31872,
-      "sha256": "16860e48216e769153cbefd9cddcd09fcfc8382a28397e2b1517dbd24b53fc25",
+      "bytes": 89856,
+      "sha256": "137baaa2605028a9b64c501b5c5e8874b6c54156597db6c0eaa30c2813c57a97",
       "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 5.616,
+        "container": "mp3"
+      },
       "hapjes": 15,
       "title": "Raketboost!",
       "body": "15 hapjes! Je vliegt door dit avondeten heen.",
@@ -220,9 +362,18 @@
       "file": "reward_20.mp3",
       "path": "audio/reward_20.mp3",
       "source": "rewards[20] title+text",
-      "bytes": 25920,
-      "sha256": "ee51d79b5a2a3c16cf1acd8a79a602d96e6f5cae13c585749f8780c93faeeb40",
+      "bytes": 67968,
+      "sha256": "24fee11f14f636bde95506aff94ac5e298885ea190b4be58a145ff5fd831a6f5",
       "format": "mp3",
+      "probe": {
+        "codec": "mp3",
+        "sample_rate_hz": 24000,
+        "channels": 1,
+        "channels_label": "mono",
+        "bit_rate_bps": 128000,
+        "duration_s": 4.248,
+        "container": "mp3"
+      },
       "hapjes": 20,
       "title": "Eetkoningin!",
       "body": "20 hapjes! Wat een prestatie.",
@@ -251,5 +402,5 @@
     },
     "start_reset_id": "start"
   },
-  "built_at_utc": "2026-07-18T20:14:07Z"
+  "built_at_utc": "2026-07-19T19:22:37Z"
 }
