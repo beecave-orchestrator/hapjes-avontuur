@@ -21,7 +21,7 @@
     "container": "mp3",
     "probe_note": "Codec parameters measured with ffprobe on the committed MP3s; not copied from a prior xAI pack.",
     "generated_at_utc": "2026-07-19T19:22:25Z",
-    "tooling": "scripts/generate_openai_dutch_v1.py via OpenAI audio.speech (gpt-4o-mini-tts, voice=marin); credentials via OPENAI_API_KEY / BWS only",
+    "tooling": "scripts/generate_openai_dutch_v1.py via OpenAI audio.speech (gpt-4o-mini-tts, voice=marin); credentials via OPENAI_API_KEY env only",
     "supersedes": "xAI ara Dutch v1 static pack (main prior to this revision)"
   },
   "decisions": {

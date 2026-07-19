@@ -67,13 +67,15 @@ in `audio/manifest.json`.
 | Locale / language | Dutch input (`nl-NL` product copy) |
 | Format | MP3 (measured on disk via ffprobe after generation) |
 | Instructions | Warm, clear, encouraging, child-friendly moderate pace |
-| Credentials | `OPENAI_API_KEY` on the generator machine only (BWS-backed) — **never** committed |
+| Credentials | `OPENAI_API_KEY` in the process environment only (injected by Hermes/BWS outside this repo) — **never** committed, never looked up from the repo |
 | Supersedes | Prior xAI `ara` Dutch static pack |
 
-Regenerate (requires `OPENAI_API_KEY`, or `BWS_ACCESS_TOKEN` that can read it):
+Regenerate (requires `OPENAI_API_KEY` already present in the environment):
 
 ```bash
-export OPENAI_API_KEY  # or rely on BWS_ACCESS_TOKEN + scripts/generate_openai_dutch_v1.py
+# Hermes/BWS should inject OPENAI_API_KEY into the environment.
+# The generator reads that variable only; it does not call BWS itself.
+test -n "$OPENAI_API_KEY" || { echo "OPENAI_API_KEY is not set"; exit 1; }
 "$HOME/.hermes/hermes-agent/venv/bin/python" scripts/generate_openai_dutch_v1.py
 "$HOME/.hermes/hermes-agent/venv/bin/python" scripts/build_manifest.py
 python3 scripts/validate_audio_assets.py

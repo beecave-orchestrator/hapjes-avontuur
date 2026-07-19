@@ -2,8 +2,8 @@
 """Generate Hapjes Avontuur Dutch static TTS assets via OpenAI gpt-4o-mini-tts.
 
 Canonical offline route for committed MP3s. Requires OPENAI_API_KEY in the
-environment (or loads it from Bitwarden Secrets Manager when BWS_ACCESS_TOKEN
-is available). Never prints or writes the API key. Does not mutate Hermes
+process environment (injected by Hermes/BWS outside this repo). Never prints or
+writes the API key. Does not look up secrets and does not mutate Hermes
 config.yaml.
 """
 from __future__ import annotations
@@ -30,10 +30,6 @@ from speech_inventory import (  # noqa: E402
     VOICE,
 )
 
-BWS = Path.home() / ".hermes" / "bin" / "bws"
-# Secret UUID for OPENAI_API_KEY in the Hermes BWS project (EU vault).
-OPENAI_SECRET_ID = "17fac135-91b5-4467-b832-b48c00b7542c"
-BWS_SERVER = "https://vault.bitwarden.eu"
 HERMES_PY = Path.home() / ".hermes" / "hermes-agent" / "venv" / "bin" / "python"
 
 
@@ -47,38 +43,10 @@ def _strip_wrapping_quotes(value: str) -> str:
 
 
 def resolve_openai_api_key() -> str:
+    """Return OPENAI_API_KEY from the process environment only."""
     key = _strip_wrapping_quotes(os.environ.get("OPENAI_API_KEY", "") or "")
-    if key:
-        return key
-    if not os.environ.get("BWS_ACCESS_TOKEN"):
-        raise SystemExit(
-            "OPENAI_API_KEY is not set and BWS_ACCESS_TOKEN is unavailable. "
-            "Export OPENAI_API_KEY or run with BWS access."
-        )
-    if not BWS.is_file():
-        raise SystemExit(f"bws binary not found at {BWS}")
-    proc = subprocess.run(
-        [
-            str(BWS),
-            "secret",
-            "get",
-            OPENAI_SECRET_ID,
-            "-u",
-            BWS_SERVER,
-            "-o",
-            "env",
-        ],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    line = proc.stdout.strip().splitlines()[-1]
-    if not line.startswith("OPENAI_API_KEY="):
-        raise SystemExit("unexpected bws env output for OPENAI_API_KEY")
-    key = _strip_wrapping_quotes(line.split("=", 1)[1])
     if not key:
-        raise SystemExit("empty OPENAI_API_KEY from bws")
-    os.environ["OPENAI_API_KEY"] = key
+        raise SystemExit("OPENAI_API_KEY is not set")
     return key
 
 
@@ -97,17 +65,20 @@ def generate_one(client, text: str, path: Path) -> None:
 def main() -> int:
     # Prefer Hermes venv (has openai package) when available.
     if HERMES_PY.is_file() and Path(sys.executable).resolve() != HERMES_PY.resolve():
-        env = os.environ.copy()
-        # Ensure key is resolved before re-exec so child inherits it.
+        # Fail fast if the key is missing before re-exec; child inherits env.
         resolve_openai_api_key()
-        return subprocess.call([str(HERMES_PY), str(Path(__file__).resolve()), *sys.argv[1:]], env=env)
+        env = os.environ.copy()
+        return subprocess.call(
+            [str(HERMES_PY), str(Path(__file__).resolve()), *sys.argv[1:]],
+            env=env,
+        )
 
     from openai import OpenAI  # type: ignore
 
     key = resolve_openai_api_key()
     print(
         f"BATCH provider={PROVIDER} model={MODEL} voice={VOICE} "
-        f"format={RESPONSE_FORMAT} n={len(ENTRIES)} key_len={len(key)}",
+        f"format={RESPONSE_FORMAT} n={len(ENTRIES)} openai_api_key=yes",
         flush=True,
     )
 

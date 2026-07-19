@@ -167,7 +167,7 @@ def main() -> None:
             "generated_at_utc": generated_at,
             "tooling": (
                 "scripts/generate_openai_dutch_v1.py via OpenAI audio.speech "
-                f"({MODEL}, voice={VOICE}); credentials via OPENAI_API_KEY / BWS only"
+                f"({MODEL}, voice={VOICE}); credentials via OPENAI_API_KEY env only"
             ),
             "supersedes": "xAI ara Dutch v1 static pack (main prior to this revision)",
         },
