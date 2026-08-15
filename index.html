@@ -531,7 +531,7 @@
     </div>
   </div>
 
-  <div class="end" id="end" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+  <div class="end" id="end" role="dialog" aria-modal="true" aria-labelledby="endTitle" aria-describedby="endText endNote">
     <div class="end-box">
       <div class="end-emoji" id="endEmoji">🎉</div>
       <div class="end-title" id="endTitle">Avontuur klaar!</div>
@@ -779,22 +779,41 @@
     // Positive end state: a safe, pressure-free finish for the main adventure.
     // "Klaar met eten" is the clear primary exit; "Bonusavontuur" is optional
     // and explicitly states that eating more is not required.
-    // Focus the primary "Klaar met eten" button when the end dialog opens,
-    // and restore focus to the hap button when it closes. This keeps the
-    // dialog keyboard- and screen-reader-friendly.
+    let endDialogReturnFocus = null;
+
+    function endDialogButtons() {
+      return Array.from(document.querySelectorAll("#end button"))
+        .filter(button => !button.disabled);
+    }
+
     function focusEndDialog() {
-      const btn = document.querySelector("#end .main-btn");
-      if (btn) btn.focus();
+      const buttons = endDialogButtons();
+      if (buttons.length) buttons[0].focus();
+    }
+
+    function closeEndDialog() {
+      document.getElementById("end").classList.remove("show");
+      const returnFocus = endDialogReturnFocus;
+      endDialogReturnFocus = null;
+      if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
+        returnFocus.focus();
+      } else {
+        document.getElementById("hapButton").focus();
+      }
     }
 
     function toonEindstaat() {
+      const end = document.getElementById("end");
+      if (!end.classList.contains("show")) {
+        endDialogReturnFocus = document.activeElement;
+      }
       document.getElementById("endEmoji").textContent = "🎉";
       document.getElementById("endTitle").textContent = "Avontuur klaar!";
       document.getElementById("endText").textContent =
         "Je hebt vandaag " + coins + " muntjes gevonden.";
       document.getElementById("endNote").textContent =
         "Verder eten is niet nodig. Je mag stoppen wanneer je wilt.";
-      document.getElementById("end").classList.add("show");
+      end.classList.add("show");
 
       playRewardSound();
       maakConfetti();
@@ -803,29 +822,41 @@
     }
 
     function klaarMetEten() {
-      document.getElementById("end").classList.remove("show");
+      closeEndDialog();
       // The main adventure is complete. The hap button no longer continues
       // the main flow; it only reopens the end state.
       document.getElementById("message").textContent =
         "Avontuur klaar! Je mag stoppen wanneer je wilt.";
       playSpeech("end_done");
-      document.getElementById("hapButton").focus();
     }
 
     function bonusAvontuur() {
-      document.getElementById("end").classList.remove("show");
+      closeEndDialog();
       bonusMode = true;
       // Bonus mode: continue at your own pace, no pressure to eat more.
       document.getElementById("message").textContent =
         "Bonusavontuur! Verder eten is niet nodig, maar mag wel.";
       playSpeech("bonus");
-      document.getElementById("hapButton").focus();
     }
 
-    // Escape closes the end dialog back to the game (no pressure to continue).
+    // Keep keyboard focus in the modal until the child chooses an exit.
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && document.getElementById("end").classList.contains("show")) {
+      const end = document.getElementById("end");
+      if (!end.classList.contains("show")) return;
+
+      if (e.key === "Escape") {
         klaarMetEten();
+        return;
+      }
+
+      if (e.key === "Tab") {
+        const buttons = endDialogButtons();
+        if (!buttons.length) return;
+        e.preventDefault();
+        const currentIndex = buttons.indexOf(document.activeElement);
+        const direction = e.shiftKey ? -1 : 1;
+        const nextIndex = (currentIndex + direction + buttons.length) % buttons.length;
+        buttons[nextIndex].focus();
       }
     });
 
