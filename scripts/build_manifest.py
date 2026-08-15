@@ -22,14 +22,14 @@ ENTRIES = [
     {
         "id": "msg_01",
         "category": "encouragement",
-        "text": "Wat een kanjerhap!",
+        "text": "Wat een lekkere hap!",
         "file": "msg_01.mp3",
         "source": "messages[0]",
     },
     {
         "id": "msg_02",
         "category": "encouragement",
-        "text": "Je bord wordt al leger!",
+        "text": "Wat fijn dat je eet!",
         "file": "msg_02.mp3",
         "source": "messages[1]",
     },
@@ -50,7 +50,7 @@ ENTRIES = [
     {
         "id": "msg_05",
         "category": "encouragement",
-        "text": "Daar word je groot en sterk van!",
+        "text": "Lekker dat je proeft!",
         "file": "msg_05.mp3",
         "source": "messages[4]",
     },
@@ -64,7 +64,7 @@ ENTRIES = [
     {
         "id": "msg_07",
         "category": "encouragement",
-        "text": "Nog eentje voor de power?",
+        "text": "Wat een gezellige hap!",
         "file": "msg_07.mp3",
         "source": "messages[6]",
     },
@@ -114,8 +114,8 @@ ENTRIES = [
         "category": "reward",
         "hapjes": 10,
         "title": "Beker gewonnen!",
-        "body": "10 hapjes! Jij bent een echte kampioen.",
-        "text": "Beker gewonnen! 10 hapjes! Jij bent een echte kampioen.",
+        "body": "10 hapjes! Wat een avontuur.",
+        "text": "Beker gewonnen! 10 hapjes! Wat een avontuur.",
         "file": "reward_10.mp3",
         "source": "rewards[10] title+text",
     },
@@ -124,8 +124,8 @@ ENTRIES = [
         "category": "reward",
         "hapjes": 15,
         "title": "Raketboost!",
-        "body": "15 hapjes! Je vliegt door dit avondeten heen.",
-        "text": "Raketboost! 15 hapjes! Je vliegt door dit avondeten heen.",
+        "body": "15 hapjes! Wat een leuke ontdekkingstocht.",
+        "text": "Raketboost! 15 hapjes! Wat een leuke ontdekkingstocht.",
         "file": "reward_15.mp3",
         "source": "rewards[15] title+text",
     },
@@ -133,12 +133,32 @@ ENTRIES = [
         "id": "reward_20",
         "category": "reward",
         "hapjes": 20,
-        # Exact title from index.html (source of truth for v1 assets).
-        "title": "Eetkoningin!",
-        "body": "20 hapjes! Wat een prestatie.",
-        "text": "Eetkoningin! 20 hapjes! Wat een prestatie.",
+        "title": "Kroon verdiend!",
+        "body": "20 hapjes! Wat een mooie reis.",
+        "text": "Kroon verdiend! 20 hapjes! Wat een mooie reis.",
         "file": "reward_20.mp3",
         "source": "rewards[20] title+text",
+    },
+    {
+        "id": "end",
+        "category": "end_state",
+        "text": "Avontuur klaar! Verder eten is niet nodig. Je mag stoppen wanneer je wilt.",
+        "file": "end.mp3",
+        "source": "toonEindstaat() end dialog",
+    },
+    {
+        "id": "end_done",
+        "category": "end_state",
+        "text": "Avontuur klaar! Je mag stoppen wanneer je wilt.",
+        "file": "end_done.mp3",
+        "source": "klaarMetEten()",
+    },
+    {
+        "id": "bonus",
+        "category": "end_state",
+        "text": "Bonusavontuur! Verder eten is niet nodig, maar mag wel.",
+        "file": "bonus.mp3",
+        "source": "bonusAvontuur()",
     },
 ]
 
@@ -185,23 +205,24 @@ def main() -> None:
         "runtime_tts": False,
         "browser_api_keys": False,
         "generation": {
-            "provider": "xai",
-            "endpoint": "POST /v1/tts",
-            "voice_id": "ara",
+            "provider": "edge-tts",
+            "endpoint": "Microsoft Edge neural TTS (offline via edge-tts)",
+            "voice_id": "nl-NL-FennaNeural",
             "language": "nl",
             "language_note": (
-                "Per-call language override language=nl. Global Hermes "
-                "tts.xai.language was not changed (remains profile default)."
+                "Regenerated for issue #7 (neutral, pressure-free copy + "
+                "end-state clips). Voice changed from xAI 'ara' to edge-tts "
+                "nl-NL-FennaNeural because xAI OAuth was unavailable in the "
+                "regeneration environment."
             ),
             "sample_rate_hz": 24000,
             "bit_rate_bps": 64000,
             "codec": "mp3",
             "channels": "mono",
             "auto_speech_tags": False,
-            "generated_at_utc": "2026-07-18T20:11:37Z",
+            "generated_at_utc": "2026-08-14T18:10:00Z",
             "tooling": (
-                "scripts/generate_xai_dutch_v1.py via Hermes "
-                "tools.tts_tool._generate_xai_tts (xAI OAuth; no secrets in repo)"
+                "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
             ),
         },
         "decisions": {
@@ -224,6 +245,7 @@ def main() -> None:
             "start_reset": 1,
             "encouragement": 10,
             "reward": 5,
+            "end_state": 3,
             "total_bytes": total,
         },
         "clips": clips,

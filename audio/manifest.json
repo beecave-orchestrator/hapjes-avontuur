@@ -6,18 +6,18 @@
   "runtime_tts": false,
   "browser_api_keys": false,
   "generation": {
-    "provider": "xai",
-    "endpoint": "POST /v1/tts",
-    "voice_id": "ara",
+    "provider": "edge-tts",
+    "endpoint": "Microsoft Edge neural TTS (offline via edge-tts)",
+    "voice_id": "nl-NL-FennaNeural",
     "language": "nl",
-    "language_note": "Per-call language override language=nl. Global Hermes tts.xai.language was not changed (remains profile default).",
+    "language_note": "Regenerated for issue #7 (neutral, pressure-free copy + end-state clips). Voice changed from xAI 'ara' to edge-tts nl-NL-FennaNeural because xAI OAuth was unavailable in the regeneration environment.",
     "sample_rate_hz": 24000,
     "bit_rate_bps": 64000,
     "codec": "mp3",
     "channels": "mono",
     "auto_speech_tags": false,
-    "generated_at_utc": "2026-07-18T20:11:37Z",
-    "tooling": "scripts/generate_xai_dutch_v1.py via Hermes tools.tts_tool._generate_xai_tts (xAI OAuth; no secrets in repo)"
+    "generated_at_utc": "2026-08-14T18:10:00Z",
+    "tooling": "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
   },
   "decisions": {
     "reward_title_body": "Each reward is ONE clip combining title + body (\"{title} {body}\") for a single modal announcement. Separate title/body files were not generated for v1.",
@@ -25,11 +25,12 @@
     "out_of_v1": "Level names, chrome labels, SFX beeps remain Web Audio; no JS playback wiring in this asset stage."
   },
   "counts": {
-    "clips": 16,
+    "clips": 19,
     "start_reset": 1,
     "encouragement": 10,
     "reward": 5,
-    "total_bytes": 297216
+    "end_state": 3,
+    "total_bytes": 457344
   },
   "clips": {
     "start": {
@@ -39,30 +40,30 @@
       "file": "start.mp3",
       "path": "audio/start.mp3",
       "source": "initial #message + resetGame()",
-      "bytes": 13632,
-      "sha256": "a9afad1d36edf8bdab61d88eefd91341c8a3b33f86e9071b20b88d73945997a5",
+      "bytes": 16128,
+      "sha256": "b8c886d9e6e4780a86793104f041075edd6ac5e8462db4c736d3d2ce091f892c",
       "format": "mp3"
     },
     "msg_01": {
       "id": "msg_01",
       "category": "encouragement",
-      "text": "Wat een kanjerhap!",
+      "text": "Wat een lekkere hap!",
       "file": "msg_01.mp3",
       "path": "audio/msg_01.mp3",
       "source": "messages[0]",
-      "bytes": 10560,
-      "sha256": "606b1fde2479e3280e6b36f25a1b1ddb6070dd31f65b0cd4edc90efa33216713",
+      "bytes": 12816,
+      "sha256": "6bee0c60f14060a8e9158046d8dbe42541ea008fb7ab987e8e9db55896895182",
       "format": "mp3"
     },
     "msg_02": {
       "id": "msg_02",
       "category": "encouragement",
-      "text": "Je bord wordt al leger!",
+      "text": "Wat fijn dat je eet!",
       "file": "msg_02.mp3",
       "path": "audio/msg_02.mp3",
       "source": "messages[1]",
-      "bytes": 12864,
-      "sha256": "53b32f98384f46b6aa72cff3806622ba3129e09bc6777b2c8523fd1100e292b5",
+      "bytes": 13248,
+      "sha256": "0bb82952614e286d07f6c5b90fbe5fcfdfcbd1e849c8cb26a23720ac6870b70b",
       "format": "mp3"
     },
     "msg_03": {
@@ -72,8 +73,8 @@
       "file": "msg_03.mp3",
       "path": "audio/msg_03.mp3",
       "source": "messages[2]",
-      "bytes": 11520,
-      "sha256": "88fa6eba177389add3678b7caa187d0843e6934477a200143ec7491d95d93d50",
+      "bytes": 13680,
+      "sha256": "d0dc982833933e899ab39a0425477d16e1c9c4c0e5e494ebcaf946166c79df53",
       "format": "mp3"
     },
     "msg_04": {
@@ -83,19 +84,19 @@
       "file": "msg_04.mp3",
       "path": "audio/msg_04.mp3",
       "source": "messages[3]",
-      "bytes": 12480,
-      "sha256": "32902d07c56db9ee6b6af67c3f781ae13107c167cebc5d08044e76a570161069",
+      "bytes": 14256,
+      "sha256": "3214e7e0ca87f88ba5f8dba039caa58f5c3aabf08146abd326498002305fd304",
       "format": "mp3"
     },
     "msg_05": {
       "id": "msg_05",
       "category": "encouragement",
-      "text": "Daar word je groot en sterk van!",
+      "text": "Lekker dat je proeft!",
       "file": "msg_05.mp3",
       "path": "audio/msg_05.mp3",
       "source": "messages[4]",
-      "bytes": 15936,
-      "sha256": "6f700992a7d0034295164ded49c25209384d470a423dca2edf45be98da19cf30",
+      "bytes": 12528,
+      "sha256": "1d1d904b59c09fbae3edfb37315cd898baf1eee037956a3f79d4f563fc4bc14e",
       "format": "mp3"
     },
     "msg_06": {
@@ -105,19 +106,19 @@
       "file": "msg_06.mp3",
       "path": "audio/msg_06.mp3",
       "source": "messages[5]",
-      "bytes": 16128,
-      "sha256": "f12a1f5b1a0f0756b46306ea3384d87493ddc210241435e56b1c9d2136b5ede9",
+      "bytes": 16992,
+      "sha256": "eae495636268bdbc5f0275327ce24404151405aa9d4836117082531239e45613",
       "format": "mp3"
     },
     "msg_07": {
       "id": "msg_07",
       "category": "encouragement",
-      "text": "Nog eentje voor de power?",
+      "text": "Wat een gezellige hap!",
       "file": "msg_07.mp3",
       "path": "audio/msg_07.mp3",
       "source": "messages[6]",
-      "bytes": 12288,
-      "sha256": "5e9a13f8c47512be8480ec39a8bb87cd32339fa099ce16e0ae6e509a9c308e9a",
+      "bytes": 13968,
+      "sha256": "fda63618722b65c6cb8c41a2fa1124e8d9055bdcfcda61c08dab19d2bc13fe87",
       "format": "mp3"
     },
     "msg_08": {
@@ -127,8 +128,8 @@
       "file": "msg_08.mp3",
       "path": "audio/msg_08.mp3",
       "source": "messages[7]",
-      "bytes": 11520,
-      "sha256": "dfabef700a0673c11bd7ca10b958b84eccd741ccaa7b1adad1c27c41796db9fe",
+      "bytes": 14400,
+      "sha256": "42ac6a9b60fa332680b5937b9a2f654b4e37f5e0222f9d203c5f278ec4ad3281",
       "format": "mp3"
     },
     "msg_09": {
@@ -138,8 +139,8 @@
       "file": "msg_09.mp3",
       "path": "audio/msg_09.mp3",
       "source": "messages[8]",
-      "bytes": 13248,
-      "sha256": "2549fb02dd61a0254d460698939c356c35865b91a39d4dec000a3ade93690800",
+      "bytes": 13968,
+      "sha256": "68886acc26bd40596f554e2729345445cae1ed6112bbefbea77a328ea21cd24f",
       "format": "mp3"
     },
     "msg_10": {
@@ -149,8 +150,8 @@
       "file": "msg_10.mp3",
       "path": "audio/msg_10.mp3",
       "source": "messages[9]",
-      "bytes": 19200,
-      "sha256": "5737c68f09d507b3849432520831b7716d01207423ba9302d638dc6df656b540",
+      "bytes": 18720,
+      "sha256": "54f9280a2258bef3447cb828b8715f23ff92f90e20c7b33e95519e8dfa7eb17a",
       "format": "mp3"
     },
     "reward_3": {
@@ -160,8 +161,8 @@
       "file": "reward_3.mp3",
       "path": "audio/reward_3.mp3",
       "source": "rewards[3] title+text",
-      "bytes": 28224,
-      "sha256": "20e65bbee9af8eb9dc59ea454ed9012e976d933bdf272776ce4e55218565ce0e",
+      "bytes": 37440,
+      "sha256": "09f15b0f9d4acfc0eff445023634b5087b4394df92d08666a4e6ec54fff15a71",
       "format": "mp3",
       "hapjes": 3,
       "title": "Ster verdiend!",
@@ -175,8 +176,8 @@
       "file": "reward_5.mp3",
       "path": "audio/reward_5.mp3",
       "source": "rewards[5] title+text",
-      "bytes": 32832,
-      "sha256": "7fb904068133e81895f424d12e93b9da34a613941d9ba96915dc626419f99e9e",
+      "bytes": 41184,
+      "sha256": "0800e2877175410c09a66d8a10a37579ab8e00a91b3dbf6d160e3ff0e6d9d33f",
       "format": "mp3",
       "hapjes": 5,
       "title": "Level omhoog!",
@@ -186,47 +187,80 @@
     "reward_10": {
       "id": "reward_10",
       "category": "reward",
-      "text": "Beker gewonnen! 10 hapjes! Jij bent een echte kampioen.",
+      "text": "Beker gewonnen! 10 hapjes! Wat een avontuur.",
       "file": "reward_10.mp3",
       "path": "audio/reward_10.mp3",
       "source": "rewards[10] title+text",
-      "bytes": 28992,
-      "sha256": "83cb5acf74d2d686e43c71a20f4d89b2a3b2c415e1cdfcec6a511f4b041abeb8",
+      "bytes": 34992,
+      "sha256": "545f5e63b6896f1b147b0f9ff06c2c4bfc67fbe2fcb27d59d1b32568160ee479",
       "format": "mp3",
       "hapjes": 10,
       "title": "Beker gewonnen!",
-      "body": "10 hapjes! Jij bent een echte kampioen.",
+      "body": "10 hapjes! Wat een avontuur.",
       "spoken_as": "title_plus_body"
     },
     "reward_15": {
       "id": "reward_15",
       "category": "reward",
-      "text": "Raketboost! 15 hapjes! Je vliegt door dit avondeten heen.",
+      "text": "Raketboost! 15 hapjes! Wat een leuke ontdekkingstocht.",
       "file": "reward_15.mp3",
       "path": "audio/reward_15.mp3",
       "source": "rewards[15] title+text",
-      "bytes": 31872,
-      "sha256": "16860e48216e769153cbefd9cddcd09fcfc8382a28397e2b1517dbd24b53fc25",
+      "bytes": 40320,
+      "sha256": "ccdcd85085204d9ed3edb68b7780cc3eb5c710077f5a9f0de44dc70de3c25803",
       "format": "mp3",
       "hapjes": 15,
       "title": "Raketboost!",
-      "body": "15 hapjes! Je vliegt door dit avondeten heen.",
+      "body": "15 hapjes! Wat een leuke ontdekkingstocht.",
       "spoken_as": "title_plus_body"
     },
     "reward_20": {
       "id": "reward_20",
       "category": "reward",
-      "text": "Eetkoningin! 20 hapjes! Wat een prestatie.",
+      "text": "Kroon verdiend! 20 hapjes! Wat een mooie reis.",
       "file": "reward_20.mp3",
       "path": "audio/reward_20.mp3",
       "source": "rewards[20] title+text",
-      "bytes": 25920,
-      "sha256": "ee51d79b5a2a3c16cf1acd8a79a602d96e6f5cae13c585749f8780c93faeeb40",
+      "bytes": 35856,
+      "sha256": "6beabcc4c7fd56a0e551e5843488925abe908f1ee1d03eddf209637e0011df5a",
       "format": "mp3",
       "hapjes": 20,
-      "title": "Eetkoningin!",
-      "body": "20 hapjes! Wat een prestatie.",
+      "title": "Kroon verdiend!",
+      "body": "20 hapjes! Wat een mooie reis.",
       "spoken_as": "title_plus_body"
+    },
+    "end": {
+      "id": "end",
+      "category": "end_state",
+      "text": "Avontuur klaar! Verder eten is niet nodig. Je mag stoppen wanneer je wilt.",
+      "file": "end.mp3",
+      "path": "audio/end.mp3",
+      "source": "toonEindstaat() end dialog",
+      "bytes": 43920,
+      "sha256": "caee9a9b90dc5461d99fce1ce680e301b3afe6a327d80f900b00e5969d23177b",
+      "format": "mp3"
+    },
+    "end_done": {
+      "id": "end_done",
+      "category": "end_state",
+      "text": "Avontuur klaar! Je mag stoppen wanneer je wilt.",
+      "file": "end_done.mp3",
+      "path": "audio/end_done.mp3",
+      "source": "klaarMetEten()",
+      "bytes": 27648,
+      "sha256": "408b5acd7f2845e3d7c4bcc2076088c1e2909be6411e00c7d348dc758cd7b126",
+      "format": "mp3"
+    },
+    "bonus": {
+      "id": "bonus",
+      "category": "end_state",
+      "text": "Bonusavontuur! Verder eten is niet nodig, maar mag wel.",
+      "file": "bonus.mp3",
+      "path": "audio/bonus.mp3",
+      "source": "bonusAvontuur()",
+      "bytes": 35280,
+      "sha256": "fe1af82652133ef10afcb026b606f5beacfe98f0af548566d39b3c31ff5d066e",
+      "format": "mp3"
     }
   },
   "lookup_helpers": {
@@ -251,5 +285,5 @@
     },
     "start_reset_id": "start"
   },
-  "built_at_utc": "2026-07-18T20:14:07Z"
+  "built_at_utc": "2026-08-15T14:52:12Z"
 }

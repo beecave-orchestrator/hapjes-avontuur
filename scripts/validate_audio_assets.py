@@ -55,6 +55,34 @@ def main() -> None:
     errors = []
     total_bytes = 0
 
+    # End-state lines that must appear in the HTML (positive, pressure-free).
+    end_lines = [
+        "Avontuur klaar!",
+        "Verder eten is niet nodig. Je mag stoppen wanneer je wilt.",
+        "Klaar met eten",
+        "Bonusavontuur! Verder eten is niet nodig, maar mag wel.",
+    ]
+    for line in end_lines:
+        if line not in html:
+            fail(f"end-state line missing from HTML: {line!r}")
+
+    # No pressure copy may remain anywhere in the HTML.
+    pressure_patterns = [
+        "Je bord wordt al leger",
+        "Nog eentje voor de power",
+        "Je vliegt door dit avondeten heen",
+        "groot en sterk",
+        "Eetkoningin",
+        "Eetkampioen",
+        "Supereter",
+        "Bordbaas",
+        "Wat een prestatie",
+        "echte kampioen",
+    ]
+    for pat in pressure_patterns:
+        if pat in html:
+            errors.append(f"pressure copy still present in HTML: {pat!r}")
+
     for cid, clip in clips.items():
         path = ROOT / clip["path"]
         if not path.is_file():
@@ -97,6 +125,18 @@ def main() -> None:
             errors.append(f"{cid}: spoken text mismatch expected={expected!r}")
         if clips[cid].get("title") != title or clips[cid].get("body") != body:
             errors.append(f"{cid}: title/body fields mismatch")
+
+    # end-state clips must exist and carry the expected pressure-free text
+    end_expected = {
+        "end": "Avontuur klaar! Verder eten is niet nodig. Je mag stoppen wanneer je wilt.",
+        "end_done": "Avontuur klaar! Je mag stoppen wanneer je wilt.",
+        "bonus": "Bonusavontuur! Verder eten is niet nodig, maar mag wel.",
+    }
+    for cid, expected in end_expected.items():
+        if cid not in clips:
+            errors.append(f"missing end-state clip {cid}")
+        elif clips[cid]["text"] != expected:
+            errors.append(f"{cid}: end-state text mismatch expected={expected!r}")
 
     # no stray committed temp files expected
     expected_files = {c["file"] for c in clips.values()} | {"manifest.json"}
