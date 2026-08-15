@@ -104,15 +104,21 @@ const hapAfterDoneEndShown = elements.end.classList.contains('show');
 
 // --- Bonus mode: hap continues at own pace, no re-trigger of end ---
 bonusAvontuur();
+const focusAfterBonusClose = document.activeElement;
 const bBefore = elements.counter.textContent;
 hapGenomen();
 const bAfter = elements.counter.textContent;
 const bonusEndShown = elements.end.classList.contains('show');
 
-// --- Reset clears everything ---
+// --- Reset closes an open dialog, restores focus, and clears everything ---
+elements.hapButton.focus();
+resetGame();
+for (let i = 0; i < 20; i++) hapGenomen();
+const resetStartedWithEndOpen = elements.end.classList.contains('show');
 resetGame();
 const resetCounter = elements.counter.textContent;
 const resetEndShown = elements.end.classList.contains('show');
+const focusAfterResetClose = document.activeElement;
 
 // --- Escape closes end dialog and restores invoking focus ---
 elements.hapButton.focus();
@@ -139,7 +145,8 @@ check('Shift+Tab wraps focus within dialog controls', shiftTabPrevented && focus
 check('Klaar met eten closes dialog and restores invoking focus', !afterDone.endShown && focusAfterDoneClose === elements.hapButton);
 check('hap after done reopens end, no counter change', S(after) === S(before) && hapAfterDoneEndShown);
 check('bonus mode continues without re-triggering end', S(bAfter) !== S(bBefore) && bonusEndShown === false);
-check('reset clears counter', S(resetCounter) === '0');
+check('Bonusavontuur closes dialog and restores invoking focus', focusAfterBonusClose === elements.hapButton);
+check('reset closes an open dialog, restores invoking focus, and clears counter', resetStartedWithEndOpen && !resetEndShown && focusAfterResetClose === elements.hapButton && S(resetCounter) === '0');
 check('Escape closes end and restores invoking focus', escShown && !elements.end.classList.contains('show') && focusAfterEscape === elements.hapButton);
 
 console.log(pass ? '\nALL CHECKS PASSED' : '\nSOME CHECKS FAILED');

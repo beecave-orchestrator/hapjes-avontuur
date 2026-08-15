@@ -868,13 +868,14 @@
     }
 
     function resetGame() {
+      const end = document.getElementById("end");
+      if (end.classList.contains("show")) closeEndDialog();
       hapjes = 0;
       coins = 0;
       combo = 0;
       adventureDone = false;
       bonusMode = false;
 
-      document.getElementById("end").classList.remove("show");
       document.getElementById("message").textContent = "Klaar voor de eerste superhap?";
       document.querySelectorAll(".badge").forEach(badge => {
         badge.classList.remove("unlocked");
