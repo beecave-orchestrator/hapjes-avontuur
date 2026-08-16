@@ -66,6 +66,9 @@ def main() -> None:
         if line not in html:
             fail(f"end-state line missing from HTML: {line!r}")
 
+    if "De gesproken teksten zijn met AI gegenereerd." not in html:
+        fail("AI-generated speech disclosure missing from HTML")
+
     # No pressure copy may remain anywhere in the HTML.
     pressure_patterns = [
         "Je bord wordt al leger",

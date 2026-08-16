@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 AUDIO = ROOT / "audio"
 
-# Must stay in sync with scripts/generate_xai_dutch_v1.py ENTRIES.
+# Must stay in sync with scripts/regenerate_edge_tts.py ENTRIES.
 ENTRIES = [
     {
         "id": "start",

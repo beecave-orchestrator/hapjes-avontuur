@@ -2,9 +2,7 @@
 """Regenerate Hapjes Avontuur Dutch static TTS assets with edge-tts.
 
 Issue #7 changed the copy (neutral, pressure-free) and added three end-state
-clips. The original v1 clips used the xAI "ara" voice, which is not available
-in this environment, so all clips are regenerated with a warm Dutch edge-tts
-voice for consistency. This is a deliberate voice change; flag it for review.
+clips. Regenerate all clips with a warm Dutch edge-tts voice for consistency.
 
 No secrets in repo. Requires: pip install edge-tts
 """
@@ -26,7 +24,7 @@ RATE = "+0%"
 PITCH = "+0Hz"
 
 # Frozen inventory from index.html (post-start spoken lines).
-# Must stay in sync with scripts/generate_xai_dutch_v1.py ENTRIES.
+# Must stay in sync with scripts/build_manifest.py ENTRIES.
 ENTRIES = [
     {"id": "start", "text": "Klaar voor de eerste superhap?", "file": "start.mp3"},
     {"id": "msg_01", "text": "Wat een lekkere hap!", "file": "msg_01.mp3"},

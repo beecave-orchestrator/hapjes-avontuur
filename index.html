@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#7b61ff" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
   <title>Hapjes Avontuur</title>
 
   <style>
@@ -143,6 +146,13 @@
       justify-content: center;
       text-align: center;
       box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.7);
+    }
+
+    .speech-disclosure {
+      margin: -6px 0 12px;
+      text-align: center;
+      font-size: 0.78rem;
+      opacity: 0.72;
     }
 
     .progress-card {
@@ -475,6 +485,7 @@
     <div class="message" id="message" aria-live="polite">
       Klaar voor de eerste superhap?
     </div>
+    <p class="speech-disclosure">De gesproken teksten zijn met AI gegenereerd.</p>
 
     <section class="progress-card">
       <div class="progress-info">
@@ -610,7 +621,7 @@
       }
     };
 
-    // Static xAI Dutch v1 speech playback.
+    // Static edge-tts Dutch speech playback.
     // No runtime TTS, no API keys: only pre-generated local MP3s keyed by stable IDs.
     // Mirrors audio/manifest.json (do not regenerate without updating both).
     const SPEECH_BASE = "audio/";

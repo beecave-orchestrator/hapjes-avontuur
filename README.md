@@ -18,8 +18,7 @@ vliegt door dit avondeten heen.") is replaced with neutral, positive lines.
 | `index.html` | Game UI + Web Audio SFX beeps + static speech playback (wired) |
 | `audio/*.mp3` | 19 static Dutch voice clips (incl. 3 end-state clips) |
 | `audio/manifest.json` | Stable ID -> path + exact Dutch source text map |
-| `scripts/generate_xai_dutch_v1.py` | Original xAI regenerator (kept for provenance) |
-| `scripts/regenerate_edge_tts.py` | Current regenerator (edge-tts, no API key) |
+| `scripts/regenerate_edge_tts.py` | Regenerates the current edge-tts clips (no API key) |
 | `scripts/build_manifest.py` | Rebuilds `audio/manifest.json` from disk |
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
 
@@ -32,10 +31,10 @@ vliegt door dit avondeten heen.") is replaced with neutral, positive lines.
 - A single shared `Audio` element is lazily created inside the first user gesture (toggleSound / hapGenomen / resetGame) so the browser autoplay policy unlocks playback. `stopSpeech()` runs before each new clip so rapid taps never overlap speech.
 
 ```
-build-time (Hermes / xAI OAuth)     runtime (GitHub Pages)
-──────────────────────────────      ──────────────────────
-Dutch lines + language=nl    ->     audio/*.mp3 + manifest.json
-                                    index.html plays by stable ID
+build-time (edge-tts)               runtime (GitHub Pages)
+────────────────────               ──────────────────────
+Dutch lines + voice=nl-NL-FennaNeural -> audio/*.mp3 + manifest.json
+                                      index.html plays by stable ID
 ```
 
 ## Frozen line inventory
@@ -71,12 +70,9 @@ Exact strings, byte sizes, and SHA-256 digests live in `audio/manifest.json`.
 | Generated | 2026-08-14 (issue #7 regeneration) |
 | Credentials | none — edge-tts needs no API key |
 
-> **Voice change note:** the original v1 clips used the xAI `ara` voice. Issue
-> #7 changed the copy and added end-state clips; xAI OAuth was unavailable in
-> the regeneration environment, so all clips were regenerated with edge-tts
-> `nl-NL-FennaNeural` for consistency. If the xAI voice is preferred, rerun the
-> original `scripts/generate_xai_dutch_v1.py` (requires Hermes xAI OAuth) and
-> rebuild the manifest.
+> **Speech disclosure:** the UI visibly states that the spoken texts are
+> AI-generated. Current clips are generated with edge-tts
+> `nl-NL-FennaNeural`.
 
 Regenerate (requires `pip install edge-tts`):
 
@@ -94,13 +90,13 @@ Do not commit temporary files such as `audio/_generation_run.json` or smoke left
 python3 scripts/validate_audio_assets.py
 ```
 
-Checks: every manifest key has a playable MP3 path, headers look like MPEG, bytes match, Dutch source text matches `index.html`, the end-state lines are present, no pressure copy remains, and the HTML has no network-TTS / API-key patterns.
+Checks: every manifest key has a playable MP3 path, headers look like MPEG, bytes match, Dutch source text matches `index.html`, the end-state lines and AI-speech disclosure are present, no pressure copy remains, and the HTML has no network-TTS / API-key patterns.
 
 ## Out of scope here
 
 - PR to `main` / GitHub Pages deploy (handled separately, requires explicit approval)
 - Changing Hermes global TTS defaults
-- Reverting the voice to xAI `ara` (see voice change note above)
+- Changing the edge-tts voice or regenerating audio without reviewing it
 
 ## License / content
 
