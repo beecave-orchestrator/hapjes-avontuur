@@ -66,7 +66,7 @@ Exact strings, byte sizes, and SHA-256 digests live in `audio/manifest.json`.
 | Provider | edge-tts (Microsoft Edge neural TTS) |
 | Voice | `nl-NL-FennaNeural` (warm, clear Dutch female) |
 | Language | `nl` |
-| Format | MP3, 24 kHz, 64 kbps, mono |
+| Format | MP3, 24 kHz, 48 kbps, mono |
 | Speech tags | off |
 | Generated | 2026-08-14 (issue #7 regeneration) |
 | Credentials | none — edge-tts needs no API key |

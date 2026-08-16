@@ -216,7 +216,7 @@ def main() -> None:
                 "regeneration environment."
             ),
             "sample_rate_hz": 24000,
-            "bit_rate_bps": 64000,
+            "bit_rate_bps": 48000,
             "codec": "mp3",
             "channels": "mono",
             "auto_speech_tags": False,

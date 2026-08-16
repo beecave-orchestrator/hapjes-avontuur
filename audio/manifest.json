@@ -12,7 +12,7 @@
     "language": "nl",
     "language_note": "Regenerated for issue #7 (neutral, pressure-free copy + end-state clips). Voice changed from xAI 'ara' to edge-tts nl-NL-FennaNeural because xAI OAuth was unavailable in the regeneration environment.",
     "sample_rate_hz": 24000,
-    "bit_rate_bps": 64000,
+    "bit_rate_bps": 48000,
     "codec": "mp3",
     "channels": "mono",
     "auto_speech_tags": false,
