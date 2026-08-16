@@ -1,89 +1,171 @@
 #!/usr/bin/env python3
-"""Build audio/manifest.json from frozen IDs + on-disk MP3 sizes/hashes.
-
-Also records measured codec parameters via ffprobe when available.
-"""
+"""Build audio/manifest.json from frozen IDs + on-disk MP3 sizes/hashes."""
 from __future__ import annotations
 
 import hashlib
 import json
-import shutil
-import subprocess
 import time
-from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIO = ROOT / "audio"
-SCRIPTS = Path(__file__).resolve().parent
 
-import sys
-
-sys.path.insert(0, str(SCRIPTS))
-from speech_inventory import (  # noqa: E402
-    ENTRIES,
-    INSTRUCTIONS,
-    LOCALE,
-    MODEL,
-    PROVIDER,
-    RESPONSE_FORMAT,
-    VOICE,
-)
-
-
-def ffprobe_file(path: Path) -> dict:
-    if not shutil.which("ffprobe"):
-        return {}
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-show_entries",
-        "stream=codec_name,sample_rate,channels,bit_rate",
-        "-show_entries",
-        "format=format_name,duration,bit_rate",
-        "-of",
-        "json",
-        str(path),
-    ]
-    try:
-        raw = subprocess.check_output(cmd, text=True)
-        data = json.loads(raw)
-    except (subprocess.CalledProcessError, json.JSONDecodeError, OSError):
-        return {}
-    streams = data.get("streams") or []
-    fmt = data.get("format") or {}
-    stream = streams[0] if streams else {}
-    out = {}
-    if stream.get("codec_name"):
-        out["codec"] = stream["codec_name"]
-    if stream.get("sample_rate"):
-        out["sample_rate_hz"] = int(stream["sample_rate"])
-    if stream.get("channels") is not None:
-        ch = int(stream["channels"])
-        out["channels"] = ch
-        out["channels_label"] = "mono" if ch == 1 else ("stereo" if ch == 2 else str(ch))
-    br = stream.get("bit_rate") or fmt.get("bit_rate")
-    if br:
-        out["bit_rate_bps"] = int(br)
-    if fmt.get("duration"):
-        out["duration_s"] = round(float(fmt["duration"]), 3)
-    if fmt.get("format_name"):
-        out["container"] = fmt["format_name"]
-    return out
-
-
-def majority(values):
-    values = [v for v in values if v is not None]
-    if not values:
-        return None
-    return Counter(values).most_common(1)[0][0]
+# Must stay in sync with scripts/regenerate_edge_tts.py ENTRIES.
+ENTRIES = [
+    {
+        "id": "start",
+        "category": "start_reset",
+        "text": "Klaar voor de eerste superhap?",
+        "file": "start.mp3",
+        "source": "initial #message + resetGame()",
+    },
+    {
+        "id": "msg_01",
+        "category": "encouragement",
+        "text": "Wat een lekkere hap!",
+        "file": "msg_01.mp3",
+        "source": "messages[0]",
+    },
+    {
+        "id": "msg_02",
+        "category": "encouragement",
+        "text": "Wat fijn dat je eet!",
+        "file": "msg_02.mp3",
+        "source": "messages[1]",
+    },
+    {
+        "id": "msg_03",
+        "category": "encouragement",
+        "text": "Supergoed bezig!",
+        "file": "msg_03.mp3",
+        "source": "messages[2]",
+    },
+    {
+        "id": "msg_04",
+        "category": "encouragement",
+        "text": "Hapjesheld gespot!",
+        "file": "msg_04.mp3",
+        "source": "messages[3]",
+    },
+    {
+        "id": "msg_05",
+        "category": "encouragement",
+        "text": "Lekker dat je proeft!",
+        "file": "msg_05.mp3",
+        "source": "messages[4]",
+    },
+    {
+        "id": "msg_06",
+        "category": "encouragement",
+        "text": "Jij bent echt goed in dit spel!",
+        "file": "msg_06.mp3",
+        "source": "messages[5]",
+    },
+    {
+        "id": "msg_07",
+        "category": "encouragement",
+        "text": "Wat een gezellige hap!",
+        "file": "msg_07.mp3",
+        "source": "messages[6]",
+    },
+    {
+        "id": "msg_08",
+        "category": "encouragement",
+        "text": "Mega trots op jou!",
+        "file": "msg_08.mp3",
+        "source": "messages[7]",
+    },
+    {
+        "id": "msg_09",
+        "category": "encouragement",
+        "text": "Dat was een dappere hap!",
+        "file": "msg_09.mp3",
+        "source": "messages[8]",
+    },
+    {
+        "id": "msg_10",
+        "category": "encouragement",
+        "text": "Je smaakpapillen gaan op avontuur!",
+        "file": "msg_10.mp3",
+        "source": "messages[9]",
+    },
+    {
+        "id": "reward_3",
+        "category": "reward",
+        "hapjes": 3,
+        "title": "Ster verdiend!",
+        "body": "Je hebt 3 hapjes gehaald. Superknap!",
+        "text": "Ster verdiend! Je hebt 3 hapjes gehaald. Superknap!",
+        "file": "reward_3.mp3",
+        "source": "rewards[3] title+text",
+    },
+    {
+        "id": "reward_5",
+        "category": "reward",
+        "hapjes": 5,
+        "title": "Level omhoog!",
+        "body": "5 hapjes! De eenhoorn is trots op jou.",
+        "text": "Level omhoog! 5 hapjes! De eenhoorn is trots op jou.",
+        "file": "reward_5.mp3",
+        "source": "rewards[5] title+text",
+    },
+    {
+        "id": "reward_10",
+        "category": "reward",
+        "hapjes": 10,
+        "title": "Beker gewonnen!",
+        "body": "10 hapjes! Wat een avontuur.",
+        "text": "Beker gewonnen! 10 hapjes! Wat een avontuur.",
+        "file": "reward_10.mp3",
+        "source": "rewards[10] title+text",
+    },
+    {
+        "id": "reward_15",
+        "category": "reward",
+        "hapjes": 15,
+        "title": "Raketboost!",
+        "body": "15 hapjes! Wat een leuke ontdekkingstocht.",
+        "text": "Raketboost! 15 hapjes! Wat een leuke ontdekkingstocht.",
+        "file": "reward_15.mp3",
+        "source": "rewards[15] title+text",
+    },
+    {
+        "id": "reward_20",
+        "category": "reward",
+        "hapjes": 20,
+        "title": "Kroon verdiend!",
+        "body": "20 hapjes! Wat een mooie reis.",
+        "text": "Kroon verdiend! 20 hapjes! Wat een mooie reis.",
+        "file": "reward_20.mp3",
+        "source": "rewards[20] title+text",
+    },
+    {
+        "id": "end",
+        "category": "end_state",
+        "text": "Avontuur klaar! Verder eten is niet nodig. Je mag stoppen wanneer je wilt.",
+        "file": "end.mp3",
+        "source": "toonEindstaat() end dialog",
+    },
+    {
+        "id": "end_done",
+        "category": "end_state",
+        "text": "Avontuur klaar! Je mag stoppen wanneer je wilt.",
+        "file": "end_done.mp3",
+        "source": "klaarMetEten()",
+    },
+    {
+        "id": "bonus",
+        "category": "end_state",
+        "text": "Bonusavontuur! Verder eten is niet nodig, maar mag wel.",
+        "file": "bonus.mp3",
+        "source": "bonusAvontuur()",
+    },
+]
 
 
 def main() -> None:
     clips = {}
     total = 0
-    probes = []
     for entry in ENTRIES:
         path = AUDIO / entry["file"]
         if not path.is_file():
@@ -92,12 +174,11 @@ def main() -> None:
         size = len(data)
         if size < 500:
             raise SystemExit(f"asset too small for {entry['id']}: {size}")
+        # MPEG ADTS or ID3
         if not (data[:3] == b"ID3" or data[0] == 0xFF):
             raise SystemExit(f"not an MP3 header for {entry['id']}")
         sha = hashlib.sha256(data).hexdigest()
         total += size
-        probe = ffprobe_file(path)
-        probes.append(probe)
         item = {
             "id": entry["id"],
             "category": entry["category"],
@@ -109,8 +190,6 @@ def main() -> None:
             "sha256": sha,
             "format": "mp3",
         }
-        if probe:
-            item["probe"] = probe
         if entry["category"] == "reward":
             item["hapjes"] = entry["hapjes"]
             item["title"] = entry["title"]
@@ -118,80 +197,47 @@ def main() -> None:
             item["spoken_as"] = "title_plus_body"
         clips[entry["id"]] = item
 
-    gen_probe = {
-        "codec": majority(p.get("codec") for p in probes),
-        "sample_rate_hz": majority(p.get("sample_rate_hz") for p in probes),
-        "bit_rate_bps": majority(p.get("bit_rate_bps") for p in probes),
-        "channels": majority(p.get("channels_label") for p in probes),
-        "container": majority(p.get("container") for p in probes),
-    }
-
-    # Prefer generation-run timestamp when present.
-    generated_at = None
-    run_log = AUDIO / "_generation_run.json"
-    if run_log.is_file():
-        try:
-            generated_at = json.loads(run_log.read_text(encoding="utf-8")).get(
-                "generated_at_utc"
-            )
-        except (json.JSONDecodeError, OSError):
-            generated_at = None
-    if not generated_at:
-        generated_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-
     manifest = {
-        "version": "2.0.0",
+        "version": "1.0.0",
         "game": "hapjes-avontuur",
-        "locale": LOCALE,
+        "locale": "nl-NL",
         "architecture": "static-pregenerated",
         "runtime_tts": False,
         "browser_api_keys": False,
-        "ai_generated_speech": True,
         "generation": {
-            "provider": PROVIDER,
-            "endpoint": "POST /v1/audio/speech",
-            "model": MODEL,
-            "voice": VOICE,
-            "locale": LOCALE,
-            "response_format": RESPONSE_FORMAT,
-            "instructions": INSTRUCTIONS,
-            "codec": gen_probe.get("codec") or "mp3",
-            "sample_rate_hz": gen_probe.get("sample_rate_hz"),
-            "bit_rate_bps": gen_probe.get("bit_rate_bps"),
-            "channels": gen_probe.get("channels"),
-            "container": gen_probe.get("container"),
-            "probe_note": (
-                "Codec parameters measured with ffprobe on the committed MP3s; "
-                "not copied from a prior xAI pack."
+            "provider": "edge-tts",
+            "endpoint": "Microsoft Edge neural TTS (offline via edge-tts)",
+            "voice_id": "nl-NL-FennaNeural",
+            "language": "nl",
+            "language_note": (
+                "Regenerated for issue #7 (neutral, pressure-free copy + "
+                "end-state clips). Voice changed from xAI 'ara' to edge-tts "
+                "nl-NL-FennaNeural because xAI OAuth was unavailable in the "
+                "regeneration environment."
             ),
-            "generated_at_utc": generated_at,
+            "sample_rate_hz": 24000,
+            "bit_rate_bps": 48000,
+            "codec": "mp3",
+            "channels": "mono",
+            "auto_speech_tags": False,
+            "generated_at_utc": "2026-08-14T18:10:00Z",
             "tooling": (
-                "scripts/generate_openai_dutch_v1.py via OpenAI audio.speech "
-                f"({MODEL}, voice={VOICE}); credentials via OPENAI_API_KEY env only"
+                "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
             ),
-            "supersedes": "xAI ara Dutch v1 static pack (main prior to this revision)",
         },
         "decisions": {
             "reward_title_body": (
                 "Each reward is ONE clip combining title + body "
-                '("{title} {body}") for a single modal announcement. '
-                "Separate title/body files were not generated."
+                "(\"{title} {body}\") for a single modal announcement. "
+                "Separate title/body files were not generated for v1."
             ),
             "stable_ids": (
                 "start; msg_01..msg_10 match messages[] order; "
                 "reward_{3,5,10,15,20} match rewards keys / badge thresholds."
             ),
-            "msg_03_wording": (
-                'User-approved split wording "Super goed bezig!" '
-                "(not the single-token Supergoed form)."
-            ),
-            "provider_choice": (
-                "Full replacement with OpenAI gpt-4o-mini-tts voice marin after "
-                "unsatisfactory Dutch quality from the prior xAI set."
-            ),
-            "disclosure": (
-                "Visible in-game note that speech is AI-generated "
-                "(OpenAI TTS usage policy)."
+            "out_of_v1": (
+                "Level names, chrome labels, SFX beeps remain Web Audio; "
+                "no JS playback wiring in this asset stage."
             ),
         },
         "counts": {
@@ -199,6 +245,7 @@ def main() -> None:
             "start_reset": 1,
             "encouragement": 10,
             "reward": 5,
+            "end_state": 3,
             "total_bytes": total,
         },
         "clips": clips,
@@ -220,7 +267,7 @@ def main() -> None:
 
     out = AUDIO / "manifest.json"
     out.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"wrote {out} clips={len(clips)} total_bytes={total} probe={gen_probe}")
+    print(f"wrote {out} clips={len(clips)} total_bytes={total}")
 
 
 if __name__ == "__main__":

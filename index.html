@@ -81,14 +81,6 @@
       cursor: pointer;
     }
 
-    .ai-note {
-      margin: 14px 2px 0;
-      text-align: center;
-      font-size: 0.78rem;
-      line-height: 1.35;
-      color: rgba(45, 42, 74, 0.62);
-    }
-
     .sound-btn:active {
       transform: translateY(4px);
       box-shadow: 0 1px 0 #d8a733;
@@ -154,6 +146,13 @@
       justify-content: center;
       text-align: center;
       box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.7);
+    }
+
+    .speech-disclosure {
+      margin: -6px 0 12px;
+      text-align: center;
+      font-size: 0.78rem;
+      opacity: 0.72;
     }
 
     .progress-card {
@@ -233,6 +232,16 @@
     .main-btn:active {
       transform: translateY(7px) scale(0.99);
       box-shadow: 0 2px 0 #5540bf, 0 8px 18px rgba(123, 97, 255, 0.18);
+    }
+
+    .main-btn.green {
+      background: linear-gradient(135deg, #32c48d, #1fa97a);
+      box-shadow: 0 9px 0 #178a63, 0 14px 25px rgba(50, 196, 141, 0.26);
+    }
+
+    .main-btn.green:active {
+      transform: translateY(7px) scale(0.99);
+      box-shadow: 0 2px 0 #178a63, 0 8px 18px rgba(50, 196, 141, 0.18);
     }
 
     .badges {
@@ -333,6 +342,70 @@
       margin-bottom: 18px;
     }
 
+    .end {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 42, 74, 0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      z-index: 25;
+    }
+
+    .end.show {
+      display: flex;
+    }
+
+    .end-box {
+      width: 100%;
+      max-width: 380px;
+      background: white;
+      border-radius: 32px;
+      padding: 28px 20px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.28);
+      animation: rewardPop 0.3s ease;
+    }
+
+    .end-emoji {
+      font-size: 4.6rem;
+      margin-bottom: 8px;
+    }
+
+    .end-title {
+      font-size: 1.7rem;
+      font-weight: 1000;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .end-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .end-note {
+      font-size: 0.95rem;
+      font-weight: 700;
+      opacity: 0.75;
+      margin-bottom: 18px;
+    }
+
+    .end-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .end-actions .main-btn {
+      width: 100%;
+    }
+
+    .end-actions .small-btn {
+      width: 100%;
+    }
+
     .confetti-piece {
       position: fixed;
       top: -20px;
@@ -409,9 +482,10 @@
       <div class="counter-label">hapjes genomen</div>
     </section>
 
-    <div class="message" id="message">
+    <div class="message" id="message" aria-live="polite">
       Klaar voor de eerste superhap?
     </div>
+    <p class="speech-disclosure">De gesproken teksten zijn met AI gegenereerd.</p>
 
     <section class="progress-card">
       <div class="progress-info">
@@ -441,7 +515,7 @@
       </div>
     </section>
 
-    <button class="main-btn" onclick="hapGenomen()">
+    <button class="main-btn" id="hapButton" onclick="hapGenomen()">
       hap genomen
     </button>
 
@@ -457,10 +531,6 @@
       <button class="small-btn" onclick="veranderEten()">Ander eten</button>
       <button class="small-btn" onclick="resetGame()">Opnieuw</button>
     </section>
-
-    <p class="ai-note" role="note">
-      Stemgeluid is AI-gegenereerd.
-    </p>
   </main>
 
   <div class="reward" id="reward">
@@ -472,37 +542,55 @@
     </div>
   </div>
 
+  <div class="end" id="end" role="dialog" aria-modal="true" aria-labelledby="endTitle" aria-describedby="endText endNote">
+    <div class="end-box">
+      <div class="end-emoji" id="endEmoji">🎉</div>
+      <div class="end-title" id="endTitle">Avontuur klaar!</div>
+      <div class="end-text" id="endText">Je hebt vandaag 6 muntjes gevonden.</div>
+      <div class="end-note" id="endNote">Verder eten is niet nodig. Je mag stoppen wanneer je wilt.</div>
+      <div class="end-actions">
+        <button class="main-btn green" onclick="klaarMetEten()">Klaar met eten</button>
+        <button class="small-btn" onclick="bonusAvontuur()">Bonusavontuur</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let hapjes = 0;
     let coins = 0;
     let combo = 0;
     let soundOn = true;
     let currentFoodIndex = 0;
+    let adventureDone = false;
+    let bonusMode = false;
 
     const levelSize = 5;
+    // Safe end boundary for the main adventure: reaching this many hapjes
+    // completes the main flow and opens the positive end state.
+    const ADVENTURE_END = 20;
 
     const foods = ["🍝", "🥦", "🥕", "🍚", "🥔", "🍗", "🍲", "🥪", "🍛", "🥗"];
 
     const messages = [
-      "Wat een kanjerhap!",
-      "Je bord wordt al leger!",
-      "Super goed bezig!",
+      "Wat een lekkere hap!",
+      "Wat fijn dat je eet!",
+      "Supergoed bezig!",
       "Hapjesheld gespot!",
-      "Daar word je groot en sterk van!",
+      "Lekker dat je proeft!",
       "Jij bent echt goed in dit spel!",
-      "Nog eentje voor de power?",
+      "Wat een gezellige hap!",
       "Mega trots op jou!",
       "Dat was een dappere hap!",
       "Je smaakpapillen gaan op avontuur!"
     ];
 
     const levelNames = [
-      "Level 1: Proever",
-      "Level 2: Hapjesheld",
-      "Level 3: Bordbaas",
-      "Level 4: Supereter",
-      "Level 5: Eetkampioen",
-      "Level 6: Legendarische Smuller"
+      "Level 1: Ontdekker",
+      "Level 2: Avonturier",
+      "Level 3: Verkenner",
+      "Level 4: Sterrenjager",
+      "Level 5: Muntjesmeester",
+      "Level 6: Legendarische Ontdekker"
     ];
 
     const rewards = {
@@ -519,22 +607,22 @@
       10: {
         emoji: "🏆",
         title: "Beker gewonnen!",
-        text: "10 hapjes! Jij bent een echte kampioen."
+        text: "10 hapjes! Wat een avontuur."
       },
       15: {
         emoji: "🚀",
         title: "Raketboost!",
-        text: "15 hapjes! Je vliegt door dit avondeten heen."
+        text: "15 hapjes! Wat een leuke ontdekkingstocht."
       },
       20: {
         emoji: "👑",
-        title: "Eetkoningin!",
-        text: "20 hapjes! Wat een prestatie."
+        title: "Kroon verdiend!",
+        text: "20 hapjes! Wat een mooie reis."
       }
     };
 
-    // Static OpenAI Dutch speech playback (pre-generated offline).
-    // No runtime TTS, no API keys: only local MP3s keyed by stable IDs.
+    // Static edge-tts Dutch speech playback.
+    // No runtime TTS, no API keys: only pre-generated local MP3s keyed by stable IDs.
     // Mirrors audio/manifest.json (do not regenerate without updating both).
     const SPEECH_BASE = "audio/";
     const SPEECH_MAP = {
@@ -553,7 +641,10 @@
       reward_5: "reward_5.mp3",
       reward_10: "reward_10.mp3",
       reward_15: "reward_15.mp3",
-      reward_20: "reward_20.mp3"
+      reward_20: "reward_20.mp3",
+      end: "end.mp3",
+      end_done: "end_done.mp3",
+      bonus: "bonus.mp3"
     };
 
     let speechAudio = null;
@@ -593,6 +684,14 @@
     }
 
     function hapGenomen() {
+      // Once the main adventure is complete, the hap button no longer
+      // continues the main flow. In bonus mode it keeps counting at the
+      // child's own pace; otherwise it reopens the end state.
+      if (adventureDone && !bonusMode) {
+        toonEindstaat();
+        return;
+      }
+
       hapjes++;
       combo++;
       coins += 2 + Math.min(combo, 5);
@@ -617,8 +716,24 @@
         maakConfetti();
       }
 
+      // Unlock the badge for this threshold even when the end state
+      // supersedes the reward modal at the boundary.
       if (rewards[hapjes]) {
         unlockBadge(hapjes);
+      }
+
+      // Safe end boundary: reaching the adventure end opens the positive
+      // end state instead of pushing for more hapjes. The end state
+      // supersedes the reward modal at the boundary so the two never stack.
+      // Guarded by !adventureDone so bonus-mode hapjes never re-trigger it.
+      if (hapjes >= ADVENTURE_END && !adventureDone) {
+        adventureDone = true;
+        document.getElementById("reward").classList.remove("show");
+        toonEindstaat();
+        return;
+      }
+
+      if (rewards[hapjes]) {
         toonBeloning(rewards[hapjes]);
       }
     }
@@ -672,6 +787,90 @@
       document.getElementById("reward").classList.remove("show");
     }
 
+    // Positive end state: a safe, pressure-free finish for the main adventure.
+    // "Klaar met eten" is the clear primary exit; "Bonusavontuur" is optional
+    // and explicitly states that eating more is not required.
+    let endDialogReturnFocus = null;
+
+    function endDialogButtons() {
+      return Array.from(document.querySelectorAll("#end button"))
+        .filter(button => !button.disabled);
+    }
+
+    function focusEndDialog() {
+      const buttons = endDialogButtons();
+      if (buttons.length) buttons[0].focus();
+    }
+
+    function closeEndDialog() {
+      document.getElementById("end").classList.remove("show");
+      const returnFocus = endDialogReturnFocus;
+      endDialogReturnFocus = null;
+      if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
+        returnFocus.focus();
+      } else {
+        document.getElementById("hapButton").focus();
+      }
+    }
+
+    function toonEindstaat() {
+      const end = document.getElementById("end");
+      if (!end.classList.contains("show")) {
+        endDialogReturnFocus = document.activeElement;
+      }
+      document.getElementById("endEmoji").textContent = "🎉";
+      document.getElementById("endTitle").textContent = "Avontuur klaar!";
+      document.getElementById("endText").textContent =
+        "Je hebt vandaag " + coins + " muntjes gevonden.";
+      document.getElementById("endNote").textContent =
+        "Verder eten is niet nodig. Je mag stoppen wanneer je wilt.";
+      end.classList.add("show");
+
+      playRewardSound();
+      maakConfetti();
+      playSpeech("end");
+      focusEndDialog();
+    }
+
+    function klaarMetEten() {
+      closeEndDialog();
+      // The main adventure is complete. The hap button no longer continues
+      // the main flow; it only reopens the end state.
+      document.getElementById("message").textContent =
+        "Avontuur klaar! Je mag stoppen wanneer je wilt.";
+      playSpeech("end_done");
+    }
+
+    function bonusAvontuur() {
+      closeEndDialog();
+      bonusMode = true;
+      // Bonus mode: continue at your own pace, no pressure to eat more.
+      document.getElementById("message").textContent =
+        "Bonusavontuur! Verder eten is niet nodig, maar mag wel.";
+      playSpeech("bonus");
+    }
+
+    // Keep keyboard focus in the modal until the child chooses an exit.
+    document.addEventListener("keydown", function (e) {
+      const end = document.getElementById("end");
+      if (!end.classList.contains("show")) return;
+
+      if (e.key === "Escape") {
+        klaarMetEten();
+        return;
+      }
+
+      if (e.key === "Tab") {
+        const buttons = endDialogButtons();
+        if (!buttons.length) return;
+        e.preventDefault();
+        const currentIndex = buttons.indexOf(document.activeElement);
+        const direction = e.shiftKey ? -1 : 1;
+        const nextIndex = (currentIndex + direction + buttons.length) % buttons.length;
+        buttons[nextIndex].focus();
+      }
+    });
+
     function veranderEten() {
       currentFoodIndex = (currentFoodIndex + 1) % foods.length;
       document.getElementById("food").textContent = foods[currentFoodIndex];
@@ -680,9 +879,13 @@
     }
 
     function resetGame() {
+      const end = document.getElementById("end");
+      if (end.classList.contains("show")) closeEndDialog();
       hapjes = 0;
       coins = 0;
       combo = 0;
+      adventureDone = false;
+      bonusMode = false;
 
       document.getElementById("message").textContent = "Klaar voor de eerste superhap?";
       document.querySelectorAll(".badge").forEach(badge => {
