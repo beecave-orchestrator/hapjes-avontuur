@@ -187,9 +187,10 @@
       transition: width 0.35s ease;
     }
 
+    /* Issue #5: combo stat removed; stats are muntjes + level. */
     .stats {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin: 12px 0 16px;
     }
@@ -280,6 +281,11 @@
       margin-top: 12px;
     }
 
+    /* Issue #5: the unlockable Feest button spans the actions row. */
+    .actions .feest-knop {
+      grid-column: 1 / -1;
+    }
+
     .small-btn {
       border: 0;
       border-radius: 18px;
@@ -296,6 +302,260 @@
     .small-btn:active {
       transform: translateY(4px);
       box-shadow: 0 1px 0 #dad4ff;
+    }
+
+    /* Issue #5: savings-goal card (spaarpot) for the quiet reward loop. */
+    .goal-card {
+      background: #fff6fb;
+      border: 2px solid #ffd7ec;
+      border-radius: 22px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .goal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      font-size: 0.98rem;
+    }
+
+    .goal-name {
+      color: var(--pink);
+    }
+
+    .goal-track {
+      height: 18px;
+      background: #ffe3f1;
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .goal-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--yellow), var(--pink));
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    .goal-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .goal-remaining {
+      font-size: 0.9rem;
+      font-weight: 800;
+      opacity: 0.85;
+    }
+
+    .goal-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--yellow);
+      box-shadow: 0 5px 0 #d8a733;
+      white-space: nowrap;
+    }
+
+    .goal-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #d8a733;
+    }
+
+    /* Issue #5: cosmetic unlock effects. */
+    .vriendje {
+      position: absolute;
+      left: -54px;
+      bottom: 2px;
+      font-size: 2.6rem;
+      display: none;
+      filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.08));
+      animation: floaty 2.4s ease-in-out infinite;
+    }
+
+    .vriendje.zichtbaar {
+      display: block;
+    }
+
+    .strijkje {
+      position: absolute;
+      top: -14px;
+      right: 4px;
+      font-size: 1.9rem;
+      display: none;
+      animation: floaty 2.8s ease-in-out infinite;
+    }
+
+    .strijkje.zichtbaar {
+      display: block;
+    }
+
+    .plate.feest-bord {
+      background: radial-gradient(circle, #ffffff 0 42%, #ffe9f6 43% 62%, #ffffff 63%);
+      box-shadow:
+        inset 0 0 0 10px rgba(255, 111, 177, 0.28),
+        0 14px 24px rgba(255, 111, 177, 0.24);
+    }
+
+    body.regenboog {
+      background: linear-gradient(135deg, #ffe6f2, #fff6bf, #d7f7ff, #e8ffe9, #f3e8ff);
+    }
+
+    /* Issue #5: Schatkist dialog (same vocabulary as the end dialog). */
+    .schatkist {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 42, 74, 0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      z-index: 22;
+    }
+
+    .schatkist.show {
+      display: flex;
+    }
+
+    .schatkist-box {
+      width: 100%;
+      max-width: 380px;
+      background: white;
+      border-radius: 32px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
+      animation: rewardPop 0.3s ease;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+
+    .schatkist-emoji {
+      font-size: 3rem;
+    }
+
+    .schatkist-title {
+      font-size: 1.6rem;
+      font-weight: 1000;
+      color: var(--purple);
+      margin: 4px 0;
+    }
+
+    .schatkist-text {
+      font-size: 0.95rem;
+      font-weight: 700;
+      opacity: 0.8;
+      margin: 0 0 14px;
+    }
+
+    .schatkist-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .schatkist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8f5ff;
+      border: 2px solid #eeeaff;
+      border-radius: 18px;
+      padding: 10px 12px;
+    }
+
+    .schatkist-item.actief {
+      border-color: var(--yellow);
+      background: #fff9db;
+    }
+
+    .schatkist-item.vrij {
+      border-color: #d3f5e5;
+      background: #f2fbf7;
+    }
+
+    .schatkist-item .schatkist-emoji {
+      font-size: 1.6rem;
+    }
+
+    .schatkist-item-info {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+      gap: 2px;
+    }
+
+    .schatkist-item-naam {
+      font-weight: 900;
+      font-size: 0.98rem;
+    }
+
+    .schatkist-item-kost {
+      font-size: 0.8rem;
+      font-weight: 800;
+      opacity: 0.75;
+    }
+
+    .schatkist-status {
+      font-size: 0.85rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .schatkist-status .small-btn {
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 0 #dad4ff;
+    }
+
+    .schatkist-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .schatkist-actions .small-btn {
+      width: 100%;
+    }
+
+    .spaar-reset {
+      display: none;
+      margin-top: 12px;
+      background: #fff4be;
+      border: 2px dashed var(--yellow);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .spaar-reset.open {
+      display: block;
+    }
+
+    .spaar-reset-vraag {
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+
+    .spaar-reset-knoppen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
     .reward {
@@ -460,6 +720,11 @@
       .badges {
         gap: 6px;
       }
+
+      .vriendje {
+        left: -38px;
+        font-size: 2.1rem;
+      }
     }
   </style>
 </head>
@@ -474,7 +739,9 @@
     </div>
 
     <section class="hero">
-      <div class="plate">
+      <div class="plate" id="plate">
+        <span class="vriendje" id="vriendje" aria-hidden="true">🐼</span>
+        <span class="strijkje" id="strijkje" aria-hidden="true">🎀</span>
         <div class="food" id="food">🍝</div>
       </div>
 
@@ -500,11 +767,6 @@
 
     <section class="stats">
       <div class="stat">
-        <strong id="combo">0x</strong>
-        <span>combo</span>
-      </div>
-
-      <div class="stat">
         <strong id="coins">0</strong>
         <span>muntjes</span>
       </div>
@@ -519,6 +781,22 @@
       hap genomen
     </button>
 
+    <!-- Issue #5: savings goal (spaarpot). Progress accrues only toward the
+         active goal; switching goals never loses saved muntjes. -->
+    <section class="goal-card" aria-label="Spaardoel">
+      <div class="goal-top">
+        <span class="goal-name" id="goalName">Spaardoel kiezen</span>
+        <span id="goalText">—</span>
+      </div>
+      <div class="goal-track" id="goalTrack" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Voortgang naar spaardoel">
+        <div class="goal-fill" id="goalFill"></div>
+      </div>
+      <div class="goal-bottom">
+        <span class="goal-remaining" id="goalRemaining">Kies iets leuks om voor te sparen</span>
+        <button class="goal-btn" id="goalButton" onclick="openSchatkist()">Schatkist</button>
+      </div>
+    </section>
+
     <section class="badges" aria-label="Beloningen">
       <div class="badge" id="badge-1">🌟</div>
       <div class="badge" id="badge-2">🦄</div>
@@ -530,6 +808,7 @@
     <section class="actions">
       <button class="small-btn" onclick="veranderEten()">Ander eten</button>
       <button class="small-btn" onclick="resetGame()">Opnieuw</button>
+      <button class="small-btn feest-knop" id="feestKnop" hidden onclick="maakConfetti(); playRewardSound();">Feest! 🎉</button>
     </section>
   </main>
 
@@ -539,6 +818,32 @@
       <div class="reward-title" id="rewardTitle">Beloning!</div>
       <div class="reward-text" id="rewardText">Goed gedaan!</div>
       <button class="main-btn" onclick="sluitBeloning()">Verder eten</button>
+    </div>
+  </div>
+
+  <!-- Issue #5: Schatkist. Only cosmetic items; one agreed purchase per item,
+       no timers, streaks, quotas, or munt games beyond saving and unlocking. -->
+  <div class="schatkist" id="schatkist" role="dialog" aria-modal="true" aria-labelledby="schatkistTitle" aria-describedby="schatkistText">
+    <div class="schatkist-box">
+      <div class="schatkist-emoji">🪙</div>
+      <h2 class="schatkist-title" id="schatkistTitle">Schatkist</h2>
+      <p class="schatkist-text" id="schatkistText">
+        Waar spaar jij voor? Elke hap geeft één muntje.
+      </p>
+      <ul class="schatkist-list" id="schatkistList"></ul>
+      <div class="schatkist-actions">
+        <button class="main-btn green" id="schatkistClose" onclick="sluitSchatkist()">Klaar</button>
+        <button class="small-btn" id="spaarResetBtn" onclick="bevestigSpaarReset()">Opnieuw sparen</button>
+      </div>
+      <div class="spaar-reset" id="spaarReset">
+        <p class="spaar-reset-vraag" id="spaarResetVraag">
+          Opnieuw sparen? Je spaarpot wordt dan leeg. Je ontgrendelde dingen mag je houden.
+        </p>
+        <div class="spaar-reset-knoppen">
+          <button class="small-btn" id="spaarResetNee" onclick="spaarResetAnnuleer()">Nee, houden</button>
+          <button class="small-btn" id="spaarResetJa" onclick="spaarResetBevestig()">Ja, opnieuw</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -558,11 +863,20 @@
   <script>
     let hapjes = 0;
     let coins = 0;
-    let combo = 0;
     let soundOn = true;
     let currentFoodIndex = 0;
     let adventureDone = false;
     let bonusMode = false;
+
+    // Issue #5: quiet savings loop state. One chosen goal at a time,
+    // permanently unlocked cosmetics, and a balance that only grows
+    // (no deduction) until an explicit, confirmed "Opnieuw sparen".
+    let activeGoalId = null;
+    let unlocked = {};
+    // Muntjes found since the last "Opnieuw" — drives the end-state line
+    // "Je hebt vandaag X muntjes gevonden" so it stays honest even though
+    // the spaarpot itself persists across adventure resets.
+    let muntjesGevonden = 0;
 
     const levelSize = 5;
     // Safe end boundary for the main adventure: reaching this many hapjes
@@ -593,6 +907,9 @@
       "Level 6: Legendarische Ontdekker"
     ];
 
+    // Milestone badges (issue #7-vetted, pressure-free). These stay separate
+    // from the issue #5 savings loop: milestones celebrate the adventure,
+    // the Schatkist is the quiet cosmetic reward.
     const rewards = {
       3: {
         emoji: "🌟",
@@ -620,6 +937,52 @@
         text: "20 hapjes! Wat een mooie reis."
       }
     };
+
+    // Issue #5: the Schatkist. Strictly cosmetic items; each costs a fixed
+    // number of muntjes. Nothing here changes what or how much a child eats.
+    // `kort` is the short name used in "nog X tot de panda" progress lines.
+    const schatkistItems = [
+      {
+        id: "confetti",
+        emoji: "🎉",
+        naam: "Feestconfetti",
+        kort: "de confetti",
+        prijs: 3,
+        wat: "Een feestknop voor confetti, wanneer je maar wilt."
+      },
+      {
+        id: "bord",
+        emoji: "🍽️",
+        naam: "Feestbord",
+        kort: "het feestbord",
+        prijs: 5,
+        wat: "Een vrolijke rand om je bord."
+      },
+      {
+        id: "panda",
+        emoji: "🐼",
+        naam: "Dierenvriendje",
+        kort: "de panda",
+        prijs: 8,
+        wat: "Een panda die naast je bord komt zitten."
+      },
+      {
+        id: "regenboog",
+        emoji: "🌈",
+        naam: "Regenbooglucht",
+        kort: "de regenboog",
+        prijs: 12,
+        wat: "Regenboogkleuren achter je avontuur."
+      },
+      {
+        id: "strik",
+        emoji: "🎀",
+        naam: "Feeststrik",
+        kort: "de strik",
+        prijs: 16,
+        wat: "Een strik op je bord."
+      }
+    ];
 
     // Static edge-tts Dutch speech playback.
     // No runtime TTS, no API keys: only pre-generated local MP3s keyed by stable IDs.
@@ -693,8 +1056,15 @@
       }
 
       hapjes++;
-      combo++;
-      coins += 2 + Math.min(combo, 5);
+      // Issue #5: every registered hap gives exactly one muntje.
+      // The old escalating combo multiplier is gone: no speed bonus,
+      // no streak logic, nothing that rewards eating faster or more.
+      coins += 1;
+      muntjesGevonden += 1;
+
+      // Quiet savings progress: if the chosen goal is now within reach,
+      // unlock it immediately. No deduction, no modal, permanently kept.
+      const ontgrendeldDoel = probeerDoelTeOntgrendelen();
 
       updateUI();
       playBiteSound();
@@ -730,7 +1100,24 @@
         adventureDone = true;
         document.getElementById("reward").classList.remove("show");
         toonEindstaat();
+        // A goal completing on this exact hap unlocks quietly: the end
+        // state is the celebration, the cosmetic is simply applied.
+        if (ontgrendeldDoel) {
+          document.getElementById("message").textContent =
+            "Avontuur klaar! " + ontgrendeldDoel.naam + " is nu van jou!";
+        }
         return;
+      }
+
+      if (ontgrendeldDoel) {
+        // Quiet goal celebration: a line in the message card. Confetti and
+        // sound only when no milestone modal already celebrates this hap.
+        document.getElementById("message").textContent =
+          "Gefeliciteerd! " + ontgrendeldDoel.naam + " is nu van jou!";
+        if (!rewards[hapjes]) {
+          playRewardSound();
+          maakConfetti();
+        }
       }
 
       if (rewards[hapjes]) {
@@ -744,7 +1131,6 @@
       const progressPercent = (progressInLevel / levelSize) * 100;
 
       document.getElementById("counter").textContent = hapjes;
-      document.getElementById("combo").textContent = combo + "x";
       document.getElementById("coins").textContent = coins;
       document.getElementById("level").textContent = level;
       document.getElementById("progressFill").style.width = progressPercent + "%";
@@ -752,6 +1138,8 @@
       const levelName = levelNames[Math.min(level - 1, levelNames.length - 1)];
       document.getElementById("levelName").textContent = levelName;
       document.getElementById("progressText").textContent = progressInLevel + " / " + levelSize;
+
+      updateGoalCard();
     }
 
     function unlockBadge(hapjesAantal) {
@@ -769,6 +1157,210 @@
         document.getElementById(badgeId).classList.add("unlocked");
       }
     }
+
+    // ── Issue #5: rustige spaarlus ────────────────────────────────────────
+    // hap nemen → muntje verdienen → doel kiezen → zichtbaar ontgrendelen.
+    // No deduction (the pot only grows), no timers, no streaks, no quotas.
+
+    function muntjesWoord(aantal) {
+      return aantal === 1 ? "muntje" : "muntjes";
+    }
+
+    function actiefDoel() {
+      return schatkistItems.find(item => item.id === activeGoalId) || null;
+    }
+
+    // Unlock the active goal once the pot reaches its price. The pot is
+    // never deducted: prices act as thresholds on one shared spaarpot.
+    // Returns the unlocked item when this call unlocked it, else null.
+    function probeerDoelTeOntgrendelen() {
+      const doel = actiefDoel();
+      if (!doel || unlocked[doel.id]) return null;
+      if (coins < doel.prijs) return null;
+      unlocked[doel.id] = true;
+      pasCosmeticaToe();
+      return doel;
+    }
+
+    // Make every unlocked cosmetic visible right away.
+    function pasCosmeticaToe() {
+      document.getElementById("vriendje").classList.toggle("zichtbaar", !!unlocked.panda);
+      document.getElementById("strijkje").classList.toggle("zichtbaar", !!unlocked.strik);
+      document.getElementById("plate").classList.toggle("feest-bord", !!unlocked.bord);
+      document.body.classList.toggle("regenboog", !!unlocked.regenboog);
+      document.getElementById("feestKnop").hidden = !unlocked.confetti;
+    }
+
+    function updateGoalCard() {
+      const doel = actiefDoel();
+      const goalName = document.getElementById("goalName");
+      const goalText = document.getElementById("goalText");
+      const goalTrack = document.getElementById("goalTrack");
+      const goalFill = document.getElementById("goalFill");
+      const goalRemaining = document.getElementById("goalRemaining");
+
+      if (!doel) {
+        goalName.textContent = "Spaardoel kiezen";
+        goalText.textContent = "—";
+        goalFill.style.width = "0%";
+        goalTrack.setAttribute("aria-valuenow", "0");
+        goalRemaining.textContent = "Kies iets leuks om voor te sparen";
+        return;
+      }
+
+      const klaar = !!unlocked[doel.id];
+      const percent = Math.min(100, Math.round((coins / doel.prijs) * 100));
+
+      goalName.textContent = doel.emoji + " " + doel.naam;
+      goalText.textContent = Math.min(coins, doel.prijs) + " van " + doel.prijs;
+      goalFill.style.width = (klaar ? 100 : percent) + "%";
+      goalTrack.setAttribute("aria-valuenow", String(klaar ? 100 : percent));
+
+      if (klaar) {
+        goalRemaining.textContent = "Dit is van jou! Kies gerust iets nieuws.";
+      } else {
+        const nog = doel.prijs - coins;
+        goalRemaining.textContent =
+          "🪙 nog " + nog + " " + muntjesWoord(nog) + " tot " + doel.kort;
+      }
+    }
+
+    let schatkistReturnFocus = null;
+
+    function schatkistOpen() {
+      return document.getElementById("schatkist").classList.contains("show");
+    }
+
+    function schatkistKnoppen() {
+      // Focusable = not disabled and not inside the closed spaar-reset panel.
+      return Array.from(document.querySelectorAll("#schatkist button"))
+        .filter(button => !button.disabled)
+        .filter(button => {
+          if (typeof button.closest !== "function") return true;
+          const panel = button.closest(".spaar-reset");
+          return !panel || panel.classList.contains("open");
+        });
+    }
+
+    function openSchatkist() {
+      schatkistReturnFocus = document.activeElement;
+      document.getElementById("spaarReset").classList.remove("open");
+      renderSchatkist();
+      document.getElementById("schatkist").classList.add("show");
+      const knoppen = schatkistKnoppen();
+      if (knoppen.length) knoppen[0].focus();
+    }
+
+    function sluitSchatkist() {
+      document.getElementById("schatkist").classList.remove("show");
+      const returnFocus = schatkistReturnFocus;
+      schatkistReturnFocus = null;
+      if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
+        returnFocus.focus();
+      } else {
+        document.getElementById("hapButton").focus();
+      }
+      updateGoalCard();
+    }
+
+    function renderSchatkist() {
+      document.getElementById("schatkistText").textContent =
+        "Je spaarpot: " + coins + " " + muntjesWoord(coins) +
+        ". Elke hap geeft er één. Waar spaar je voor?";
+
+      const lijst = document.getElementById("schatkistList");
+      lijst.innerHTML = "";
+
+      schatkistItems.forEach(item => {
+        const rij = document.createElement("li");
+        rij.className = "schatkist-item";
+
+        const isActief = activeGoalId === item.id;
+        const isVrij = !!unlocked[item.id];
+        if (isActief) rij.classList.add("actief");
+        if (isVrij) rij.classList.add("vrij");
+
+        const emoji = document.createElement("span");
+        emoji.className = "schatkist-emoji";
+        emoji.textContent = item.emoji;
+        emoji.setAttribute("aria-hidden", "true");
+
+        const info = document.createElement("div");
+        info.className = "schatkist-item-info";
+
+        const naam = document.createElement("div");
+        naam.className = "schatkist-item-naam";
+        naam.textContent = item.naam;
+
+        const kost = document.createElement("div");
+        kost.className = "schatkist-item-kost";
+        kost.textContent = item.wat + " (" + item.prijs + " " + muntjesWoord(item.prijs) + ")";
+
+        info.appendChild(naam);
+        info.appendChild(kost);
+
+        const status = document.createElement("div");
+        status.className = "schatkist-status";
+
+        if (isVrij) {
+          status.textContent = "Van jou! ✓";
+        } else if (isActief) {
+          status.textContent = "Hier spaar je voor";
+        } else {
+          const kies = document.createElement("button");
+          kies.className = "small-btn";
+          kies.textContent = "Hiervoor sparen";
+          kies.setAttribute("data-doel", item.id);
+          kies.addEventListener("click", () => kiesDoel(item.id));
+          status.appendChild(kies);
+        }
+
+        rij.appendChild(emoji);
+        rij.appendChild(info);
+        rij.appendChild(status);
+        lijst.appendChild(rij);
+      });
+    }
+
+    function kiesDoel(doelId) {
+      activeGoalId = doelId;
+      // Choosing an already-affordable item unlocks it right away:
+      // the pot only grows, so this can never cost anything.
+      const vers = probeerDoelTeOntgrendelen();
+      renderSchatkist();
+      updateGoalCard();
+      if (vers) {
+        playRewardSound();
+        maakConfetti();
+      }
+      // The clicked row re-rendered away; keep keyboard focus in the dialog.
+      document.getElementById("schatkistClose").focus();
+    }
+
+    // Kindvriendelijke reset van de spaarpot: alleen via een expliciete
+    // bevestiging, en ontgrendelde dingen blijven altijd behouden.
+    function bevestigSpaarReset() {
+      document.getElementById("spaarReset").classList.add("open");
+      document.getElementById("spaarResetJa").focus();
+    }
+
+    function spaarResetAnnuleer() {
+      document.getElementById("spaarReset").classList.remove("open");
+      document.getElementById("spaarResetBtn").focus();
+    }
+
+    function spaarResetBevestig() {
+      coins = 0;
+      activeGoalId = null;
+      document.getElementById("spaarReset").classList.remove("open");
+      document.getElementById("message").textContent =
+        "Nieuwe spaarpot! Je ontgrendelde dingen mag je houden.";
+      renderSchatkist();
+      updateUI();
+      playPopSound();
+      document.getElementById("schatkistClose").focus();
+    }
+    // ── einde issue #5 spaarlus ───────────────────────────────────────────
 
     function toonBeloning(reward) {
       document.getElementById("rewardEmoji").textContent = reward.emoji;
@@ -821,7 +1413,7 @@
       document.getElementById("endEmoji").textContent = "🎉";
       document.getElementById("endTitle").textContent = "Avontuur klaar!";
       document.getElementById("endText").textContent =
-        "Je hebt vandaag " + coins + " muntjes gevonden.";
+        "Je hebt vandaag " + muntjesGevonden + " muntjes gevonden.";
       document.getElementById("endNote").textContent =
         "Verder eten is niet nodig. Je mag stoppen wanneer je wilt.";
       end.classList.add("show");
@@ -853,6 +1445,27 @@
     // Keep keyboard focus in the modal until the child chooses an exit.
     document.addEventListener("keydown", function (e) {
       const end = document.getElementById("end");
+      const schatkist = document.getElementById("schatkist");
+
+      // The Schatkist dialog gets the same focus trap as the end dialog.
+      if (schatkist.classList.contains("show")) {
+        if (e.key === "Escape") {
+          sluitSchatkist();
+          return;
+        }
+
+        if (e.key === "Tab") {
+          const knoppen = schatkistKnoppen();
+          if (!knoppen.length) return;
+          e.preventDefault();
+          const currentIndex = knoppen.indexOf(document.activeElement);
+          const direction = e.shiftKey ? -1 : 1;
+          const nextIndex = (currentIndex + direction + knoppen.length) % knoppen.length;
+          knoppen[nextIndex].focus();
+        }
+        return;
+      }
+
       if (!end.classList.contains("show")) return;
 
       if (e.key === "Escape") {
@@ -881,9 +1494,12 @@
     function resetGame() {
       const end = document.getElementById("end");
       if (end.classList.contains("show")) closeEndDialog();
+      if (schatkistOpen()) sluitSchatkist();
+      // Issue #5: "Opnieuw" starts a new adventure. It does NOT touch the
+      // spaarpot or unlocked cosmetics: those only change through the
+      // explicit, confirmed "Opnieuw sparen" inside the Schatkist.
       hapjes = 0;
-      coins = 0;
-      combo = 0;
+      muntjesGevonden = 0;
       adventureDone = false;
       bonusMode = false;
 

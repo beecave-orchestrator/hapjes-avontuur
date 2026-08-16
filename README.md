@@ -4,14 +4,26 @@ Dutch kids snack-encouragement game. Single-page static app for GitHub Pages.
 
 Live (from `main`): https://beecave-orchestrator.github.io/hapjes-avontuur/
 
-## What’s in this branch (`fix/issue-7-positive-end-state`)
+## What’s in this branch (`feat/issue-5-schatkist`)
 
-This branch adds a **positive, pressure-free end state** (issue #7). The main
-adventure now has a safe end boundary: after 20 hapjes the game opens a
-"Avontuur klaar!" dialog with a clear **Klaar met eten** primary exit and an
-optional **Bonusavontuur** that explicitly says eating more is not required.
-Pressure copy ("Je bord wordt al leger!", "Nog eentje voor de power?", "Je
-vliegt door dit avondeten heen.") is replaced with neutral, positive lines.
+This branch adds a **quiet, cosmetic reward loop** (issue #5): hap nemen →
+muntje verdienen → doel kiezen → zichtbaar ontgrendelen.
+
+- Every registered hap gives **exactly one muntje**. The old escalating
+  combo multiplier is gone.
+- One savings goal at a time with visible progress, e.g.
+  `🪙 4 van 8 — nog 4 muntjes tot de panda`.
+- The **Schatkist** holds five strictly cosmetic items (Feestconfetti,
+  Feestbord, Dierenvriendje, Regenbooglucht, Feeststrik). Prices act as
+  thresholds on one shared spaarpot: unlocking never deducts muntjes, so
+  the balance can never go negative.
+- Unlocked cosmetics apply immediately and permanently: confetti button,
+  plate rim, panda friend, rainbow sky, bow.
+- **Reset is child-friendly and explicit.** "Opnieuw" starts a new
+  adventure and never touches the spaarpot or unlocked items. The pot only
+  clears through "Opnieuw sparen" inside the Schatkist, which asks for
+  confirmation and always keeps unlocked items.
+- No timers, streaks, quotas, rankings, munt deduction, or food rewards.
 
 | Path | Purpose |
 | --- | --- |
@@ -21,6 +33,7 @@ vliegt door dit avondeten heen.") is replaced with neutral, positive lines.
 | `scripts/regenerate_edge_tts.py` | Regenerates the current edge-tts clips (no API key) |
 | `scripts/build_manifest.py` | Rebuilds `audio/manifest.json` from disk |
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
+| `tests/verify_schatkist.js` | Issue #5 reward-loop and reset behavior checks |
 
 ## Architecture: static audio only
 
