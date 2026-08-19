@@ -25,6 +25,24 @@ muntje verdienen → doel kiezen → zichtbaar ontgrendelen.
   confirmation and always keeps unlocked items.
 - No timers, streaks, quotas, rankings, munt deduction, or food rewards.
 
+This branch also keeps the merged **meal picker** (issue #6):
+
+- "Eten kiezen" opens a dialog with labelled Dutch meals: Aardappels en
+  groente, Pasta, Rijst, Noedels, Soep, and the permanent neutral choice
+  **Mijn eigen eten**. Emoji are supplementary (`aria-hidden`); the text
+  labels carry the meaning.
+- The chosen meal stays visible all session in a chip under the counter
+  ("Je eet nu: …") and can be changed deliberately by reopening the picker.
+- An optional, explicitly skippable second step (Groente, Vlees of vis,
+  Vegetarisch, Saus, Weet ik niet) never pressures the child: "Deze stap
+  overslaan" and Escape both pass without answering, and skipping never
+  changes the chosen meal.
+- Keyboard and screen-reader support: `role="dialog"` + `aria-modal`,
+  radiogroup semantics with `aria-checked` and roving `tabindex`, arrow-key
+  selection, visible `:focus-visible` outlines, a Tab focus trap, and focus
+  restoration to the opener button on close.
+- No automatic emoji rotation anywhere in the meal-selection experience.
+
 | Path | Purpose |
 | --- | --- |
 | `index.html` | Game UI + Web Audio SFX beeps + static speech playback (wired) |
@@ -34,6 +52,7 @@ muntje verdienen → doel kiezen → zichtbaar ontgrendelen.
 | `scripts/build_manifest.py` | Rebuilds `audio/manifest.json` from disk |
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
 | `tests/verify_schatkist.js` | Issue #5 reward-loop and reset behavior checks |
+| `tests/meal_picker.test.mjs` | Zero-dep Node tests: picker behaviour + a11y |
 
 ## Architecture: static audio only
 
@@ -103,8 +122,12 @@ Do not commit temporary files such as `audio/_generation_run.json` or smoke left
 node tests/verify_schatkist.js
 node tests/verify_end_state.js
 node tests/verify_document_links.js
+node --test tests/*.test.mjs
 python3 scripts/validate_audio_assets.py
 ```
+
+The Node tests are zero-dependency: they run the real inline `<script>` from
+`index.html` inside a minimal DOM shim, so no jsdom install is needed.
 
 Checks: every manifest key has a playable MP3 path, headers look like MPEG, bytes match, Dutch source text matches `index.html`, the end-state lines and AI-speech disclosure are present, no pressure copy remains, and the HTML has no network-TTS / API-key patterns.
 

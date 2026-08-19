@@ -26,6 +26,7 @@ function makeEl(id) {
       contains(c) { return this._set.has(c); },
     },
     focus() { global.document.activeElement = this; },
+    addEventListener() {},
     offsetWidth: 100,
   };
 }
@@ -36,17 +37,22 @@ const ids = [
   'endPrimary','endBonus','badge-1','badge-2','badge-3','badge-4','badge-5','soundButton'
 ];
 for (const id of ids) elements[id] = makeEl(id);
+elements.mealPickerBox = makeEl('mealPickerBox');
 
 global.document = {
   activeElement: null,
   getElementById(id) { return elements[id] || makeEl(id); },
   querySelector(sel) {
     if (sel === '#end .main-btn') return elements.endPrimary;
+    // The meal picker's static markup exists in the page; expose its box so
+    // the picker's keydown bindings from the merged script still attach.
+    if (sel === '#mealPicker .picker-box') return elements.mealPickerBox;
     return null;
   },
   querySelectorAll(sel) {
     if (sel === '#end button') return [elements.endPrimary, elements.endBonus];
     if (sel === '.badge') return ids.filter(i => i.startsWith('badge')).map(i => elements[i]);
+    if (sel === '#mealGrid .meal-option' || sel === '#extraGrid .meal-option') return [];
     return [];
   },
   createElement() { return makeEl('confetti'); },

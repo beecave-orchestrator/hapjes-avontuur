@@ -100,6 +100,7 @@ global.document = {
   getElementById(id) { return elements[id] || makeEl(id); },
   querySelector(sel) {
     if (sel === '#end .main-btn') return elements.endPrimary;
+    if (sel === '#mealPicker .picker-box') return makeEl('mealPickerBox');
     return null;
   },
   querySelectorAll(sel) {
@@ -115,6 +116,7 @@ global.document = {
       return buttons;
     }
     if (sel === '.badge') return ids.filter(i => i.startsWith('badge')).map(i => elements[i]);
+    if (sel === '#mealGrid .meal-option' || sel === '#extraGrid .meal-option') return [];
     return [];
   },
   createElement(tag) { dynCounter += 1; return makeEl('dyn-' + dynCounter, tag); },
