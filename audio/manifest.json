@@ -6,18 +6,19 @@
   "runtime_tts": false,
   "browser_api_keys": false,
   "generation": {
-    "provider": "edge-tts",
-    "endpoint": "Microsoft Edge neural TTS (offline via edge-tts)",
-    "voice_id": "nl-NL-FennaNeural",
+    "provider": "openai",
+    "endpoint": "POST /v1/audio/speech",
+    "model": "gpt-4o-mini-tts",
+    "voice": "marin",
     "language": "nl",
-    "language_note": "Issues #7 and #15 packs are generated with edge-tts nl-NL-FennaNeural. The original v1 OpenAI route (gpt-4o-mini-tts, voice marin) is kept in scripts/generate_openai_dutch_v1.py for keyed environments; issue #15 shipped with edge-tts so all clips share one voice.",
+    "language_note": "Issue #15 child-facing clips and the existing pack use OpenAI gpt-4o-mini-tts voice marin. edge-tts is not an accepted fallback.",
     "sample_rate_hz": 24000,
     "bit_rate_bps": 48000,
     "codec": "mp3",
     "channels": "mono",
     "auto_speech_tags": false,
-    "generated_at_utc": "2026-08-19T00:00:00Z",
-    "tooling": "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
+    "generated_at_utc": "2026-08-19T19:41:59Z",
+    "tooling": "scripts/generate_openai_dutch_v1.py"
   },
   "decisions": {
     "reward_title_body": "Each reward is ONE clip combining title + body (\"{title} {body}\") for a single modal announcement. Separate title/body files were not generated for v1.",
@@ -37,7 +38,7 @@
     "schatkist": 5,
     "start_reset": 1,
     "unlock": 10,
-    "total_bytes": 1203696
+    "total_bytes": 2148096
   },
   "clips": {
     "start": {
@@ -276,8 +277,8 @@
       "file": "picker_title_1.mp3",
       "path": "audio/picker_title_1.mp3",
       "source": "picker step 1 title + note",
-      "bytes": 39312,
-      "sha256": "39b3777d70b143437b961f8bce2cf9a669a2c9a91cef59fb6d21bb972d8f258a",
+      "bytes": 79488,
+      "sha256": "e579fbdce0aef55d3ac0e0ad2342569f0b770245a51d23472f54eab764593c97",
       "format": "mp3"
     },
     "picker_title_2": {
@@ -287,8 +288,8 @@
       "file": "picker_title_2.mp3",
       "path": "audio/picker_title_2.mp3",
       "source": "picker step 2 title + note",
-      "bytes": 41328,
-      "sha256": "dbab8a06d9a0c1a3f1ea427cc74f365c621389ad8a24b1d5b2cf7ff3ecf7fb06",
+      "bytes": 100992,
+      "sha256": "907e54c3f952842d6e3b972ce50a932f42cd83dd90547a08e94afdcf16d3d5e9",
       "format": "mp3"
     },
     "meal_aardappels": {
@@ -298,8 +299,8 @@
       "file": "meal_aardappels.mp3",
       "path": "audio/meal_aardappels.mp3",
       "source": "meals.aardappels.name",
-      "bytes": 13968,
-      "sha256": "a42a661b844ebdd970c5f22064d411821c9f38480d10f32cddbedffd852fc415",
+      "bytes": 35328,
+      "sha256": "fc5f1e5800765f6dd3505782645f7eb35883975654d6eec43e54be09ef475f76",
       "format": "mp3"
     },
     "meal_pasta": {
@@ -309,8 +310,8 @@
       "file": "meal_pasta.mp3",
       "path": "audio/meal_pasta.mp3",
       "source": "meals.pasta.name",
-      "bytes": 10656,
-      "sha256": "98b52ee10e58addbd19180a8f65ef90d76dd4881c8690af3c8a0dd4810f63114",
+      "bytes": 16128,
+      "sha256": "a830d7162c1bb612d5ac3be9c3da092420ad40e16fc1cddd858f84e3545caab2",
       "format": "mp3"
     },
     "meal_rijst": {
@@ -320,8 +321,8 @@
       "file": "meal_rijst.mp3",
       "path": "audio/meal_rijst.mp3",
       "source": "meals.rijst.name",
-      "bytes": 9792,
-      "sha256": "31981699c1e5a79b1efe38968e993feeed59370b92e42d514e6a8331ae4ec959",
+      "bytes": 36864,
+      "sha256": "93b5b047b866d9f791918c81ab6aad0510a26e48319a15d87ab8a9309d404640",
       "format": "mp3"
     },
     "meal_noedels": {
@@ -331,8 +332,8 @@
       "file": "meal_noedels.mp3",
       "path": "audio/meal_noedels.mp3",
       "source": "meals.noedels.name",
-      "bytes": 10656,
-      "sha256": "717de99a0707b85f6bc663642b3933f61c7bce121991c751ece89c64de849945",
+      "bytes": 16896,
+      "sha256": "0e56815808b8c43077d700558c25b077ab9e98076696055276d214f976b273e1",
       "format": "mp3"
     },
     "meal_soep": {
@@ -342,8 +343,8 @@
       "file": "meal_soep.mp3",
       "path": "audio/meal_soep.mp3",
       "source": "meals.soep.name",
-      "bytes": 10656,
-      "sha256": "2536c18ac05e26336ad290302062df3f843ca1333a117dc783d7fe996e65bbea",
+      "bytes": 17664,
+      "sha256": "d320644ae89b8ae3542ce5ce99f9a3d557edfb19456369001cedf34ac43d7588",
       "format": "mp3"
     },
     "meal_eigen": {
@@ -353,8 +354,8 @@
       "file": "meal_eigen.mp3",
       "path": "audio/meal_eigen.mp3",
       "source": "meals.eigen.name",
-      "bytes": 13680,
-      "sha256": "e9dde723426565354d4db95ccd536b897a4406963c97f6f0839667880c71cf77",
+      "bytes": 33792,
+      "sha256": "5fb2140c20ccdb7792e4a53aef6c4d28acca5146455909339dc4d52afe44c061",
       "format": "mp3"
     },
     "extra_groente": {
@@ -364,8 +365,8 @@
       "file": "extra_groente.mp3",
       "path": "audio/extra_groente.mp3",
       "source": "extras.groente",
-      "bytes": 10656,
-      "sha256": "9fead3688c0312665111df075c60f5a323bfc9b16bf3f291ba7403142160ba0c",
+      "bytes": 22656,
+      "sha256": "b10221af4120128d352219754ca86726aad8fd734cd92e0780f88f0dd9f25d60",
       "format": "mp3"
     },
     "extra_vlees": {
@@ -375,8 +376,8 @@
       "file": "extra_vlees.mp3",
       "path": "audio/extra_vlees.mp3",
       "source": "extras.vlees",
-      "bytes": 12816,
-      "sha256": "0d33c20bd2a1835519a090eeb42aba458d6c13abb9c236012bdc818231d69f89",
+      "bytes": 25728,
+      "sha256": "eaab83d6f67ee3c13e601b71f3ee36a8a5ae22330bb4e0fc8bf3b6fbeef79956",
       "format": "mp3"
     },
     "extra_vegetarisch": {
@@ -386,8 +387,8 @@
       "file": "extra_vegetarisch.mp3",
       "path": "audio/extra_vegetarisch.mp3",
       "source": "extras.vegetarisch",
-      "bytes": 12240,
-      "sha256": "23412642ac74e3abc7005031505dfe1e8d67ff66fb1894773ff7b8917ee386c4",
+      "bytes": 25728,
+      "sha256": "b44a56b41044d92266774814b91c2efb55a4ae59a6ab1498326c2f7ba554e30e",
       "format": "mp3"
     },
     "extra_saus": {
@@ -397,8 +398,8 @@
       "file": "extra_saus.mp3",
       "path": "audio/extra_saus.mp3",
       "source": "extras.saus",
-      "bytes": 10656,
-      "sha256": "3c4067215c26855c06711504910be07ef75ef36554205d50fb03576440389ab6",
+      "bytes": 21888,
+      "sha256": "13360e0040c6dbd885d5e6b71a0c40e0ce5ee6e20a18f4d49cf36e6977ec6c80",
       "format": "mp3"
     },
     "extra_weetniet": {
@@ -408,8 +409,8 @@
       "file": "extra_weetniet.mp3",
       "path": "audio/extra_weetniet.mp3",
       "source": "extras.weetniet",
-      "bytes": 10656,
-      "sha256": "bfee399eab08aad5de01e1813bb81cf8f4e8a1167068807b6fb14b6e9dcdb39f",
+      "bytes": 17664,
+      "sha256": "d051b15477a5457f1169a2a0c2c9d81330efc1f459626fd5683129f662f05633",
       "format": "mp3"
     },
     "chip_kies": {
@@ -419,8 +420,8 @@
       "file": "chip_kies.mp3",
       "path": "audio/chip_kies.mp3",
       "source": "meal chip default #mealChipText",
-      "bytes": 11232,
-      "sha256": "f8cba02f1773cb8962be62d6144751ab0547a2fb312f9d7111327caf9cd8a7ab",
+      "bytes": 24960,
+      "sha256": "7184a516d63ef351c683bb029cce3107cd8ec0b3f05a789602cde95d7c1c2c29",
       "format": "mp3"
     },
     "chip_eat_aardappels": {
@@ -430,8 +431,8 @@
       "file": "chip_eat_aardappels.mp3",
       "path": "audio/chip_eat_aardappels.mp3",
       "source": "meal chip \"Je eet nu: \" + name",
-      "bytes": 19584,
-      "sha256": "6e4080f42734a7d417cca2eca6fd5dbfbacca64cba3c2309d6390ae5383e58b0",
+      "bytes": 69888,
+      "sha256": "7305d3aaaf101925ff7ff5d99980c349b60284e76063f1c49e0bc5ef5d61913b",
       "format": "mp3"
     },
     "chip_eat_pasta": {
@@ -441,8 +442,8 @@
       "file": "chip_eat_pasta.mp3",
       "path": "audio/chip_eat_pasta.mp3",
       "source": "meal chip \"Je eet nu: \" + name",
-      "bytes": 15552,
-      "sha256": "d868a2dc5f29e0bf4c28fc1fe108046308fc79abef5a27d5ed90d1b5d310e0fc",
+      "bytes": 35328,
+      "sha256": "563122c090565a1115ed81210e57c70bf522fe8176bbb5dc7ba8e99ef4e65a5d",
       "format": "mp3"
     },
     "chip_eat_rijst": {
@@ -452,8 +453,8 @@
       "file": "chip_eat_rijst.mp3",
       "path": "audio/chip_eat_rijst.mp3",
       "source": "meal chip \"Je eet nu: \" + name",
-      "bytes": 15408,
-      "sha256": "44cd3c3c302bf712ac9fa37a50c246cffbcfa3e39bf6f98eba0c0134b156b41c",
+      "bytes": 39168,
+      "sha256": "f12ef8366b286a6aa1b8aff6930c6132dbbcc5777c99b6e524ad90e1c21d29b5",
       "format": "mp3"
     },
     "chip_eat_noedels": {
@@ -463,8 +464,8 @@
       "file": "chip_eat_noedels.mp3",
       "path": "audio/chip_eat_noedels.mp3",
       "source": "meal chip \"Je eet nu: \" + name",
-      "bytes": 15840,
-      "sha256": "e0d38e663f81a3ed2d979556d79451e78d637138af9547309bbc48b66f80eaca",
+      "bytes": 38400,
+      "sha256": "809b43ea439ec5d3c0a13f704880539368033eb6382a1620c7a35f80b162c25f",
       "format": "mp3"
     },
     "chip_eat_soep": {
@@ -474,8 +475,8 @@
       "file": "chip_eat_soep.mp3",
       "path": "audio/chip_eat_soep.mp3",
       "source": "meal chip \"Je eet nu: \" + name",
-      "bytes": 14256,
-      "sha256": "666b68a9f10dc67e658a1b64d66e95a84a3c06540717404b35b7e14e87110a53",
+      "bytes": 27264,
+      "sha256": "f22d34ed98ad534cc058558f7dc21551c8de5907a5f448195c7db3841f84dafb",
       "format": "mp3"
     },
     "chip_eat_eigen": {
@@ -485,8 +486,8 @@
       "file": "chip_eat_eigen.mp3",
       "path": "audio/chip_eat_eigen.mp3",
       "source": "meal chip \"Je eet nu: \" + name",
-      "bytes": 19008,
-      "sha256": "8943b5459a39fa2e649633d9ef7d8192c4c8e02f780dd473db34d3865663b128",
+      "bytes": 44160,
+      "sha256": "28746c6a3de448ed93e49401501174aa65abed0f8097352d220253ab2ca16417",
       "format": "mp3"
     },
     "schatkist_intro": {
@@ -496,8 +497,8 @@
       "file": "schatkist_intro.mp3",
       "path": "audio/schatkist_intro.mp3",
       "source": "schatkist title + initial #schatkistText",
-      "bytes": 38160,
-      "sha256": "95bf51c1de8728717b5b9763a9bbb69b60005613ff2cd5ebc24b2343b53bd5ec",
+      "bytes": 72960,
+      "sha256": "3f5fb988ad8a263163e1d85736c7a989ecaa1749a00a12e3047d7baa2e053cf0",
       "format": "mp3"
     },
     "schatkist_actief": {
@@ -507,8 +508,8 @@
       "file": "schatkist_actief.mp3",
       "path": "audio/schatkist_actief.mp3",
       "source": "renderSchatkist() active-goal status",
-      "bytes": 12816,
-      "sha256": "80270749c66295e763e62864c14c966dbabad71c554775ec9979ebb46c38d6f5",
+      "bytes": 30720,
+      "sha256": "0d4ff3b714d2a654abcffb61295088d910633bbb79e333d34b76a38c2f7ba380",
       "format": "mp3"
     },
     "schatkist_vrij": {
@@ -518,8 +519,8 @@
       "file": "schatkist_vrij.mp3",
       "path": "audio/schatkist_vrij.mp3",
       "source": "renderSchatkist() unlocked status \"Van jou! ✓\"",
-      "bytes": 10656,
-      "sha256": "3d9739edcd71a82992415d4ec47e86ec6384ba45d309ee95839f598d9124018e",
+      "bytes": 29568,
+      "sha256": "82eac9b952ee5180effb29cbe60871577716760f013886ae5735cad4c3116c71",
       "format": "mp3"
     },
     "spaar_reset_vraag": {
@@ -529,8 +530,8 @@
       "file": "spaar_reset_vraag.mp3",
       "path": "audio/spaar_reset_vraag.mp3",
       "source": "#spaarResetVraag",
-      "bytes": 43488,
-      "sha256": "e21c5c34a943b67d1a9d5e3360a854f3665dcab9a8fe2fa0a2e531e945fee1d4",
+      "bytes": 93696,
+      "sha256": "c77e160750878dbc8d5ab979cae320255b87707227ccc14331aae30e749c25e0",
       "format": "mp3"
     },
     "spaar_reset_nieuw": {
@@ -540,8 +541,8 @@
       "file": "spaar_reset_nieuw.mp3",
       "path": "audio/spaar_reset_nieuw.mp3",
       "source": "spaarResetBevestig() message",
-      "bytes": 29808,
-      "sha256": "9509a1faef765acd2f9b352486d0417d3d237f3c2cc9e809245621ad491b93bf",
+      "bytes": 74496,
+      "sha256": "ddabd9aefd558cad953cd1381084b0ff391b753b7d14689953585bbc5b45d9d9",
       "format": "mp3"
     },
     "unlock_confetti": {
@@ -551,8 +552,8 @@
       "file": "unlock_confetti.mp3",
       "path": "audio/unlock_confetti.mp3",
       "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
-      "bytes": 30240,
-      "sha256": "5bba165a2e676c731f7ff337a976787bd1315ca586ce66b101aeb221046a0963",
+      "bytes": 72960,
+      "sha256": "21fc6a0391372b3e49fc634e28017f917162120f9d83967ab3db050cf1523e1c",
       "format": "mp3"
     },
     "unlock_bord": {
@@ -562,8 +563,8 @@
       "file": "unlock_bord.mp3",
       "path": "audio/unlock_bord.mp3",
       "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
-      "bytes": 28656,
-      "sha256": "9a20f4611164cb42748e4021ea8265beeb20739f5712095a1f3ad34602949dbf",
+      "bytes": 53760,
+      "sha256": "2c5f13e88841c06f4a27198c52716256921c82b3e0c36bc6fe5c775062ff21fa",
       "format": "mp3"
     },
     "unlock_panda": {
@@ -573,8 +574,8 @@
       "file": "unlock_panda.mp3",
       "path": "audio/unlock_panda.mp3",
       "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
-      "bytes": 29376,
-      "sha256": "293e51f7a8542d6acc8c7968abdceaaaac39eebd022e01f5d5819a5f9ba51a47",
+      "bytes": 61056,
+      "sha256": "906b1d26ae695e7fe7a112f07319ac0db548f95ec0d96fe6ea9e8c3fe4131f9f",
       "format": "mp3"
     },
     "unlock_regenboog": {
@@ -584,8 +585,8 @@
       "file": "unlock_regenboog.mp3",
       "path": "audio/unlock_regenboog.mp3",
       "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
-      "bytes": 30816,
-      "sha256": "c5739d42acd1cb77ec60441ae05df8021e170b49e2138a8e0815c6e146073b73",
+      "bytes": 73728,
+      "sha256": "07bb4252255c2766f36490a53c6ad657dc24d5dac5480e6398068f51a4e2ee94",
       "format": "mp3"
     },
     "unlock_strik": {
@@ -595,8 +596,8 @@
       "file": "unlock_strik.mp3",
       "path": "audio/unlock_strik.mp3",
       "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
-      "bytes": 28080,
-      "sha256": "b4c0b57d17afc5b72609e28e341b951c7c3da3358b379bf4b7636d8aa11e625a",
+      "bytes": 57600,
+      "sha256": "5a8c8d7fe43cd53c2b669c91c96a7791b0ce430c548ff5fcce27433a6819ab47",
       "format": "mp3"
     },
     "unlock_einde_confetti": {
@@ -606,8 +607,8 @@
       "file": "unlock_einde_confetti.mp3",
       "path": "audio/unlock_einde_confetti.mp3",
       "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
-      "bytes": 30096,
-      "sha256": "ea9890d7a08e9d08b9d8fb337764705959d273039d7efcf2d90416377384e131",
+      "bytes": 77568,
+      "sha256": "232d0743b315eb6579a6cc52ecbb4b77a5a0d7f801d10328662ba5c5b90a8cf4",
       "format": "mp3"
     },
     "unlock_einde_bord": {
@@ -617,8 +618,8 @@
       "file": "unlock_einde_bord.mp3",
       "path": "audio/unlock_einde_bord.mp3",
       "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
-      "bytes": 28512,
-      "sha256": "78c6538556058e86cf29c3f9e2b41780ef9f1b5c87230d88ced4daa34e0ff1df",
+      "bytes": 54528,
+      "sha256": "d5898d0f36f760b048554da921c426a2505661f49c0986e222c656a0f57f1d36",
       "format": "mp3"
     },
     "unlock_einde_panda": {
@@ -628,8 +629,8 @@
       "file": "unlock_einde_panda.mp3",
       "path": "audio/unlock_einde_panda.mp3",
       "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
-      "bytes": 29088,
-      "sha256": "c0fa05e7b7546c31a57da0c316484724ac74ed6d468ba8e35b712b171414f0ce",
+      "bytes": 66432,
+      "sha256": "3fcbeecb94a41f5dbe1c05d97b570984ae4cecf514c133a50299e4ed68507f00",
       "format": "mp3"
     },
     "unlock_einde_regenboog": {
@@ -639,8 +640,8 @@
       "file": "unlock_einde_regenboog.mp3",
       "path": "audio/unlock_einde_regenboog.mp3",
       "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
-      "bytes": 30672,
-      "sha256": "0a9ed0bc4ea7f4b9486cb414fe2522e1d12b9f0606400e44c36edcaa5ba756df",
+      "bytes": 74496,
+      "sha256": "f20717010920d56a11d8241cbd969b6f80e8452c2f194bfa1be43d3c41363453",
       "format": "mp3"
     },
     "unlock_einde_strik": {
@@ -650,8 +651,8 @@
       "file": "unlock_einde_strik.mp3",
       "path": "audio/unlock_einde_strik.mp3",
       "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
-      "bytes": 27936,
-      "sha256": "6b7dbbd73dd4b130a7ad2a9283d73775e40f7182039950e92c53ccff58edb578",
+      "bytes": 67200,
+      "sha256": "828441739b7dc2546c7b743f37682a68fde778af75ed1ee2d160df811bb0279f",
       "format": "mp3"
     }
   },
@@ -725,5 +726,5 @@
     "schatkist",
     "unlock"
   ],
-  "built_at_utc": "2026-08-19T18:50:01Z"
+  "built_at_utc": "2026-08-19T19:41:59Z"
 }

@@ -65,26 +65,23 @@ def main() -> None:
         "runtime_tts": False,
         "browser_api_keys": False,
         "generation": {
-            "provider": "edge-tts",
-            "endpoint": "Microsoft Edge neural TTS (offline via edge-tts)",
-            "voice_id": "nl-NL-FennaNeural",
+            "provider": "openai",
+            "endpoint": "POST /v1/audio/speech",
+            "model": "gpt-4o-mini-tts",
+            "voice": "marin",
             "language": "nl",
             "language_note": (
-                "Issues #7 and #15 packs are generated with edge-tts "
-                "nl-NL-FennaNeural. The original v1 OpenAI route "
-                "(gpt-4o-mini-tts, voice marin) is kept in "
-                "scripts/generate_openai_dutch_v1.py for keyed environments; "
-                "issue #15 shipped with edge-tts so all clips share one voice."
+                "Issue #15 child-facing clips and the existing pack use "
+                "OpenAI gpt-4o-mini-tts voice marin. edge-tts is not an "
+                "accepted fallback."
             ),
             "sample_rate_hz": 24000,
             "bit_rate_bps": 48000,
             "codec": "mp3",
             "channels": "mono",
             "auto_speech_tags": False,
-            "generated_at_utc": "2026-08-19T00:00:00Z",
-            "tooling": (
-                "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
-            ),
+            "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "tooling": "scripts/generate_openai_dutch_v1.py",
         },
         "decisions": {
             "reward_title_body": (

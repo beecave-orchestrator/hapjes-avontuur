@@ -28,22 +28,22 @@ Spoken text matches the visible line exactly (issue #15 rule). Numeric status li
 
 | Field | Value |
 | --- | --- |
-| Provider | edge-tts (Microsoft Edge neural TTS) |
-| Voice | `nl-NL-FennaNeural` |
-| Locale | Dutch (`nl`) |
-| Format | MP3, measured 24 kHz / 48 kbps / mono |
-| Generation | 2026-08-19 issue #15 extension (19 base clips from issue #7 unchanged, 35 new child-facing clips; 54 total) |
-| Credentials | none required by edge-tts |
+| Provider | OpenAI TTS (`POST /v1/audio/speech`) |
+| Model | `gpt-4o-mini-tts` |
+| Voice | `marin` |
+| Locale | Dutch (`nl-NL`) |
+| Format | MP3 |
+| Credentials | `OPENAI_API_KEY` or `VOICE_TOOLS_OPENAI_KEY` in the process environment only — never committed |
 
-Issue #15 named OpenAI `gpt-4o-mini-tts` / voice `marin` as the generator. The shipped pack is edge-tts Fenna instead, for two reasons: no OpenAI credentials exist in this environment, and the existing 19-clip base pack has been Fenna since issue #7, so mixing voices mid-game would give the child two different voices. `scripts/generate_openai_dutch_v1.py` remains available and was extended with `--ids` / missing-only selection for a keyed environment; it is not the provenance of this pack.
+Do not ship edge-tts. If the key is missing, stop.
 
-The UI accurately discloses that speech is AI-generated: the disclosure lives in the parent/info menu (issue #8), programmatically readable via the dialog's `aria-describedby`, and no longer permanently on the main child screen.
+The UI discloses that speech is AI-generated in the parent/info menu (issue #8).
 
 ## Regeneration and validation
 
 ```bash
-pip install edge-tts
-python3 scripts/regenerate_edge_tts.py --only-missing   # only gaps; default regenerates all
+test -n "${OPENAI_API_KEY:-${VOICE_TOOLS_OPENAI_KEY:-}}" || { echo "OpenAI key missing"; exit 1; }
+python3 scripts/generate_openai_dutch_v1.py --only-missing
 python3 scripts/build_manifest.py
 python3 scripts/validate_audio_assets.py
 ```

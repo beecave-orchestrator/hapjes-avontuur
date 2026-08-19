@@ -279,6 +279,16 @@ def main() -> None:
     if manifest.get("browser_api_keys") is not False:
         errors.append("browser_api_keys must be false")
 
+    gen = manifest.get("generation") or {}
+    if gen.get("provider") != "openai":
+        errors.append(f"generation.provider must be openai, got {gen.get('provider')!r}")
+    if gen.get("model") != "gpt-4o-mini-tts":
+        errors.append(f"generation.model must be gpt-4o-mini-tts, got {gen.get('model')!r}")
+    if gen.get("voice") != "marin":
+        errors.append(f"generation.voice must be marin, got {gen.get('voice')!r}")
+    if gen.get("provider") == "edge-tts" or "Fenna" in str(gen.get("voice_id", "")):
+        errors.append("edge-tts / Fenna is not an accepted fallback")
+
     # index.html must still have no network TTS / API keys
     bad_patterns = [
         r"api\.x\.ai",

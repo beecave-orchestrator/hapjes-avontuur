@@ -61,11 +61,16 @@ def _strip_wrapping_quotes(value: str) -> str:
 
 
 def resolve_openai_api_key() -> str:
-    """Return OPENAI_API_KEY from the process environment only."""
-    key = _strip_wrapping_quotes(os.environ.get("OPENAI_API_KEY", "") or "")
-    if not key:
-        raise SystemExit("OPENAI_API_KEY is not set")
-    return key
+    """Return the OpenAI key from the process environment only.
+
+    Accepts OPENAI_API_KEY, or VOICE_TOOLS_OPENAI_KEY as the local alias.
+    Never looks up secrets. Never prints the key.
+    """
+    for name in ("OPENAI_API_KEY", "VOICE_TOOLS_OPENAI_KEY"):
+        key = _strip_wrapping_quotes(os.environ.get(name, "") or "")
+        if key:
+            return key
+    raise SystemExit("OPENAI_API_KEY is not set (VOICE_TOOLS_OPENAI_KEY also empty)")
 
 
 def generate_one(client, text: str, path: Path) -> None:
