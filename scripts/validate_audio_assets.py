@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -24,6 +25,8 @@ def fail(msg: str) -> None:
 
 
 def main() -> None:
+    if shutil.which("ffprobe") is None:
+        fail("ffprobe not found on PATH; install ffmpeg (bitrate checks need it)")
     if not MANIFEST.is_file():
         fail(f"missing {MANIFEST}")
     if not HTML.is_file():

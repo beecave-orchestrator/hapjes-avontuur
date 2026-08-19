@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -51,6 +52,8 @@ def probe_mp3(path: Path) -> dict:
 
 
 def main() -> None:
+    if shutil.which("ffprobe") is None:
+        raise SystemExit("ffprobe not found on PATH; install ffmpeg (probe_mp3 needs it)")
     clips = {}
     total = 0
     counts: dict[str, int] = {}

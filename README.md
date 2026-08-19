@@ -106,7 +106,8 @@ Exact strings, byte sizes, and SHA-256 digests live in `audio/manifest.json`.
 > states that the spoken texts are AI-generated. Current clips use
 > OpenAI `gpt-4o-mini-tts` / `marin`. Do not fall back to edge-tts.
 
-Regenerate (fails closed without a key):
+Regenerate (fails closed without a key; requires `ffmpeg` (`ffprobe` on
+`PATH`) for manifest bitrates and validation):
 
 ```bash
 python3 scripts/generate_openai_dutch_v1.py --only-missing
@@ -117,6 +118,9 @@ python3 scripts/validate_audio_assets.py
 Do not commit temporary files such as `audio/_generation_run.json` or smoke leftovers.
 
 ## Validation
+
+Requires `ffprobe` (part of `ffmpeg`) on `PATH`; the validator fails closed
+with a clear message when it is missing.
 
 ```bash
 node tests/verify_schatkist.js

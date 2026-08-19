@@ -41,6 +41,11 @@ The UI discloses that speech is AI-generated in the parent/info menu (issue #8).
 
 ## Regeneration and validation
 
+Tooling requirements: `python3` and `ffmpeg` (`ffprobe` must be on `PATH`;
+`build_manifest.py` and `validate_audio_assets.py` shell out to it for codec
+facts and bitrate checks; both fail closed with a clear message if it is
+missing).
+
 ```bash
 test -n "${OPENAI_API_KEY:-${VOICE_TOOLS_OPENAI_KEY:-}}" || { echo "OpenAI key missing"; exit 1; }
 python3 scripts/generate_openai_dutch_v1.py --only-missing
