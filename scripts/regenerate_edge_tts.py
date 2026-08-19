@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Regenerate Hapjes Avontuur Dutch static TTS assets with edge-tts.
 
-Canonical route for the committed pack (provenance since issue #7): one warm
-Dutch neural voice (nl-NL-FennaNeural), no secrets, no runtime TTS.
+DEV-ONLY FALLBACK: NOT accepted for the committed pack. The committed
+pack is OpenAI gpt-4o-mini-tts / marin (operator ruling, PR #16);
+edge-tts / Fenna output fails validation. See docs/static-tts-assets.md
+("Do not ship edge-tts."). Kept only as a historical, keyless generator
+for local preview.
 
 Usage:
   python3 scripts/regenerate_edge_tts.py                 # regenerate all
