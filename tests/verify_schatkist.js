@@ -22,11 +22,12 @@ const elements = {};
 const documentListeners = {};
 let dynCounter = 0;
 
-function makeEl(id) {
+function makeEl(id, tag) {
   const el = {
     id,
+    tagName: String(tag || 'div').toUpperCase(),
     textContent: '',
-    innerHTML: '',
+    _innerHTML: '',
     className: '',
     hidden: false,
     disabled: false,
@@ -52,9 +53,16 @@ function makeEl(id) {
     appendChild(child) { this.children.push(child); return child; },
     setAttribute(k, v) { this['attr_' + k] = v; },
     addEventListener(type, fn) { this.listeners[type] = fn; },
-    closest() { return null; },
+    closest(sel) { return null; },
     offsetWidth: 100,
   };
+  Object.defineProperty(el, 'innerHTML', {
+    get() { return this._innerHTML; },
+    set(v) {
+      this._innerHTML = String(v);
+      if (v === '') this.children = [];
+    },
+  });
   return el;
 }
 
@@ -70,9 +78,22 @@ const ids = [
 ];
 for (const id of ids) elements[id] = makeEl(id);
 
-// Mirror the real DOM: the confirm buttons live inside the (hidden) panel.
-elements.spaarResetJa.closest = () => elements.spaarReset;
-elements.spaarResetNee.closest = () => elements.spaarReset;
+elements.schatkistClose.tagName = 'BUTTON';
+elements.spaarResetBtn.tagName = 'BUTTON';
+elements.spaarResetJa.tagName = 'BUTTON';
+elements.spaarResetNee.tagName = 'BUTTON';
+elements.spaarReset.classList._set = new Set();
+elements.spaarReset.textContent =
+  'Opnieuw sparen? Je spaarpot wordt dan leeg. Je ontgrendelde dingen mag je houden.';
+elements.spaarResetJa.closest = (sel) => (sel === '.spaar-reset' || !sel ? elements.spaarReset : null);
+elements.spaarResetNee.closest = (sel) => (sel === '.spaar-reset' || !sel ? elements.spaarReset : null);
+elements.schatkist.children = [
+  elements.schatkistList,
+  elements.schatkistClose,
+  elements.spaarResetBtn,
+  elements.spaarReset,
+];
+elements.spaarReset.children = [elements.spaarResetJa, elements.spaarResetNee];
 
 global.document = {
   activeElement: null,
@@ -84,12 +105,19 @@ global.document = {
   querySelectorAll(sel) {
     if (sel === '#end button') return [elements.endPrimary, elements.endBonus];
     if (sel === '#schatkist button') {
-      return [elements.schatkistClose, elements.spaarResetBtn, elements.spaarResetJa, elements.spaarResetNee];
+      const buttons = [];
+      function walk(node) {
+        if (!node) return;
+        if (node.tagName === 'BUTTON') buttons.push(node);
+        (node.children || []).forEach(walk);
+      }
+      walk(elements.schatkist);
+      return buttons;
     }
     if (sel === '.badge') return ids.filter(i => i.startsWith('badge')).map(i => elements[i]);
     return [];
   },
-  createElement() { dynCounter += 1; return makeEl('dyn-' + dynCounter); },
+  createElement(tag) { dynCounter += 1; return makeEl('dyn-' + dynCounter, tag); },
   addEventListener(type, handler) { documentListeners[type] = handler; },
   body: makeEl('body'),
 };
@@ -133,7 +161,8 @@ check('no combo variable in the script', !/\bcombo\s*[+\-]/.test(code));
 // ── 2. Schatkist: goal choice and progress line ───────────────────────────
 openSchatkist();
 check('schatkist opens as a named, modal dialog', /id="schatkist"\s+role="dialog"\s+aria-modal="true"/.test(html));
-check('schatkist focus starts on the primary (Klaar) button', document.activeElement === elements.schatkistClose);
+const firstItemButton = latestKiesKnopVoor('confetti');
+check('schatkist focus starts on the first item button', document.activeElement === firstItemButton);
 check('pot line shows the quiet rule', /Elke hap geeft er \u00e9\u00e9n/.test(elements.schatkistText.textContent));
 
 const kiesPanda = latestKiesKnopVoor('panda');
@@ -176,9 +205,10 @@ dispatchKey('Tab');
 const focusAfterTabWrap = document.activeElement;
 const shiftTabPrevented = dispatchKey('Tab', true);
 const focusAfterShiftTab = document.activeElement;
-check('Tab stays inside the Schatkist dialog', tabPrevented && (focusAfterTab === elements.spaarResetBtn || focusAfterTab === elements.schatkistClose));
-check('Tab wraps within the Schatkist dialog', focusAfterTabWrap === elements.schatkistClose || focusAfterTabWrap === elements.spaarResetBtn);
-check('Shift+Tab wraps within the Schatkist dialog', shiftTabPrevented && (focusAfterShiftTab === elements.spaarResetBtn || focusAfterShiftTab === elements.schatkistClose));
+const schatkistButtons = document.querySelectorAll('#schatkist button');
+check('Tab stays inside the Schatkist dialog', tabPrevented && schatkistButtons.includes(focusAfterTab));
+check('Tab wraps within the Schatkist dialog', schatkistButtons.includes(focusAfterTabWrap));
+check('Shift+Tab wraps within the Schatkist dialog', shiftTabPrevented && schatkistButtons.includes(focusAfterShiftTab));
 dispatchKey('Escape');
 check('Escape closes the Schatkist and restores invoking focus', !elements.schatkist.classList.contains('show') && document.activeElement === elements.hapButton);
 
@@ -200,7 +230,7 @@ const potVoorReset = S(elements.coins.textContent);
 openSchatkist();
 bevestigSpaarReset();
 check('spaar-reset asks before clearing', elements.spaarReset.classList.contains('open'));
-check('spaar-reset explains what is kept', /ontgrendelde dingen mag je houden/.test(elements.spaarReset.textContent || html));
+check('spaar-reset explains what is kept', /ontgrendelde dingen mag je houden/.test(elements.spaarReset.textContent));
 spaarResetAnnuleer();
 check('cancelling keeps the pot intact', S(elements.coins.textContent) === potVoorReset && !elements.spaarReset.classList.contains('open'));
 bevestigSpaarReset();

@@ -100,6 +100,9 @@ Do not commit temporary files such as `audio/_generation_run.json` or smoke left
 ## Validation
 
 ```bash
+node tests/verify_schatkist.js
+node tests/verify_end_state.js
+node tests/verify_document_links.js
 python3 scripts/validate_audio_assets.py
 ```
 
