@@ -61,6 +61,9 @@ bitrate; do not hardcode 48000).
 
 Keep `audio/_generation_run.json` untracked.
 
+Clip count and regenerate steps: `docs/static-tts-assets.md`. Count clips
+from `audio/manifest.json`, not from this file.
+
 ### 3. No eetdruk
 
 Copy stays warm, optional, and proud. Never pressure a child to eat more.
@@ -81,14 +84,24 @@ different from first-choice hide.
 
 ### 5. Overlays shade everything except the popup
 
-Dialogs (ouder, picker, Schatkist, end, reward):
+Compliant today (picker, Schatkist, end, oudermenu):
 
-- Dimmer: `rgba(45, 42, 74, 0.72)` over the **full viewport**.
+- Dimmer: `rgba(45, 42, 74, 0.72)` (oudermenu scrim is `0.78`).
 - Popup card: solid white, opacity 1. Game text must not show through.
-- Preferred stack: confetti `z-index: 30`, dialogs `40`, end-state `45`,
+- Stack: confetti `z-index: 30`, picker/Schatkist `40`, end-state `45`,
   oudermenu `46` with a separate `.oudermenu-scrim` behind the card.
-- Look at a **full-page** screenshot yourself. A cropped dialog hid the
-  “shade stops halfway” bug more than once.
+- Two valid overlay shapes: most dialogs are `position: fixed; inset: 0`.
+  Oudermenu is the long-page case (scrollable host + document-tall
+  scrim, card stays in the viewport). Do not convert a working
+  `inset: 0` dialog into the oudermenu shape, or the reverse.
+
+**Known deviation (issue #18):** `.reward` is still z-index `20` with a
+`0.35` scrim. `hapGenomen()` fires confetti then `toonBeloning()`, so
+confetti can sit on the Beloning card. Do not document reward as fixed
+until that lands.
+
+Look at a **full-page** screenshot yourself. A cropped dialog hid the
+“shade stops halfway” bug more than once.
 
 ### 6. Look at the pixels
 
@@ -176,7 +189,8 @@ Need `ffprobe` for manifest bitrate probes.
 
 - New child-facing features that change the loop (map, new rewards, new
   meals).
-- Regenerating the **entire** existing 54-clip pack (cost + review).
+- Regenerating the **entire** existing pack (cost + review; count lives
+  in `audio/manifest.json`).
 - Merging to `main` / treating Pages as updated.
 - Using edge-tts or any non-marin voice “just this once”.
 - Deleting `scripts/regenerate_edge_tts.py`.
@@ -221,8 +235,8 @@ Need `ffprobe` for manifest bitrate probes.
 | Symptom | Likely cause |
 | --- | --- |
 | Game text shows through a dialog | Card is inside a translucent overlay. Split scrim + opaque box. |
-| Shade stops halfway down the page | Overlay is `100vh` / `fixed` while the page scrolls. Cover the document, keep the card in the viewport. |
-| Confetti on top of copy | Confetti z-index 30 above the dialog. Raise the dialog. |
+| Shade stops halfway down the page | Only the long-page/oudermenu pattern needs a document-tall scrim. Viewport-fixed `inset: 0` dialogs are already correct — do not “fix” those. |
+| Confetti on top of copy | Dialog below z-index 30 (today: `.reward`). Raise the dialog, or see issue #18. |
 | Validator green, voice still Fenna | Manifest claimed openai; files were 48 kbps. Probe bitrate. |
 | Worker “finished” TTS without a key | It used edge-tts. Reject the pack. Block the card. |
 | End / Schatkist tests fail after meal-first | Stub never called `selectMeal`. |
