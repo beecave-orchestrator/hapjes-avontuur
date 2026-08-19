@@ -26,7 +26,7 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100dvh;
       font-family: "Trebuchet MS", system-ui, sans-serif;
       background:
         radial-gradient(circle at top left, #fff0f7 0, transparent 35%),
@@ -38,6 +38,10 @@
       align-items: center;
       padding: 18px;
       overflow-x: hidden;
+    }
+
+    body.modal-open {
+      overflow: hidden;
     }
 
     .app {
@@ -613,7 +617,13 @@
     /* Meal picker dialog: semantic, keyboard-friendly controls. */
     .picker {
       position: fixed;
-      inset: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      margin: 0;
       background: rgba(45, 42, 74, 0.72);
       display: none;
       justify-content: center;
@@ -742,7 +752,13 @@
        and the sound setting so they live outside the child hap flow. */
     .oudermenu {
       position: fixed;
-      inset: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      margin: 0;
       background: rgba(45, 42, 74, 0.72);
       display: none;
       justify-content: center;
@@ -788,7 +804,7 @@
       font-size: 1.5rem;
       font-weight: 1000;
       color: var(--purple);
-      margin: 0 0 10px;
+      margin: 0 48px 10px 0;
     }
 
     .oudermenu-info {
@@ -1636,12 +1652,14 @@
       document.getElementById("spaarReset").classList.remove("open");
       renderSchatkist();
       document.getElementById("schatkist").classList.add("show");
+      syncPageScrollLock();
       const knoppen = schatkistKnoppen();
       if (knoppen.length) knoppen[0].focus();
     }
 
     function sluitSchatkist() {
       document.getElementById("schatkist").classList.remove("show");
+      syncPageScrollLock();
       const returnFocus = schatkistReturnFocus;
       schatkistReturnFocus = null;
       if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
@@ -1756,6 +1774,7 @@
       document.getElementById("rewardTitle").textContent = reward.title;
       document.getElementById("rewardText").textContent = reward.text;
       document.getElementById("reward").classList.add("show");
+      syncPageScrollLock();
 
       // Rewards are frozen as one clip per hapjes threshold (title + body).
       playSpeech("reward_" + hapjes);
@@ -1766,6 +1785,7 @@
 
     function sluitBeloning() {
       document.getElementById("reward").classList.remove("show");
+      syncPageScrollLock();
     }
 
     // Positive end state: a safe, pressure-free finish for the main adventure.
@@ -1785,6 +1805,7 @@
 
     function closeEndDialog() {
       document.getElementById("end").classList.remove("show");
+      syncPageScrollLock();
       const returnFocus = endDialogReturnFocus;
       endDialogReturnFocus = null;
       if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
@@ -1806,6 +1827,7 @@
       document.getElementById("endNote").textContent =
         "Verder eten is niet nodig. Je mag stoppen wanneer je wilt.";
       end.classList.add("show");
+      syncPageScrollLock();
 
       playRewardSound();
       maakConfetti();
@@ -1985,6 +2007,7 @@
       document.getElementById("pickerStep1").hidden = step !== 1;
       document.getElementById("pickerStep2").hidden = step !== 2;
       document.getElementById("mealPicker").classList.add("show");
+      syncPageScrollLock();
 
       // The dialog label and action labels follow the visible step.
       document
@@ -2057,6 +2080,7 @@
     function closeMealPicker() {
       pickerOpenStep = 0;
       document.getElementById("mealPicker").classList.remove("show");
+      syncPageScrollLock();
       document.getElementById("etenKiesButton").focus();
     }
 
@@ -2122,11 +2146,23 @@
       geluid.setAttribute("aria-pressed", soundOn ? "false" : "true");
     }
 
+    function syncPageScrollLock() {
+      const ids = ["oudermenu", "mealPicker", "schatkist", "end", "reward"];
+      const open = ids.some(function (id) {
+        const el = document.getElementById(id);
+        return el && el.classList.contains("show");
+      });
+      if (document.body && document.body.classList && typeof document.body.classList.toggle === "function") {
+        document.body.classList.toggle("modal-open", open);
+      }
+    }
+
     function openOudermenu() {
       oudermenuReturnFocus = document.activeElement;
       syncOudermenuGeluid();
       document.getElementById("oudermenu").classList.add("show");
       document.getElementById("parentButton").setAttribute("aria-expanded", "true");
+      syncPageScrollLock();
       const knoppen = oudermenuKnoppen();
       if (knoppen.length) knoppen[0].focus();
     }
@@ -2134,6 +2170,7 @@
     function sluitOudermenu() {
       document.getElementById("oudermenu").classList.remove("show");
       document.getElementById("parentButton").setAttribute("aria-expanded", "false");
+      syncPageScrollLock();
       const returnFocus = oudermenuReturnFocus;
       oudermenuReturnFocus = null;
       if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
