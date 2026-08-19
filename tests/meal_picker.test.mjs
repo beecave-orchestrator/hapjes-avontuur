@@ -383,13 +383,16 @@ test("picker dialog has dialog semantics and a visible focus style", () => {
 // Behaviour: selection, persistence, change, skip, keyboard
 // ---------------------------------------------------------------------------
 
-test("initial state shows no meal chosen and neutral plate", () => {
+test("initial state shows a meal-choice button and hides the play area", () => {
+  const chip = document.getElementById("mealChip");
+  assert.equal(chip.tagName, "BUTTON");
   assert.equal(
     document.getElementById("mealChipText").textContent,
-    "Nog geen eten gekozen"
+    "Kies je eten"
   );
   assert.equal(document.getElementById("food").textContent, "🍽️");
-  assert.ok(!document.getElementById("mealChip").classList.contains("chosen"));
+  assert.ok(!chip.classList.contains("chosen"));
+  assert.ok(document.getElementById("playArea").hidden);
 });
 
 test("selecting a meal updates chip, plate, and radio state", () => {
@@ -406,6 +409,7 @@ test("selecting a meal updates chip, plate, and radio state", () => {
   assert.equal(mealButton("soep").getAttribute("aria-checked"), "false");
   assert.ok(mealButton("pasta").classList.contains("selected"));
   assert.ok(document.getElementById("mealChip").classList.contains("chosen"));
+  assert.ok(!document.getElementById("playArea").hidden);
 });
 
 test("meal choice persists in the session and can be changed deliberately", () => {
@@ -548,8 +552,8 @@ test("Tab is trapped inside the open dialog and Escape closes it", () => {
   );
   assert.equal(
     document.activeElement,
-    document.getElementById("etenKiesButton"),
-    "focus returns to the 'Eten kiezen' opener"
+    document.getElementById("mealChip"),
+    "focus returns to the meal chip opener"
   );
 });
 

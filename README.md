@@ -53,6 +53,7 @@ This branch also keeps the merged **meal picker** (issue #6):
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
 | `tests/verify_schatkist.js` | Issue #5 reward-loop and reset behavior checks |
 | `tests/meal_picker.test.mjs` | Zero-dep Node tests: picker behaviour + a11y |
+| `tests/parent_menu.test.mjs` | Zero-dep Node tests: issue #8 oudermenu + a11y |
 
 ## Architecture: static audio only
 
@@ -102,9 +103,11 @@ Exact strings, byte sizes, and SHA-256 digests live in `audio/manifest.json`.
 | Generated | 2026-08-14 (issue #7 regeneration) |
 | Credentials | none — edge-tts needs no API key |
 
-> **Speech disclosure:** the UI visibly states that the spoken texts are
-> AI-generated. Current clips are generated with edge-tts
-> `nl-NL-FennaNeural`.
+> **Speech disclosure:** the parent/info menu (ℹ️ next to the sound button)
+> states that the spoken texts are AI-generated. The disclosure is
+> programmatically readable (`aria-describedby` on the dialog) and no longer
+> sits permanently on the main child screen. Current clips are generated
+> with edge-tts `nl-NL-FennaNeural`.
 
 Regenerate (requires `pip install edge-tts`):
 
@@ -126,10 +129,12 @@ node --test tests/*.test.mjs
 python3 scripts/validate_audio_assets.py
 ```
 
+The `node --test` glob covers `tests/meal_picker.test.mjs` and `tests/parent_menu.test.mjs` (issue #8).
+
 The Node tests are zero-dependency: they run the real inline `<script>` from
 `index.html` inside a minimal DOM shim, so no jsdom install is needed.
 
-Checks: every manifest key has a playable MP3 path, headers look like MPEG, bytes match, Dutch source text matches `index.html`, the end-state lines and AI-speech disclosure are present, no pressure copy remains, and the HTML has no network-TTS / API-key patterns.
+Checks: every manifest key has a playable MP3 path, headers look like MPEG, bytes match, Dutch source text matches `index.html`, the end-state lines are present, the AI-speech disclosure lives inside the parent/info menu (`oudermenu`), no pressure copy remains, and the HTML has no network-TTS / API-key patterns.
 
 ## Out of scope here
 

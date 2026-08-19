@@ -26,7 +26,8 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
       font-family: "Trebuchet MS", system-ui, sans-serif;
       background:
         radial-gradient(circle at top left, #fff0f7 0, transparent 35%),
@@ -38,6 +39,10 @@
       align-items: center;
       padding: 18px;
       overflow-x: hidden;
+    }
+
+    body.modal-open {
+      overflow: hidden;
     }
 
     .app {
@@ -84,6 +89,35 @@
     .sound-btn:active {
       transform: translateY(4px);
       box-shadow: 0 1px 0 #d8a733;
+    }
+
+    /* Issue #8: sound + parent/info controls sit together in the top bar. */
+    .topbar-controls {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .parent-btn {
+      border: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 5px 0 #5540bf;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .parent-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #5540bf;
+    }
+
+    .parent-btn:focus-visible,
+    .sound-btn:focus-visible {
+      outline: 4px solid var(--blue);
+      outline-offset: 2px;
     }
 
     .hero {
@@ -146,13 +180,6 @@
       justify-content: center;
       text-align: center;
       box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.7);
-    }
-
-    .speech-disclosure {
-      margin: -6px 0 12px;
-      text-align: center;
-      font-size: 0.78rem;
-      opacity: 0.72;
     }
 
     .progress-card {
@@ -283,6 +310,12 @@
 
     /* Issue #5: the unlockable Feest button spans the actions row. */
     .actions .feest-knop {
+      grid-column: 1 / -1;
+    }
+
+    /* Issue #8: with Opnieuw moved to the oudermenu, Eten kiezen is the
+       only always-visible action; span the row like the Feest button. */
+    .actions .eten-kies-knop {
       grid-column: 1 / -1;
     }
 
@@ -558,34 +591,61 @@
       gap: 8px;
     }
 
-    /* Meal picker (issue #6): the chosen meal stays visible in the hero. */
+    /* Meal picker: the chip is the main invite until a meal is chosen. */
     .meal-chip {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      margin: 2px auto 10px;
-      padding: 8px 16px;
-      background: #ffffff;
-      border: 3px dashed var(--pink);
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      margin: 14px auto 6px;
+      padding: 16px 18px;
+      border: 0;
       border-radius: 999px;
-      font-weight: 900;
-      font-size: 1rem;
-      box-shadow: 0 6px 14px rgba(123, 97, 255, 0.12);
+      font-family: inherit;
+      font-weight: 1000;
+      font-size: 1.15rem;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ff8ec8 0%, #7b61ff 100%);
+      box-shadow: 0 8px 0 #5a46c7, 0 14px 24px rgba(123, 97, 255, 0.22);
+    }
+
+    .meal-chip:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #5a46c7, 0 8px 16px rgba(123, 97, 255, 0.18);
+    }
+
+    .meal-chip:focus-visible {
+      outline: 4px solid var(--blue);
+      outline-offset: 3px;
     }
 
     .meal-chip.chosen {
-      border-style: solid;
+      color: var(--dark);
       background: #fff0f7;
+      border: 3px solid var(--pink);
+      box-shadow: 0 6px 14px rgba(123, 97, 255, 0.12);
     }
 
     .meal-chip-emoji {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
+    }
+
+    #playArea[hidden] {
+      display: none !important;
     }
 
     /* Meal picker dialog: semantic, keyboard-friendly controls. */
     .picker {
       position: fixed;
-      inset: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      margin: 0;
       background: rgba(45, 42, 74, 0.72);
       display: none;
       justify-content: center;
@@ -707,6 +767,105 @@
 
     .picker-step[hidden] {
       display: none !important;
+    }
+
+    /* Issue #8: parent/info menu (oudermenu). Same dialog vocabulary as the
+       meal picker and Schatkist; holds the AI-voice disclosure, restart,
+       and the sound setting so they live outside the child hap flow. */
+    .oudermenu {
+      position: fixed;
+      inset: 0;
+      z-index: 46;
+      display: none;
+      overflow: auto;
+    }
+
+    .oudermenu.show {
+      display: block;
+    }
+
+    .oudermenu-scrim {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      min-height: 100%;
+      background: rgba(45, 42, 74, 0.78);
+    }
+
+    .oudermenu-box {
+      position: relative;
+      z-index: 1;
+      width: calc(100% - 36px);
+      max-width: 380px;
+      max-height: calc(100dvh - 48px);
+      overflow-y: auto;
+      margin: 10vh auto 32px;
+      background: #ffffff;
+      opacity: 1;
+      isolation: isolate;
+      border-radius: 32px;
+      padding: 24px 18px 20px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
+      animation: rewardPop 0.3s ease;
+    }
+
+    .oudermenu-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: #f1edff;
+      font-size: 1.2rem;
+      font-weight: 1000;
+      color: var(--dark);
+      cursor: pointer;
+    }
+
+    .oudermenu-title {
+      font-size: 1.5rem;
+      font-weight: 1000;
+      color: var(--purple);
+      margin: 0 48px 10px 0;
+    }
+
+    .oudermenu-info {
+      background: #f8f5ff;
+      border: 2px solid #eeeaff;
+      border-radius: 18px;
+      padding: 12px 14px;
+      margin: 0 0 14px;
+      text-align: left;
+      display: grid;
+      gap: 8px;
+    }
+
+    .oudermenu-info p {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: var(--dark);
+    }
+
+    .oudermenu-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .oudermenu-actions .small-btn,
+    .oudermenu-actions .main-btn {
+      width: 100%;
+    }
+
+    .oudermenu-box button:focus-visible {
+      outline: 4px solid var(--blue);
+      outline-offset: 2px;
     }
 
     .reward {
@@ -842,6 +1001,11 @@
       to { transform: scale(1); opacity: 1; }
     }
 
+    @keyframes ouderPop {
+      from { transform: translate(-50%, -50%) scale(0.75); opacity: 0; }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
     @keyframes fall {
       to {
         transform: translateY(110vh) rotate(720deg);
@@ -884,31 +1048,35 @@
   <main class="app">
     <div class="topbar">
       <h1 class="title">Hapjes Avontuur</h1>
-      <button class="sound-btn" id="soundButton" onclick="toggleSound()" aria-label="Geluid aan of uit">
-        🔊
-      </button>
+      <div class="topbar-controls">
+        <button class="sound-btn" id="soundButton" onclick="toggleSound()" aria-label="Geluid aan of uit">
+          🔊
+        </button>
+        <button class="parent-btn" id="parentButton" type="button" onclick="openOudermenu()" aria-haspopup="dialog" aria-expanded="false" aria-label="Informatie voor ouders">
+          ℹ️
+        </button>
+      </div>
     </div>
 
     <section class="hero">
       <div class="plate" id="plate">
         <span class="vriendje" id="vriendje" aria-hidden="true">🐼</span>
         <span class="strijkje" id="strijkje" aria-hidden="true">🎀</span>
-        <div class="food" id="food">🍝</div>
+        <div class="food" id="food">🍽️</div>
       </div>
-
-      <div class="counter" id="counter">0</div>
-      <div class="counter-label">hapjes genomen</div>
     </section>
 
-    <p class="meal-chip" id="mealChip" aria-live="polite">
-      <span class="meal-chip-emoji" id="mealChipEmoji">🍽️</span>
-      <span id="mealChipText">Nog geen eten gekozen</span>
-    </p>
+    <button class="meal-chip" id="mealChip" type="button" onclick="openMealPicker()" aria-live="polite">
+      <span class="meal-chip-emoji" id="mealChipEmoji" aria-hidden="true">🍽️</span>
+      <span id="mealChipText">Kies je eten</span>
+    </button>
 
+    <div id="playArea" hidden="">
+    <div class="counter" id="counter">0</div>
+    <div class="counter-label">hapjes genomen</div>
     <div class="message" id="message" aria-live="polite">
       Klaar voor de eerste superhap?
     </div>
-    <p class="speech-disclosure">De gesproken teksten zijn met AI gegenereerd.</p>
 
     <section class="progress-card">
       <div class="progress-info">
@@ -962,10 +1130,10 @@
     </section>
 
     <section class="actions">
-      <button class="small-btn" id="etenKiesButton" onclick="openMealPicker()">Eten kiezen</button>
-      <button class="small-btn" onclick="resetGame()">Opnieuw</button>
+      <button class="small-btn eten-kies-knop" id="etenKiesButton" onclick="openMealPicker()">Eten kiezen</button>
       <button class="small-btn feest-knop" id="feestKnop" hidden onclick="maakConfetti(); playRewardSound();">Feest! 🎉</button>
     </section>
+    </div>
   </main>
 
   <div class="picker" id="mealPicker" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
@@ -1035,6 +1203,31 @@
       <div class="picker-actions">
         <button class="main-btn" type="button" id="pickerDone" onclick="confirmMealStep()">Klaar</button>
         <button class="small-btn" type="button" id="pickerSkip" onclick="skipMealStep()">Deze stap overslaan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue #8: parent/info menu. Next to the sound button, outside the child
+       hap flow. Holds the AI-voice disclosure (programmatically readable),
+       restart, and the sound setting. Long-press is deliberately not added:
+       the clearly labelled button is keyboard-reachable. -->
+  <div class="oudermenu" id="oudermenu" role="dialog" aria-modal="true" aria-labelledby="oudermenuTitle" aria-describedby="oudermenuInfo">
+    <div class="oudermenu-scrim" aria-hidden="true"></div>
+    <div class="oudermenu-box">
+      <button class="oudermenu-close" id="oudermenuClose" type="button" onclick="sluitOudermenu()" aria-label="Informatie voor ouders sluiten">✕</button>
+
+      <h2 class="oudermenu-title" id="oudermenuTitle">Informatie voor ouders</h2>
+
+      <div class="oudermenu-info" id="oudermenuInfo">
+        <p id="oudermenuStem">De gesproken teksten zijn met AI gegenereerd.</p>
+        <p id="oudermenuSpelen">Spelen stopt vanzelf. Het spel zegt nooit hoeveel er gegeten moet worden.</p>
+        <p id="oudermenuPrivacy">Deze website luistert niet en gebruikt geen microfoon. Er wordt niets opgeslagen of gedeeld.</p>
+      </div>
+
+      <div class="oudermenu-actions">
+        <button class="main-btn" type="button" id="oudermenuGeluid" onclick="toggleOuderGeluid()">Geluid aan</button>
+        <button class="small-btn" type="button" id="oudermenuOpnieuw" onclick="opnieuwViaOudermenu()">Opnieuw beginnen</button>
+        <button class="small-btn" type="button" id="oudermenuSluit" onclick="sluitOudermenu()">Terug naar het spel</button>
       </div>
     </div>
   </div>
@@ -1293,6 +1486,10 @@
     }
 
     function hapGenomen() {
+      if (!selectedMealKey) {
+        openMealPicker();
+        return;
+      }
       // Once the main adventure is complete, the hap button no longer
       // continues the main flow. In bonus mode it keeps counting at the
       // child's own pace; otherwise it reopens the end state.
@@ -1493,12 +1690,14 @@
       document.getElementById("spaarReset").classList.remove("open");
       renderSchatkist();
       document.getElementById("schatkist").classList.add("show");
+      syncPageScrollLock();
       const knoppen = schatkistKnoppen();
       if (knoppen.length) knoppen[0].focus();
     }
 
     function sluitSchatkist() {
       document.getElementById("schatkist").classList.remove("show");
+      syncPageScrollLock();
       const returnFocus = schatkistReturnFocus;
       schatkistReturnFocus = null;
       if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
@@ -1613,6 +1812,7 @@
       document.getElementById("rewardTitle").textContent = reward.title;
       document.getElementById("rewardText").textContent = reward.text;
       document.getElementById("reward").classList.add("show");
+      syncPageScrollLock();
 
       // Rewards are frozen as one clip per hapjes threshold (title + body).
       playSpeech("reward_" + hapjes);
@@ -1623,6 +1823,7 @@
 
     function sluitBeloning() {
       document.getElementById("reward").classList.remove("show");
+      syncPageScrollLock();
     }
 
     // Positive end state: a safe, pressure-free finish for the main adventure.
@@ -1642,6 +1843,7 @@
 
     function closeEndDialog() {
       document.getElementById("end").classList.remove("show");
+      syncPageScrollLock();
       const returnFocus = endDialogReturnFocus;
       endDialogReturnFocus = null;
       if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
@@ -1663,6 +1865,7 @@
       document.getElementById("endNote").textContent =
         "Verder eten is niet nodig. Je mag stoppen wanneer je wilt.";
       end.classList.add("show");
+      syncPageScrollLock();
 
       playRewardSound();
       maakConfetti();
@@ -1694,6 +1897,24 @@
     document.addEventListener("keydown", function (e) {
       const end = document.getElementById("end");
       const schatkist = document.getElementById("schatkist");
+      const oudermenu = document.getElementById("oudermenu");
+
+      if (oudermenu && oudermenu.classList.contains("show")) {
+        if (e.key === "Escape") {
+          sluitOudermenu();
+          return;
+        }
+        if (e.key === "Tab") {
+          const knoppen = oudermenuKnoppen();
+          if (!knoppen.length) return;
+          e.preventDefault();
+          const currentIndex = knoppen.indexOf(document.activeElement);
+          const direction = e.shiftKey ? -1 : 1;
+          const nextIndex = (currentIndex + direction + knoppen.length) % knoppen.length;
+          knoppen[nextIndex].focus();
+        }
+        return;
+      }
 
       if (schatkist && schatkist.classList.contains("show")) {
         if (e.key === "Escape") {
@@ -1783,10 +2004,10 @@
       // is selected) is the tab stop; arrows move within the group.
       const syncGrid = function (buttons, dataAttr, selectedKey) {
         const hasChecked = buttons.some(function (btn) {
-          return btn.dataset[dataAttr] === selectedKey;
+          return btn.dataset && btn.dataset[dataAttr] === selectedKey;
         });
         buttons.forEach(function (btn, i) {
-          const chosen = btn.dataset[dataAttr] === selectedKey;
+          const chosen = !!(btn.dataset && btn.dataset[dataAttr] === selectedKey);
           setRadioState(btn, chosen);
           btn.tabIndex = chosen || (!hasChecked && i === 0) ? 0 : -1;
         });
@@ -1807,11 +2028,15 @@
         chipEmoji.textContent = meal.emoji;
         chipText.textContent = "Je eet nu: " + meal.name;
         chip.classList.add("chosen");
+        chip.setAttribute("aria-label", "Eten veranderen, nu " + meal.name);
+        document.getElementById("playArea").hidden = false;
       } else {
         document.getElementById("food").textContent = "🍽️";
         chipEmoji.textContent = "🍽️";
-        chipText.textContent = "Nog geen eten gekozen";
+        chipText.textContent = "Kies je eten";
         chip.classList.remove("chosen");
+        chip.setAttribute("aria-label", "Kies je eten");
+        document.getElementById("playArea").hidden = true;
       }
     }
 
@@ -1824,6 +2049,7 @@
       document.getElementById("pickerStep1").hidden = step !== 1;
       document.getElementById("pickerStep2").hidden = step !== 2;
       document.getElementById("mealPicker").classList.add("show");
+      syncPageScrollLock();
 
       // The dialog label and action labels follow the visible step.
       document
@@ -1896,7 +2122,8 @@
     function closeMealPicker() {
       pickerOpenStep = 0;
       document.getElementById("mealPicker").classList.remove("show");
-      document.getElementById("etenKiesButton").focus();
+      syncPageScrollLock();
+      document.getElementById("mealChip").focus();
     }
 
     // Arrow-key navigation inside each radiogroup: the selected option
@@ -1937,10 +2164,83 @@
     });
     // ---- End meal picker --------------------------------------------------
 
+    // ---- Parent/info menu (issue #8) ---------------------------------------
+    // Labelled, keyboard-reachable control next to the sound button. The
+    // AI-voice disclosure, restart, and the sound setting live here, outside
+    // the child hap flow. Long-press access is intentionally not added: the
+    // clearly labelled button is already keyboard-reachable.
+    let oudermenuReturnFocus = null;
+
+    function oudermenuOpen() {
+      return document.getElementById("oudermenu").classList.contains("show");
+    }
+
+    function oudermenuKnoppen() {
+      return Array.from(document.querySelectorAll("#oudermenu button"))
+        .filter(button => !button.disabled);
+    }
+
+    // Mirror the sound state into the oudermenu action: label, pressed
+    // state, and pressed styling all follow soundOn.
+    function syncOudermenuGeluid() {
+      const geluid = document.getElementById("oudermenuGeluid");
+      geluid.textContent = soundOn ? "Geluid uit" : "Geluid aan";
+      geluid.setAttribute("aria-pressed", soundOn ? "false" : "true");
+    }
+
+    function syncPageScrollLock() {
+      const ids = ["oudermenu", "mealPicker", "schatkist", "end", "reward"];
+      const open = ids.some(function (id) {
+        const el = document.getElementById(id);
+        return el && el.classList.contains("show");
+      });
+      if (document.body && document.body.classList && typeof document.body.classList.toggle === "function") {
+        document.body.classList.toggle("modal-open", open);
+      }
+    }
+
+    function openOudermenu() {
+      oudermenuReturnFocus = document.activeElement;
+      syncOudermenuGeluid();
+      document.getElementById("oudermenu").classList.add("show");
+      document.getElementById("parentButton").setAttribute("aria-expanded", "true");
+      syncPageScrollLock();
+      const knoppen = oudermenuKnoppen();
+      if (knoppen.length) knoppen[0].focus();
+    }
+
+    function sluitOudermenu() {
+      document.getElementById("oudermenu").classList.remove("show");
+      document.getElementById("parentButton").setAttribute("aria-expanded", "false");
+      syncPageScrollLock();
+      const returnFocus = oudermenuReturnFocus;
+      oudermenuReturnFocus = null;
+      if (returnFocus && returnFocus !== document.body && typeof returnFocus.focus === "function") {
+        returnFocus.focus();
+      } else {
+        document.getElementById("hapButton").focus();
+      }
+    }
+
+    // The sound action inside the oudermenu shares the topbar toggle.
+    function toggleOuderGeluid() {
+      toggleSound();
+      syncOudermenuGeluid();
+      document.getElementById("oudermenuGeluid").focus();
+    }
+
+    // Restart from the oudermenu. resetGame() closes the open oudermenu
+    // itself (see its dialog-close list) and restores focus to the opener.
+    function opnieuwViaOudermenu() {
+      resetGame();
+    }
+    // ---- End parent/info menu ----------------------------------------------
+
     function resetGame() {
       const end = document.getElementById("end");
       if (end.classList.contains("show")) closeEndDialog();
       if (schatkistOpen()) sluitSchatkist();
+      if (oudermenuOpen()) sluitOudermenu();
       // Issue #5: "Opnieuw" starts a new adventure. It does NOT touch the
       // spaarpot or unlocked cosmetics: those only change through the
       // explicit, confirmed "Opnieuw sparen" inside the Schatkist.

@@ -72,6 +72,7 @@ function dispatchKey(key, shiftKey = false) {
 
 // Run the game script.
 eval(code);
+selectMeal("pasta");
 
 // --- Simulate 20 hapjes ---
 elements.hapButton.focus();

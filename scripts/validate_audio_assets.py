@@ -66,8 +66,19 @@ def main() -> None:
         if line not in html:
             fail(f"end-state line missing from HTML: {line!r}")
 
+    # Issue #8: the AI-voice disclosure lives in the parent/info menu
+    # (oudermenu), programmatically readable, no longer permanently on the
+    # main child screen.
     if "De gesproken teksten zijn met AI gegenereerd." not in html:
         fail("AI-generated speech disclosure missing from HTML")
+    if 'id="oudermenuStem"' not in html:
+        fail("AI-generated speech disclosure not anchored in the oudermenu")
+    oudermenu_start = html.find('<div class="oudermenu"')
+    if oudermenu_start == -1:
+        fail("oudermenu dialog markup missing")
+    oudermenu_end = html.find("</body>", oudermenu_start)
+    if html.find("De gesproken teksten zijn met AI gegenereerd.", oudermenu_start, oudermenu_end) == -1:
+        fail("AI-generated speech disclosure must stay inside the oudermenu dialog")
 
     # No pressure copy may remain anywhere in the HTML.
     pressure_patterns = [

@@ -30,7 +30,7 @@ Each reward is one spoken clip combining `{title} {body}`. The three end-state c
 | Generation | 2026-08-14 issue #7 regeneration |
 | Credentials | none required by edge-tts |
 
-The UI accurately discloses that speech is AI-generated. `scripts/generate_openai_dutch_v1.py` remains available as the prior OpenAI-pack generator, but is not the generator or provenance for this 19-clip end-state pack.
+The UI accurately discloses that speech is AI-generated: the disclosure lives in the parent/info menu (issue #8), programmatically readable via the dialog's `aria-describedby`, and no longer permanently on the main child screen. `scripts/generate_openai_dutch_v1.py` remains available as the prior OpenAI-pack generator, but is not the generator or provenance for this 19-clip end-state pack.
 
 ## Regeneration and validation
 
