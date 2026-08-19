@@ -1,171 +1,30 @@
 #!/usr/bin/env python3
-"""Build audio/manifest.json from frozen IDs + on-disk MP3 sizes/hashes."""
+"""Build audio/manifest.json from the frozen inventory + on-disk MP3s.
+
+The inventory (stable IDs, exact Dutch text) lives in
+scripts/speech_inventory.py — the single source of truth shared with the
+generators. This script only measures what is on disk.
+"""
 from __future__ import annotations
 
 import hashlib
 import json
+import sys
 import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIO = ROOT / "audio"
+SCRIPTS = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS))
 
-# Must stay in sync with scripts/regenerate_edge_tts.py ENTRIES.
-ENTRIES = [
-    {
-        "id": "start",
-        "category": "start_reset",
-        "text": "Klaar voor de eerste superhap?",
-        "file": "start.mp3",
-        "source": "initial #message + resetGame()",
-    },
-    {
-        "id": "msg_01",
-        "category": "encouragement",
-        "text": "Wat een lekkere hap!",
-        "file": "msg_01.mp3",
-        "source": "messages[0]",
-    },
-    {
-        "id": "msg_02",
-        "category": "encouragement",
-        "text": "Wat fijn dat je eet!",
-        "file": "msg_02.mp3",
-        "source": "messages[1]",
-    },
-    {
-        "id": "msg_03",
-        "category": "encouragement",
-        "text": "Supergoed bezig!",
-        "file": "msg_03.mp3",
-        "source": "messages[2]",
-    },
-    {
-        "id": "msg_04",
-        "category": "encouragement",
-        "text": "Hapjesheld gespot!",
-        "file": "msg_04.mp3",
-        "source": "messages[3]",
-    },
-    {
-        "id": "msg_05",
-        "category": "encouragement",
-        "text": "Lekker dat je proeft!",
-        "file": "msg_05.mp3",
-        "source": "messages[4]",
-    },
-    {
-        "id": "msg_06",
-        "category": "encouragement",
-        "text": "Jij bent echt goed in dit spel!",
-        "file": "msg_06.mp3",
-        "source": "messages[5]",
-    },
-    {
-        "id": "msg_07",
-        "category": "encouragement",
-        "text": "Wat een gezellige hap!",
-        "file": "msg_07.mp3",
-        "source": "messages[6]",
-    },
-    {
-        "id": "msg_08",
-        "category": "encouragement",
-        "text": "Mega trots op jou!",
-        "file": "msg_08.mp3",
-        "source": "messages[7]",
-    },
-    {
-        "id": "msg_09",
-        "category": "encouragement",
-        "text": "Dat was een dappere hap!",
-        "file": "msg_09.mp3",
-        "source": "messages[8]",
-    },
-    {
-        "id": "msg_10",
-        "category": "encouragement",
-        "text": "Je smaakpapillen gaan op avontuur!",
-        "file": "msg_10.mp3",
-        "source": "messages[9]",
-    },
-    {
-        "id": "reward_3",
-        "category": "reward",
-        "hapjes": 3,
-        "title": "Ster verdiend!",
-        "body": "Je hebt 3 hapjes gehaald. Superknap!",
-        "text": "Ster verdiend! Je hebt 3 hapjes gehaald. Superknap!",
-        "file": "reward_3.mp3",
-        "source": "rewards[3] title+text",
-    },
-    {
-        "id": "reward_5",
-        "category": "reward",
-        "hapjes": 5,
-        "title": "Level omhoog!",
-        "body": "5 hapjes! De eenhoorn is trots op jou.",
-        "text": "Level omhoog! 5 hapjes! De eenhoorn is trots op jou.",
-        "file": "reward_5.mp3",
-        "source": "rewards[5] title+text",
-    },
-    {
-        "id": "reward_10",
-        "category": "reward",
-        "hapjes": 10,
-        "title": "Beker gewonnen!",
-        "body": "10 hapjes! Wat een avontuur.",
-        "text": "Beker gewonnen! 10 hapjes! Wat een avontuur.",
-        "file": "reward_10.mp3",
-        "source": "rewards[10] title+text",
-    },
-    {
-        "id": "reward_15",
-        "category": "reward",
-        "hapjes": 15,
-        "title": "Raketboost!",
-        "body": "15 hapjes! Wat een leuke ontdekkingstocht.",
-        "text": "Raketboost! 15 hapjes! Wat een leuke ontdekkingstocht.",
-        "file": "reward_15.mp3",
-        "source": "rewards[15] title+text",
-    },
-    {
-        "id": "reward_20",
-        "category": "reward",
-        "hapjes": 20,
-        "title": "Kroon verdiend!",
-        "body": "20 hapjes! Wat een mooie reis.",
-        "text": "Kroon verdiend! 20 hapjes! Wat een mooie reis.",
-        "file": "reward_20.mp3",
-        "source": "rewards[20] title+text",
-    },
-    {
-        "id": "end",
-        "category": "end_state",
-        "text": "Avontuur klaar! Verder eten is niet nodig. Je mag stoppen wanneer je wilt.",
-        "file": "end.mp3",
-        "source": "toonEindstaat() end dialog",
-    },
-    {
-        "id": "end_done",
-        "category": "end_state",
-        "text": "Avontuur klaar! Je mag stoppen wanneer je wilt.",
-        "file": "end_done.mp3",
-        "source": "klaarMetEten()",
-    },
-    {
-        "id": "bonus",
-        "category": "end_state",
-        "text": "Bonusavontuur! Verder eten is niet nodig, maar mag wel.",
-        "file": "bonus.mp3",
-        "source": "bonusAvontuur()",
-    },
-]
+from speech_inventory import CHILD_FACING_CATEGORIES, ENTRIES  # noqa: E402
 
 
 def main() -> None:
     clips = {}
     total = 0
+    counts: dict[str, int] = {}
     for entry in ENTRIES:
         path = AUDIO / entry["file"]
         if not path.is_file():
@@ -196,9 +55,10 @@ def main() -> None:
             item["body"] = entry["body"]
             item["spoken_as"] = "title_plus_body"
         clips[entry["id"]] = item
+        counts[entry["category"]] = counts.get(entry["category"], 0) + 1
 
     manifest = {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "game": "hapjes-avontuur",
         "locale": "nl-NL",
         "architecture": "static-pregenerated",
@@ -210,17 +70,18 @@ def main() -> None:
             "voice_id": "nl-NL-FennaNeural",
             "language": "nl",
             "language_note": (
-                "Regenerated for issue #7 (neutral, pressure-free copy + "
-                "end-state clips). Voice changed from xAI 'ara' to edge-tts "
-                "nl-NL-FennaNeural because xAI OAuth was unavailable in the "
-                "regeneration environment."
+                "Issues #7 and #15 packs are generated with edge-tts "
+                "nl-NL-FennaNeural. The original v1 OpenAI route "
+                "(gpt-4o-mini-tts, voice marin) is kept in "
+                "scripts/generate_openai_dutch_v1.py for keyed environments; "
+                "issue #15 shipped with edge-tts so all clips share one voice."
             ),
             "sample_rate_hz": 24000,
             "bit_rate_bps": 48000,
             "codec": "mp3",
             "channels": "mono",
             "auto_speech_tags": False,
-            "generated_at_utc": "2026-08-14T18:10:00Z",
+            "generated_at_utc": "2026-08-19T00:00:00Z",
             "tooling": (
                 "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
             ),
@@ -231,21 +92,33 @@ def main() -> None:
                 "(\"{title} {body}\") for a single modal announcement. "
                 "Separate title/body files were not generated for v1."
             ),
+            "picker_title_note": (
+                "Each picker step is ONE clip combining the visible title + "
+                "note (issue #15), mirroring the reward title+body pattern."
+            ),
             "stable_ids": (
                 "start; msg_01..msg_10 match messages[] order; "
-                "reward_{3,5,10,15,20} match rewards keys / badge thresholds."
+                "reward_{3,5,10,15,20} match rewards keys / badge thresholds; "
+                "picker_title_{1,2}; meal_<key>/extra_<key> match picker "
+                "options; chip_kies + chip_eat_<key> match meal chip lines; "
+                "schatkist_* match dialog copy; unlock_<key> and "
+                "unlock_einde_<key> match unlock announcements."
             ),
-            "out_of_v1": (
-                "Level names, chrome labels, SFX beeps remain Web Audio; "
-                "no JS playback wiring in this asset stage."
+            "numeric_lines_not_frozen": (
+                "Issue #15: goal-card counters (\"X van Y\", \"nog X "
+                "muntjes\", pot counts, progress \"0 / 5\") are deliberately "
+                "not frozen as clips. They change every hap; re-speaking "
+                "running numbers each bite would add counting pressure the "
+                "game explicitly avoids (issue #5/#7 pressure-free rule)."
+            ),
+            "oudermenu_silent": (
+                "The parent/info menu (issue #8) is not child-facing and "
+                "stays silent by standing merge rule."
             ),
         },
         "counts": {
             "clips": len(clips),
-            "start_reset": 1,
-            "encouragement": 10,
-            "reward": 5,
-            "end_state": 3,
+            **{k: v for k, v in sorted(counts.items())},
             "total_bytes": total,
         },
         "clips": clips,
@@ -260,8 +133,34 @@ def main() -> None:
                 "15": "reward_15",
                 "20": "reward_20",
             },
+            "meal_by_key": {
+                e["id"].removeprefix("meal_"): e["id"]
+                for e in ENTRIES
+                if e["category"] == "picker_name" and e["id"].startswith("meal_")
+            },
+            "extra_by_key": {
+                e["id"].removeprefix("extra_"): e["id"]
+                for e in ENTRIES
+                if e["category"] == "picker_name" and e["id"].startswith("extra_")
+            },
+            "chip_eat_by_meal_key": {
+                e["id"].removeprefix("chip_eat_"): e["id"]
+                for e in ENTRIES
+                if e["id"].startswith("chip_eat_")
+            },
+            "unlock_by_item": {
+                e["id"].removeprefix("unlock_"): e["id"]
+                for e in ENTRIES
+                if e["category"] == "unlock" and not e["id"].startswith("unlock_einde_")
+            },
+            "unlock_einde_by_item": {
+                e["id"].removeprefix("unlock_einde_"): e["id"]
+                for e in ENTRIES
+                if e["id"].startswith("unlock_einde_")
+            },
             "start_reset_id": "start",
         },
+        "child_facing_categories": CHILD_FACING_CATEGORIES,
         "built_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "game": "hapjes-avontuur",
   "locale": "nl-NL",
   "architecture": "static-pregenerated",
@@ -10,27 +10,34 @@
     "endpoint": "Microsoft Edge neural TTS (offline via edge-tts)",
     "voice_id": "nl-NL-FennaNeural",
     "language": "nl",
-    "language_note": "Regenerated for issue #7 (neutral, pressure-free copy + end-state clips). Voice changed from xAI 'ara' to edge-tts nl-NL-FennaNeural because xAI OAuth was unavailable in the regeneration environment.",
+    "language_note": "Issues #7 and #15 packs are generated with edge-tts nl-NL-FennaNeural. The original v1 OpenAI route (gpt-4o-mini-tts, voice marin) is kept in scripts/generate_openai_dutch_v1.py for keyed environments; issue #15 shipped with edge-tts so all clips share one voice.",
     "sample_rate_hz": 24000,
     "bit_rate_bps": 48000,
     "codec": "mp3",
     "channels": "mono",
     "auto_speech_tags": false,
-    "generated_at_utc": "2026-08-14T18:10:00Z",
+    "generated_at_utc": "2026-08-19T00:00:00Z",
     "tooling": "scripts/regenerate_edge_tts.py (edge-tts; no secrets in repo)"
   },
   "decisions": {
     "reward_title_body": "Each reward is ONE clip combining title + body (\"{title} {body}\") for a single modal announcement. Separate title/body files were not generated for v1.",
-    "stable_ids": "start; msg_01..msg_10 match messages[] order; reward_{3,5,10,15,20} match rewards keys / badge thresholds.",
-    "out_of_v1": "Level names, chrome labels, SFX beeps remain Web Audio; no JS playback wiring in this asset stage."
+    "picker_title_note": "Each picker step is ONE clip combining the visible title + note (issue #15), mirroring the reward title+body pattern.",
+    "stable_ids": "start; msg_01..msg_10 match messages[] order; reward_{3,5,10,15,20} match rewards keys / badge thresholds; picker_title_{1,2}; meal_<key>/extra_<key> match picker options; chip_kies + chip_eat_<key> match meal chip lines; schatkist_* match dialog copy; unlock_<key> and unlock_einde_<key> match unlock announcements.",
+    "numeric_lines_not_frozen": "Issue #15: goal-card counters (\"X van Y\", \"nog X muntjes\", pot counts, progress \"0 / 5\") are deliberately not frozen as clips. They change every hap; re-speaking running numbers each bite would add counting pressure the game explicitly avoids (issue #5/#7 pressure-free rule).",
+    "oudermenu_silent": "The parent/info menu (issue #8) is not child-facing and stays silent by standing merge rule."
   },
   "counts": {
-    "clips": 19,
-    "start_reset": 1,
+    "clips": 54,
+    "chip": 7,
     "encouragement": 10,
-    "reward": 5,
     "end_state": 3,
-    "total_bytes": 457344
+    "picker": 2,
+    "picker_name": 11,
+    "reward": 5,
+    "schatkist": 5,
+    "start_reset": 1,
+    "unlock": 10,
+    "total_bytes": 1203696
   },
   "clips": {
     "start": {
@@ -261,6 +268,391 @@
       "bytes": 35280,
       "sha256": "fe1af82652133ef10afcb026b606f5beacfe98f0af548566d39b3c31ff5d066e",
       "format": "mp3"
+    },
+    "picker_title_1": {
+      "id": "picker_title_1",
+      "category": "picker",
+      "text": "Wat eet je vandaag? Je mag zelf kiezen. Alle keuzes zijn goed.",
+      "file": "picker_title_1.mp3",
+      "path": "audio/picker_title_1.mp3",
+      "source": "picker step 1 title + note",
+      "bytes": 39312,
+      "sha256": "39b3777d70b143437b961f8bce2cf9a669a2c9a91cef59fb6d21bb972d8f258a",
+      "format": "mp3"
+    },
+    "picker_title_2": {
+      "id": "picker_title_2",
+      "category": "picker",
+      "text": "Wil je nog wat kiezen? Dit hoeft niet. Je mag deze stap ook overslaan.",
+      "file": "picker_title_2.mp3",
+      "path": "audio/picker_title_2.mp3",
+      "source": "picker step 2 title + note",
+      "bytes": 41328,
+      "sha256": "dbab8a06d9a0c1a3f1ea427cc74f365c621389ad8a24b1d5b2cf7ff3ecf7fb06",
+      "format": "mp3"
+    },
+    "meal_aardappels": {
+      "id": "meal_aardappels",
+      "category": "picker_name",
+      "text": "Aardappels en groente",
+      "file": "meal_aardappels.mp3",
+      "path": "audio/meal_aardappels.mp3",
+      "source": "meals.aardappels.name",
+      "bytes": 13968,
+      "sha256": "a42a661b844ebdd970c5f22064d411821c9f38480d10f32cddbedffd852fc415",
+      "format": "mp3"
+    },
+    "meal_pasta": {
+      "id": "meal_pasta",
+      "category": "picker_name",
+      "text": "Pasta",
+      "file": "meal_pasta.mp3",
+      "path": "audio/meal_pasta.mp3",
+      "source": "meals.pasta.name",
+      "bytes": 10656,
+      "sha256": "98b52ee10e58addbd19180a8f65ef90d76dd4881c8690af3c8a0dd4810f63114",
+      "format": "mp3"
+    },
+    "meal_rijst": {
+      "id": "meal_rijst",
+      "category": "picker_name",
+      "text": "Rijst",
+      "file": "meal_rijst.mp3",
+      "path": "audio/meal_rijst.mp3",
+      "source": "meals.rijst.name",
+      "bytes": 9792,
+      "sha256": "31981699c1e5a79b1efe38968e993feeed59370b92e42d514e6a8331ae4ec959",
+      "format": "mp3"
+    },
+    "meal_noedels": {
+      "id": "meal_noedels",
+      "category": "picker_name",
+      "text": "Noedels",
+      "file": "meal_noedels.mp3",
+      "path": "audio/meal_noedels.mp3",
+      "source": "meals.noedels.name",
+      "bytes": 10656,
+      "sha256": "717de99a0707b85f6bc663642b3933f61c7bce121991c751ece89c64de849945",
+      "format": "mp3"
+    },
+    "meal_soep": {
+      "id": "meal_soep",
+      "category": "picker_name",
+      "text": "Soep",
+      "file": "meal_soep.mp3",
+      "path": "audio/meal_soep.mp3",
+      "source": "meals.soep.name",
+      "bytes": 10656,
+      "sha256": "2536c18ac05e26336ad290302062df3f843ca1333a117dc783d7fe996e65bbea",
+      "format": "mp3"
+    },
+    "meal_eigen": {
+      "id": "meal_eigen",
+      "category": "picker_name",
+      "text": "Mijn eigen eten",
+      "file": "meal_eigen.mp3",
+      "path": "audio/meal_eigen.mp3",
+      "source": "meals.eigen.name",
+      "bytes": 13680,
+      "sha256": "e9dde723426565354d4db95ccd536b897a4406963c97f6f0839667880c71cf77",
+      "format": "mp3"
+    },
+    "extra_groente": {
+      "id": "extra_groente",
+      "category": "picker_name",
+      "text": "Groente",
+      "file": "extra_groente.mp3",
+      "path": "audio/extra_groente.mp3",
+      "source": "extras.groente",
+      "bytes": 10656,
+      "sha256": "9fead3688c0312665111df075c60f5a323bfc9b16bf3f291ba7403142160ba0c",
+      "format": "mp3"
+    },
+    "extra_vlees": {
+      "id": "extra_vlees",
+      "category": "picker_name",
+      "text": "Vlees of vis",
+      "file": "extra_vlees.mp3",
+      "path": "audio/extra_vlees.mp3",
+      "source": "extras.vlees",
+      "bytes": 12816,
+      "sha256": "0d33c20bd2a1835519a090eeb42aba458d6c13abb9c236012bdc818231d69f89",
+      "format": "mp3"
+    },
+    "extra_vegetarisch": {
+      "id": "extra_vegetarisch",
+      "category": "picker_name",
+      "text": "Vegetarisch",
+      "file": "extra_vegetarisch.mp3",
+      "path": "audio/extra_vegetarisch.mp3",
+      "source": "extras.vegetarisch",
+      "bytes": 12240,
+      "sha256": "23412642ac74e3abc7005031505dfe1e8d67ff66fb1894773ff7b8917ee386c4",
+      "format": "mp3"
+    },
+    "extra_saus": {
+      "id": "extra_saus",
+      "category": "picker_name",
+      "text": "Saus",
+      "file": "extra_saus.mp3",
+      "path": "audio/extra_saus.mp3",
+      "source": "extras.saus",
+      "bytes": 10656,
+      "sha256": "3c4067215c26855c06711504910be07ef75ef36554205d50fb03576440389ab6",
+      "format": "mp3"
+    },
+    "extra_weetniet": {
+      "id": "extra_weetniet",
+      "category": "picker_name",
+      "text": "Weet ik niet",
+      "file": "extra_weetniet.mp3",
+      "path": "audio/extra_weetniet.mp3",
+      "source": "extras.weetniet",
+      "bytes": 10656,
+      "sha256": "bfee399eab08aad5de01e1813bb81cf8f4e8a1167068807b6fb14b6e9dcdb39f",
+      "format": "mp3"
+    },
+    "chip_kies": {
+      "id": "chip_kies",
+      "category": "chip",
+      "text": "Kies je eten",
+      "file": "chip_kies.mp3",
+      "path": "audio/chip_kies.mp3",
+      "source": "meal chip default #mealChipText",
+      "bytes": 11232,
+      "sha256": "f8cba02f1773cb8962be62d6144751ab0547a2fb312f9d7111327caf9cd8a7ab",
+      "format": "mp3"
+    },
+    "chip_eat_aardappels": {
+      "id": "chip_eat_aardappels",
+      "category": "chip",
+      "text": "Je eet nu: Aardappels en groente",
+      "file": "chip_eat_aardappels.mp3",
+      "path": "audio/chip_eat_aardappels.mp3",
+      "source": "meal chip \"Je eet nu: \" + name",
+      "bytes": 19584,
+      "sha256": "6e4080f42734a7d417cca2eca6fd5dbfbacca64cba3c2309d6390ae5383e58b0",
+      "format": "mp3"
+    },
+    "chip_eat_pasta": {
+      "id": "chip_eat_pasta",
+      "category": "chip",
+      "text": "Je eet nu: Pasta",
+      "file": "chip_eat_pasta.mp3",
+      "path": "audio/chip_eat_pasta.mp3",
+      "source": "meal chip \"Je eet nu: \" + name",
+      "bytes": 15552,
+      "sha256": "d868a2dc5f29e0bf4c28fc1fe108046308fc79abef5a27d5ed90d1b5d310e0fc",
+      "format": "mp3"
+    },
+    "chip_eat_rijst": {
+      "id": "chip_eat_rijst",
+      "category": "chip",
+      "text": "Je eet nu: Rijst",
+      "file": "chip_eat_rijst.mp3",
+      "path": "audio/chip_eat_rijst.mp3",
+      "source": "meal chip \"Je eet nu: \" + name",
+      "bytes": 15408,
+      "sha256": "44cd3c3c302bf712ac9fa37a50c246cffbcfa3e39bf6f98eba0c0134b156b41c",
+      "format": "mp3"
+    },
+    "chip_eat_noedels": {
+      "id": "chip_eat_noedels",
+      "category": "chip",
+      "text": "Je eet nu: Noedels",
+      "file": "chip_eat_noedels.mp3",
+      "path": "audio/chip_eat_noedels.mp3",
+      "source": "meal chip \"Je eet nu: \" + name",
+      "bytes": 15840,
+      "sha256": "e0d38e663f81a3ed2d979556d79451e78d637138af9547309bbc48b66f80eaca",
+      "format": "mp3"
+    },
+    "chip_eat_soep": {
+      "id": "chip_eat_soep",
+      "category": "chip",
+      "text": "Je eet nu: Soep",
+      "file": "chip_eat_soep.mp3",
+      "path": "audio/chip_eat_soep.mp3",
+      "source": "meal chip \"Je eet nu: \" + name",
+      "bytes": 14256,
+      "sha256": "666b68a9f10dc67e658a1b64d66e95a84a3c06540717404b35b7e14e87110a53",
+      "format": "mp3"
+    },
+    "chip_eat_eigen": {
+      "id": "chip_eat_eigen",
+      "category": "chip",
+      "text": "Je eet nu: Mijn eigen eten",
+      "file": "chip_eat_eigen.mp3",
+      "path": "audio/chip_eat_eigen.mp3",
+      "source": "meal chip \"Je eet nu: \" + name",
+      "bytes": 19008,
+      "sha256": "8943b5459a39fa2e649633d9ef7d8192c4c8e02f780dd473db34d3865663b128",
+      "format": "mp3"
+    },
+    "schatkist_intro": {
+      "id": "schatkist_intro",
+      "category": "schatkist",
+      "text": "Schatkist. Waar spaar jij voor? Elke hap geeft één muntje.",
+      "file": "schatkist_intro.mp3",
+      "path": "audio/schatkist_intro.mp3",
+      "source": "schatkist title + initial #schatkistText",
+      "bytes": 38160,
+      "sha256": "95bf51c1de8728717b5b9763a9bbb69b60005613ff2cd5ebc24b2343b53bd5ec",
+      "format": "mp3"
+    },
+    "schatkist_actief": {
+      "id": "schatkist_actief",
+      "category": "schatkist",
+      "text": "Hier spaar je voor",
+      "file": "schatkist_actief.mp3",
+      "path": "audio/schatkist_actief.mp3",
+      "source": "renderSchatkist() active-goal status",
+      "bytes": 12816,
+      "sha256": "80270749c66295e763e62864c14c966dbabad71c554775ec9979ebb46c38d6f5",
+      "format": "mp3"
+    },
+    "schatkist_vrij": {
+      "id": "schatkist_vrij",
+      "category": "schatkist",
+      "text": "Van jou!",
+      "file": "schatkist_vrij.mp3",
+      "path": "audio/schatkist_vrij.mp3",
+      "source": "renderSchatkist() unlocked status \"Van jou! ✓\"",
+      "bytes": 10656,
+      "sha256": "3d9739edcd71a82992415d4ec47e86ec6384ba45d309ee95839f598d9124018e",
+      "format": "mp3"
+    },
+    "spaar_reset_vraag": {
+      "id": "spaar_reset_vraag",
+      "category": "schatkist",
+      "text": "Opnieuw sparen? Je spaarpot wordt dan leeg. Je ontgrendelde dingen mag je houden.",
+      "file": "spaar_reset_vraag.mp3",
+      "path": "audio/spaar_reset_vraag.mp3",
+      "source": "#spaarResetVraag",
+      "bytes": 43488,
+      "sha256": "e21c5c34a943b67d1a9d5e3360a854f3665dcab9a8fe2fa0a2e531e945fee1d4",
+      "format": "mp3"
+    },
+    "spaar_reset_nieuw": {
+      "id": "spaar_reset_nieuw",
+      "category": "schatkist",
+      "text": "Nieuwe spaarpot! Je ontgrendelde dingen mag je houden.",
+      "file": "spaar_reset_nieuw.mp3",
+      "path": "audio/spaar_reset_nieuw.mp3",
+      "source": "spaarResetBevestig() message",
+      "bytes": 29808,
+      "sha256": "9509a1faef765acd2f9b352486d0417d3d237f3c2cc9e809245621ad491b93bf",
+      "format": "mp3"
+    },
+    "unlock_confetti": {
+      "id": "unlock_confetti",
+      "category": "unlock",
+      "text": "Gefeliciteerd! Feestconfetti is nu van jou!",
+      "file": "unlock_confetti.mp3",
+      "path": "audio/unlock_confetti.mp3",
+      "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
+      "bytes": 30240,
+      "sha256": "5bba165a2e676c731f7ff337a976787bd1315ca586ce66b101aeb221046a0963",
+      "format": "mp3"
+    },
+    "unlock_bord": {
+      "id": "unlock_bord",
+      "category": "unlock",
+      "text": "Gefeliciteerd! Feestbord is nu van jou!",
+      "file": "unlock_bord.mp3",
+      "path": "audio/unlock_bord.mp3",
+      "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
+      "bytes": 28656,
+      "sha256": "9a20f4611164cb42748e4021ea8265beeb20739f5712095a1f3ad34602949dbf",
+      "format": "mp3"
+    },
+    "unlock_panda": {
+      "id": "unlock_panda",
+      "category": "unlock",
+      "text": "Gefeliciteerd! Dierenvriendje is nu van jou!",
+      "file": "unlock_panda.mp3",
+      "path": "audio/unlock_panda.mp3",
+      "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
+      "bytes": 29376,
+      "sha256": "293e51f7a8542d6acc8c7968abdceaaaac39eebd022e01f5d5819a5f9ba51a47",
+      "format": "mp3"
+    },
+    "unlock_regenboog": {
+      "id": "unlock_regenboog",
+      "category": "unlock",
+      "text": "Gefeliciteerd! Regenbooglucht is nu van jou!",
+      "file": "unlock_regenboog.mp3",
+      "path": "audio/unlock_regenboog.mp3",
+      "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
+      "bytes": 30816,
+      "sha256": "c5739d42acd1cb77ec60441ae05df8021e170b49e2138a8e0815c6e146073b73",
+      "format": "mp3"
+    },
+    "unlock_strik": {
+      "id": "unlock_strik",
+      "category": "unlock",
+      "text": "Gefeliciteerd! Feeststrik is nu van jou!",
+      "file": "unlock_strik.mp3",
+      "path": "audio/unlock_strik.mp3",
+      "source": "\"Gefeliciteerd! \" + naam + \" is nu van jou!\"",
+      "bytes": 28080,
+      "sha256": "b4c0b57d17afc5b72609e28e341b951c7c3da3358b379bf4b7636d8aa11e625a",
+      "format": "mp3"
+    },
+    "unlock_einde_confetti": {
+      "id": "unlock_einde_confetti",
+      "category": "unlock",
+      "text": "Avontuur klaar! Feestconfetti is nu van jou!",
+      "file": "unlock_einde_confetti.mp3",
+      "path": "audio/unlock_einde_confetti.mp3",
+      "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
+      "bytes": 30096,
+      "sha256": "ea9890d7a08e9d08b9d8fb337764705959d273039d7efcf2d90416377384e131",
+      "format": "mp3"
+    },
+    "unlock_einde_bord": {
+      "id": "unlock_einde_bord",
+      "category": "unlock",
+      "text": "Avontuur klaar! Feestbord is nu van jou!",
+      "file": "unlock_einde_bord.mp3",
+      "path": "audio/unlock_einde_bord.mp3",
+      "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
+      "bytes": 28512,
+      "sha256": "78c6538556058e86cf29c3f9e2b41780ef9f1b5c87230d88ced4daa34e0ff1df",
+      "format": "mp3"
+    },
+    "unlock_einde_panda": {
+      "id": "unlock_einde_panda",
+      "category": "unlock",
+      "text": "Avontuur klaar! Dierenvriendje is nu van jou!",
+      "file": "unlock_einde_panda.mp3",
+      "path": "audio/unlock_einde_panda.mp3",
+      "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
+      "bytes": 29088,
+      "sha256": "c0fa05e7b7546c31a57da0c316484724ac74ed6d468ba8e35b712b171414f0ce",
+      "format": "mp3"
+    },
+    "unlock_einde_regenboog": {
+      "id": "unlock_einde_regenboog",
+      "category": "unlock",
+      "text": "Avontuur klaar! Regenbooglucht is nu van jou!",
+      "file": "unlock_einde_regenboog.mp3",
+      "path": "audio/unlock_einde_regenboog.mp3",
+      "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
+      "bytes": 30672,
+      "sha256": "0a9ed0bc4ea7f4b9486cb414fe2522e1d12b9f0606400e44c36edcaa5ba756df",
+      "format": "mp3"
+    },
+    "unlock_einde_strik": {
+      "id": "unlock_einde_strik",
+      "category": "unlock",
+      "text": "Avontuur klaar! Feeststrik is nu van jou!",
+      "file": "unlock_einde_strik.mp3",
+      "path": "audio/unlock_einde_strik.mp3",
+      "source": "\"Avontuur klaar! \" + naam + \" is nu van jou!\"",
+      "bytes": 27936,
+      "sha256": "6b7dbbd73dd4b130a7ad2a9283d73775e40f7182039950e92c53ccff58edb578",
+      "format": "mp3"
     }
   },
   "lookup_helpers": {
@@ -283,7 +675,55 @@
       "15": "reward_15",
       "20": "reward_20"
     },
+    "meal_by_key": {
+      "aardappels": "meal_aardappels",
+      "pasta": "meal_pasta",
+      "rijst": "meal_rijst",
+      "noedels": "meal_noedels",
+      "soep": "meal_soep",
+      "eigen": "meal_eigen"
+    },
+    "extra_by_key": {
+      "groente": "extra_groente",
+      "vlees": "extra_vlees",
+      "vegetarisch": "extra_vegetarisch",
+      "saus": "extra_saus",
+      "weetniet": "extra_weetniet"
+    },
+    "chip_eat_by_meal_key": {
+      "aardappels": "chip_eat_aardappels",
+      "pasta": "chip_eat_pasta",
+      "rijst": "chip_eat_rijst",
+      "noedels": "chip_eat_noedels",
+      "soep": "chip_eat_soep",
+      "eigen": "chip_eat_eigen"
+    },
+    "unlock_by_item": {
+      "confetti": "unlock_confetti",
+      "bord": "unlock_bord",
+      "panda": "unlock_panda",
+      "regenboog": "unlock_regenboog",
+      "strik": "unlock_strik"
+    },
+    "unlock_einde_by_item": {
+      "confetti": "unlock_einde_confetti",
+      "bord": "unlock_einde_bord",
+      "panda": "unlock_einde_panda",
+      "regenboog": "unlock_einde_regenboog",
+      "strik": "unlock_einde_strik"
+    },
     "start_reset_id": "start"
   },
-  "built_at_utc": "2026-08-15T14:52:12Z"
+  "child_facing_categories": [
+    "start_reset",
+    "encouragement",
+    "reward",
+    "end_state",
+    "picker",
+    "picker_name",
+    "chip",
+    "schatkist",
+    "unlock"
+  ],
+  "built_at_utc": "2026-08-19T18:50:01Z"
 }
