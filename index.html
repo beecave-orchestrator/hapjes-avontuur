@@ -1423,7 +1423,7 @@
       }
     ];
 
-    // Static edge-tts Dutch speech playback.
+    // Static OpenAI Dutch speech playback (gpt-4o-mini-tts / marin).
     // No runtime TTS, no API keys: only pre-generated local MP3s keyed by stable IDs.
     // Mirrors audio/manifest.json (do not regenerate without updating both).
     const SPEECH_BASE = "audio/";
@@ -1446,7 +1446,43 @@
       reward_20: "reward_20.mp3",
       end: "end.mp3",
       end_done: "end_done.mp3",
-      bonus: "bonus.mp3"
+      bonus: "bonus.mp3",
+      // Issue #15: child-facing picker, chip, Schatkist, and unlock clips.
+      picker_title_1: "picker_title_1.mp3",
+      picker_title_2: "picker_title_2.mp3",
+      meal_aardappels: "meal_aardappels.mp3",
+      meal_pasta: "meal_pasta.mp3",
+      meal_rijst: "meal_rijst.mp3",
+      meal_noedels: "meal_noedels.mp3",
+      meal_soep: "meal_soep.mp3",
+      meal_eigen: "meal_eigen.mp3",
+      extra_groente: "extra_groente.mp3",
+      extra_vlees: "extra_vlees.mp3",
+      extra_vegetarisch: "extra_vegetarisch.mp3",
+      extra_saus: "extra_saus.mp3",
+      extra_weetniet: "extra_weetniet.mp3",
+      chip_kies: "chip_kies.mp3",
+      chip_eat_aardappels: "chip_eat_aardappels.mp3",
+      chip_eat_pasta: "chip_eat_pasta.mp3",
+      chip_eat_rijst: "chip_eat_rijst.mp3",
+      chip_eat_noedels: "chip_eat_noedels.mp3",
+      chip_eat_soep: "chip_eat_soep.mp3",
+      chip_eat_eigen: "chip_eat_eigen.mp3",
+      schatkist_intro: "schatkist_intro.mp3",
+      schatkist_actief: "schatkist_actief.mp3",
+      schatkist_vrij: "schatkist_vrij.mp3",
+      spaar_reset_vraag: "spaar_reset_vraag.mp3",
+      spaar_reset_nieuw: "spaar_reset_nieuw.mp3",
+      unlock_confetti: "unlock_confetti.mp3",
+      unlock_bord: "unlock_bord.mp3",
+      unlock_panda: "unlock_panda.mp3",
+      unlock_regenboog: "unlock_regenboog.mp3",
+      unlock_strik: "unlock_strik.mp3",
+      unlock_einde_confetti: "unlock_einde_confetti.mp3",
+      unlock_einde_bord: "unlock_einde_bord.mp3",
+      unlock_einde_panda: "unlock_einde_panda.mp3",
+      unlock_einde_regenboog: "unlock_einde_regenboog.mp3",
+      unlock_einde_strik: "unlock_einde_strik.mp3"
     };
 
     let speechAudio = null;
@@ -1548,6 +1584,7 @@
         if (ontgrendeldDoel) {
           document.getElementById("message").textContent =
             "Avontuur klaar! " + ontgrendeldDoel.naam + " is nu van jou!";
+          playSpeech("unlock_einde_" + ontgrendeldDoel.id);
         }
         return;
       }
@@ -1557,6 +1594,7 @@
         // sound only when no milestone modal already celebrates this hap.
         document.getElementById("message").textContent =
           "Gefeliciteerd! " + ontgrendeldDoel.naam + " is nu van jou!";
+        playSpeech("unlock_" + ontgrendeldDoel.id);
         if (!rewards[hapjes]) {
           playRewardSound();
           maakConfetti();
@@ -1691,6 +1729,9 @@
       renderSchatkist();
       document.getElementById("schatkist").classList.add("show");
       syncPageScrollLock();
+      // Issue #15: the dialog title + standing question are spoken on open.
+      // The live pot count is a numeric line and stays unspoken by design.
+      playSpeech("schatkist_intro");
       const knoppen = schatkistKnoppen();
       if (knoppen.length) knoppen[0].focus();
     }
@@ -1775,8 +1816,14 @@
       renderSchatkist();
       updateGoalCard();
       if (vers) {
+        // Issue #15: the chosen row now reads "Van jou! ✓" — speak the
+        // matching clip. The unlock message stays in the dialog here.
+        playSpeech("schatkist_vrij");
         playRewardSound();
         maakConfetti();
+      } else {
+        // Issue #15: the chosen row now reads "Hier spaar je voor".
+        playSpeech("schatkist_actief");
       }
       // The clicked row re-rendered away; keep keyboard focus in the dialog.
       document.getElementById("schatkistClose").focus();
@@ -1786,6 +1833,8 @@
     // bevestiging, en ontgrendelde dingen blijven altijd behouden.
     function bevestigSpaarReset() {
       document.getElementById("spaarReset").classList.add("open");
+      // Issue #15: the confirmation question just became visible.
+      playSpeech("spaar_reset_vraag");
       document.getElementById("spaarResetJa").focus();
     }
 
@@ -1800,6 +1849,8 @@
       document.getElementById("spaarReset").classList.remove("open");
       document.getElementById("message").textContent =
         "Nieuwe spaarpot! Je ontgrendelde dingen mag je houden.";
+      // Issue #15: speak the new-pot message that just appeared.
+      playSpeech("spaar_reset_nieuw");
       renderSchatkist();
       updateUI();
       playPopSound();
@@ -1985,6 +2036,10 @@
     let selectedMealKey = null;
     let selectedExtraKey = null;
     let pickerOpenStep = 0; // 0 = closed, 1 = meal step, 2 = optional step
+    // Issue #15: whether the start clip has already been asked for this
+    // session. The start line only "appears" once per game start; later
+    // picker closes speak the chip line instead.
+    let startClipGevraagd = false;
 
     function mealOptionButtons() {
       return Array.from(document.querySelectorAll("#mealGrid .meal-option"));
@@ -2062,6 +2117,11 @@
         step === 2 ? "Klaar" : "Verder";
       document.getElementById("pickerSkip").textContent =
         step === 2 ? "Deze stap overslaan" : "Niet kiezen";
+
+      // Issue #15: the visible title + note are spoken as one clip when the
+      // step appears. playSpeech stops any earlier clip, so the last shown
+      // line always wins.
+      playSpeech("picker_title_" + step);
     }
 
     function openMealPicker() {
@@ -2083,6 +2143,8 @@
       syncPickerRadios();
       updateMealDisplay();
       setPickerHint(meals[key].name + " gekozen. Je kunt het nog veranderen.");
+      // Issue #15: speak the chosen name; it matches the visible hint line.
+      playSpeech("meal_" + key);
       playPopSound();
       popFood();
     }
@@ -2091,6 +2153,8 @@
       selectedExtraKey = key;
       syncPickerRadios();
       setPickerHint(extras[key] + " gekozen.");
+      // Issue #15: speak the chosen name; it matches the visible hint line.
+      playSpeech("extra_" + key);
       playPopSound();
     }
 
@@ -2124,6 +2188,21 @@
       document.getElementById("mealPicker").classList.remove("show");
       syncPageScrollLock();
       document.getElementById("mealChip").focus();
+
+      // Issue #15: the chip line is the live visible line again; speak the
+      // matching clip. The very first confirmed meal starts the game: the
+      // start line "Klaar voor de eerste superhap?" is now visible, so the
+      // start clip takes over — it never plays while that line is hidden.
+      if (selectedMealKey && meals[selectedMealKey]) {
+        if (!startClipGevraagd && !document.getElementById("playArea").hidden) {
+          startClipGevraagd = true;
+          playSpeech("start");
+        } else {
+          playSpeech("chip_eat_" + selectedMealKey);
+        }
+      } else {
+        playSpeech("chip_kies");
+      }
     }
 
     // Arrow-key navigation inside each radiogroup: the selected option

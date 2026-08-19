@@ -46,9 +46,9 @@ This branch also keeps the merged **meal picker** (issue #6):
 | Path | Purpose |
 | --- | --- |
 | `index.html` | Game UI + Web Audio SFX beeps + static speech playback (wired) |
-| `audio/*.mp3` | 19 static Dutch voice clips (incl. 3 end-state clips) |
+| `audio/*.mp3` | 54 static Dutch voice clips (child-facing pack) |
 | `audio/manifest.json` | Stable ID -> path + exact Dutch source text map |
-| `scripts/regenerate_edge_tts.py` | Regenerates the current edge-tts clips (no API key) |
+| `scripts/generate_openai_dutch_v1.py` | Regenerates clips via OpenAI gpt-4o-mini-tts / marin |
 | `scripts/build_manifest.py` | Rebuilds `audio/manifest.json` from disk |
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
 | `tests/verify_schatkist.js` | Issue #5 reward-loop and reset behavior checks |
@@ -64,9 +64,9 @@ This branch also keeps the merged **meal picker** (issue #6):
 - A single shared `Audio` element is lazily created inside the first user gesture (toggleSound / hapGenomen / resetGame) so the browser autoplay policy unlocks playback. `stopSpeech()` runs before each new clip so rapid taps never overlap speech.
 
 ```
-build-time (edge-tts)               runtime (GitHub Pages)
-────────────────────               ──────────────────────
-Dutch lines + voice=nl-NL-FennaNeural -> audio/*.mp3 + manifest.json
+build-time (OpenAI gpt-4o-mini-tts / marin)   runtime (GitHub Pages)
+──────────────────────────────────────────   ──────────────────────
+Dutch lines + voice=marin -> audio/*.mp3 + manifest.json
                                       index.html plays by stable ID
 ```
 
@@ -95,24 +95,22 @@ Exact strings, byte sizes, and SHA-256 digests live in `audio/manifest.json`.
 
 | Field | Value |
 | --- | --- |
-| Provider | edge-tts (Microsoft Edge neural TTS) |
-| Voice | `nl-NL-FennaNeural` (warm, clear Dutch female) |
+| Provider | OpenAI TTS (`POST /v1/audio/speech`) |
+| Model | `gpt-4o-mini-tts` |
+| Voice | `marin` |
 | Language | `nl` |
-| Format | MP3, 24 kHz, 48 kbps, mono |
-| Speech tags | off |
-| Generated | 2026-08-14 (issue #7 regeneration) |
-| Credentials | none — edge-tts needs no API key |
+| Format | MP3 |
+| Credentials | `OPENAI_API_KEY` or `VOICE_TOOLS_OPENAI_KEY` in the environment only |
 
 > **Speech disclosure:** the parent/info menu (ℹ️ next to the sound button)
-> states that the spoken texts are AI-generated. The disclosure is
-> programmatically readable (`aria-describedby` on the dialog) and no longer
-> sits permanently on the main child screen. Current clips are generated
-> with edge-tts `nl-NL-FennaNeural`.
+> states that the spoken texts are AI-generated. Current clips use
+> OpenAI `gpt-4o-mini-tts` / `marin`. Do not fall back to edge-tts.
 
-Regenerate (requires `pip install edge-tts`):
+Regenerate (fails closed without a key; requires `ffmpeg` (`ffprobe` on
+`PATH`) for manifest bitrates and validation):
 
 ```bash
-python3 scripts/regenerate_edge_tts.py
+python3 scripts/generate_openai_dutch_v1.py --only-missing
 python3 scripts/build_manifest.py
 python3 scripts/validate_audio_assets.py
 ```
@@ -120,6 +118,9 @@ python3 scripts/validate_audio_assets.py
 Do not commit temporary files such as `audio/_generation_run.json` or smoke leftovers.
 
 ## Validation
+
+Requires `ffprobe` (part of `ffmpeg`) on `PATH`; the validator fails closed
+with a clear message when it is missing.
 
 ```bash
 node tests/verify_schatkist.js
@@ -140,7 +141,7 @@ Checks: every manifest key has a playable MP3 path, headers look like MPEG, byte
 
 - PR to `main` / GitHub Pages deploy (handled separately, requires explicit approval)
 - Changing Hermes global TTS defaults
-- Changing the edge-tts voice or regenerating audio without reviewing it
+- Changing the OpenAI voice or regenerating audio without reviewing it
 
 ## License / content
 

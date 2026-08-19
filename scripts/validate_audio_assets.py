@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Non-destructive validation: manifest ↔ files ↔ index.html source strings."""
+"""Non-destructive validation: manifest ↔ files ↔ inventory ↔ index.html copy."""
 from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -11,6 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 AUDIO = ROOT / "audio"
 MANIFEST = AUDIO / "manifest.json"
 HTML = ROOT / "index.html"
+SCRIPTS = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS))
+
+from speech_inventory import CHILD_FACING_CATEGORIES, ENTRIES  # noqa: E402
 
 
 def fail(msg: str) -> None:
@@ -19,6 +25,8 @@ def fail(msg: str) -> None:
 
 
 def main() -> None:
+    if shutil.which("ffprobe") is None:
+        fail("ffprobe not found on PATH; install ffmpeg (bitrate checks need it)")
     if not MANIFEST.is_file():
         fail(f"missing {MANIFEST}")
     if not HTML.is_file():
@@ -152,6 +160,113 @@ def main() -> None:
         elif clips[cid]["text"] != expected:
             errors.append(f"{cid}: end-state text mismatch expected={expected!r}")
 
+    # ── Issue #15: every child-facing clip must exist and match the HTML ──
+    for entry in ENTRIES:
+        cid = entry["id"]
+        if cid not in clips:
+            errors.append(f"issue #15: missing child-facing clip {cid}")
+            continue
+        if clips[cid]["text"] != entry["text"]:
+            errors.append(
+                f"{cid}: inventory/manifest text mismatch "
+                f"inv={entry['text']!r} man={clips[cid]['text']!r}"
+            )
+        if clips[cid].get("file") != entry["file"]:
+            errors.append(f"{cid}: file mismatch inv={entry['file']} man={clips[cid].get('file')}")
+
+    # Manifest must not carry clips outside the inventory (drift guard).
+    inventory_ids = {e["id"] for e in ENTRIES}
+    for cid in clips:
+        if cid not in inventory_ids:
+            errors.append(f"manifest clip {cid} not in speech_inventory (drift)")
+
+    # Child-facing categories must be exactly the enforced set.
+    listed = manifest.get("child_facing_categories")
+    if listed != CHILD_FACING_CATEGORIES:
+        errors.append("manifest.child_facing_categories drifted from speech_inventory")
+
+    # The HTML must reference every inventory clip via SPEECH_MAP and play
+    # it: SPEECH_MAP keys mirror the inventory, and each new hook family is
+    # present in the source.
+    speech_map_block = re.search(r"const SPEECH_MAP = \{(.*?)\};", html, re.S)
+    if speech_map_block is None:
+        fail("SPEECH_MAP not found in index.html")
+    map_keys = set(re.findall(r"([A-Za-z0-9_]+):\s*\"[^\"]+\"", speech_map_block.group(1)))
+    for entry in ENTRIES:
+        if entry["id"] not in map_keys:
+            errors.append(f"issue #15: SPEECH_MAP missing key {entry['id']}")
+    for key in map_keys:
+        if key not in inventory_ids:
+            errors.append(f"issue #15: SPEECH_MAP key {key} not in inventory")
+
+    # Playback hooks: each child-facing family must actually call playSpeech.
+    hook_checks = [
+        ('playSpeech("picker_title_" + step)', "picker step titles"),
+        ('playSpeech("meal_" + key)', "meal names"),
+        ('playSpeech("extra_" + key)', "extra names"),
+        ('playSpeech("chip_eat_" + selectedMealKey)', "chip chosen line"),
+        ('playSpeech("chip_kies")', "chip invite line"),
+        ('playSpeech("schatkist_intro")', "schatkist open"),
+        ('playSpeech("schatkist_actief")', "schatkist active status"),
+        ('playSpeech("schatkist_vrij")', "schatkist unlocked status"),
+        ('playSpeech("spaar_reset_vraag")', "spaar reset question"),
+        ('playSpeech("spaar_reset_nieuw")', "spaar reset confirmation"),
+        ('playSpeech("unlock_" + ontgrendeldDoel.id)', "goal unlock line"),
+        ('playSpeech("unlock_einde_" + ontgrendeldDoel.id)', "end-boundary unlock line"),
+        ('playSpeech("start")', "start/reset line"),
+    ]
+    for needle, label in hook_checks:
+        if needle not in html:
+            errors.append(f"issue #15: playSpeech hook missing for {label}")
+
+    # The start clip may only play while its line is visible: the first
+    # game start (picker close with the play area visible) and resetGame.
+    if "startClipGevraagd" not in html:
+        errors.append("issue #15: start clip guard (startClipGevraagd) missing")
+
+    # Child-facing spoken texts must appear verbatim in the HTML (visible
+    # line) or be assembled from visible copy fragments. Numeric progress
+    # lines are the documented exception (manifest decisions).
+    assembled_ok = {
+        # chip lines: "Je eet nu: " + meals[key].name
+        **{
+            e["id"]: ('"Je eet nu: "' in html and e["text"].removeprefix("Je eet nu: ") in html)
+            for e in ENTRIES
+            if e["id"].startswith("chip_eat_")
+        },
+        # picker titles: title + note are separate visible elements
+        "picker_title_1": ("Wat eet je vandaag?" in html and "Je mag zelf kiezen. Alle keuzes zijn goed." in html),
+        "picker_title_2": ("Wil je nog wat kiezen?" in html and "Dit hoeft niet. Je mag deze stap ook overslaan." in html),
+        # schatkist intro: title + standing question
+        "schatkist_intro": (">Schatkist</h2>" in html and "Waar spaar jij voor? Elke hap geeft één muntje." in html),
+        # unlocked status: emoji suffix is decorative
+        "schatkist_vrij": '"Van jou! ✓"' in html,
+        # unlock announcements: "Gefeliciteerd! " + naam + " is nu van jou!"
+        **{
+            e["id"]: ('"Gefeliciteerd! "' in html and e["text"].removeprefix("Gefeliciteerd! ").removesuffix(" is nu van jou!") in html)
+            for e in ENTRIES
+            if e["category"] == "unlock" and not e["id"].startswith("unlock_einde_")
+        },
+        **{
+            e["id"]: ('"Avontuur klaar! "' in html and e["text"].removeprefix("Avontuur klaar! ").removesuffix(" is nu van jou!") in html)
+            for e in ENTRIES
+            if e["id"].startswith("unlock_einde_")
+        },
+        # spaar reset message assembled in spaarResetBevestig
+        "spaar_reset_nieuw": '"Nieuwe spaarpot! Je ontgrendelde dingen mag je houden."' in html,
+    }
+    for entry in ENTRIES:
+        cid = entry["id"]
+        # reward/end_state texts are "{title} {body}" concatenations already
+        # cross-checked against the HTML fragments above; skip verbatim here.
+        if entry["category"] in ("reward", "end_state"):
+            continue
+        if cid in assembled_ok:
+            if not assembled_ok[cid]:
+                errors.append(f"issue #15: {cid} spoken text does not match visible copy")
+        elif entry["text"] not in html:
+            errors.append(f"issue #15: {cid} spoken text not found in index.html: {entry['text']!r}")
+
     # no stray committed temp files expected
     expected_files = {c["file"] for c in clips.values()} | {"manifest.json"}
     on_disk = {p.name for p in AUDIO.iterdir() if p.is_file() and not p.name.startswith("_")}
@@ -167,6 +282,50 @@ def main() -> None:
         errors.append("runtime_tts must be false")
     if manifest.get("browser_api_keys") is not False:
         errors.append("browser_api_keys must be false")
+
+    gen = manifest.get("generation") or {}
+    if gen.get("provider") != "openai":
+        errors.append(f"generation.provider must be openai, got {gen.get('provider')!r}")
+    if gen.get("model") != "gpt-4o-mini-tts":
+        errors.append(f"generation.model must be gpt-4o-mini-tts, got {gen.get('model')!r}")
+    if gen.get("voice") != "marin":
+        errors.append(f"generation.voice must be marin, got {gen.get('voice')!r}")
+    if gen.get("provider") == "edge-tts" or "Fenna" in str(gen.get("voice_id", "")):
+        errors.append("edge-tts / Fenna is not an accepted fallback")
+
+    # Bytes-level profile: OpenAI marin clips in this repo are 128 kbps CBR.
+    # 48 kbps is the edge-tts Fenna signature. A lying marin manifest must fail.
+    for cid, clip in clips.items():
+        path = AUDIO / clip["file"]
+        if not path.is_file():
+            continue
+        probe = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "a:0",
+                "-show_entries",
+                "stream=bit_rate",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        try:
+            bitrate = int((probe.stdout or "0").strip() or 0)
+        except ValueError:
+            bitrate = 0
+        if gen.get("voice") == "marin" and bitrate and bitrate < 96000:
+            errors.append(
+                f"{cid}: bitrate {bitrate} looks like Fenna (48k), not marin (128k)"
+            )
+        declared = clip.get("bit_rate_bps")
+        if declared and bitrate and declared != bitrate:
+            errors.append(f"{cid}: bit_rate_bps manifest={declared} file={bitrate}")
 
     # index.html must still have no network TTS / API keys
     bad_patterns = [
@@ -186,11 +345,12 @@ def main() -> None:
     print("total_bytes", total_bytes)
     print("messages_ok", len(messages) == 10)
     print("rewards_ok", set(rewards) == {3, 5, 10, 15, 20})
+    print("child_facing_clips", sum(1 for e in ENTRIES if e["category"] in CHILD_FACING_CATEGORIES))
     if errors:
         for e in errors:
             print("FAIL:", e)
         raise SystemExit(1)
-    print("PASS: manifest, paths, MP3 headers, and HTML source texts align")
+    print("PASS: manifest, paths, MP3 headers, inventory, SPEECH_MAP hooks, and HTML source texts align")
 
 
 if __name__ == "__main__":

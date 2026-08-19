@@ -33,6 +33,24 @@ from speech_inventory import (  # noqa: E402
 HERMES_PY = Path.home() / ".hermes" / "hermes-agent" / "venv" / "bin" / "python"
 
 
+def parse_args(argv):
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--only-missing",
+        action="store_true",
+        help="generate only clips whose MP3 is not on disk yet",
+    )
+    parser.add_argument(
+        "--ids",
+        nargs="*",
+        default=[],
+        help="generate only these stable IDs (space separated)",
+    )
+    return parser.parse_args(argv)
+
+
 def _strip_wrapping_quotes(value: str) -> str:
     value = value.strip()
     if (value.startswith('"') and value.endswith('"')) or (
@@ -43,11 +61,16 @@ def _strip_wrapping_quotes(value: str) -> str:
 
 
 def resolve_openai_api_key() -> str:
-    """Return OPENAI_API_KEY from the process environment only."""
-    key = _strip_wrapping_quotes(os.environ.get("OPENAI_API_KEY", "") or "")
-    if not key:
-        raise SystemExit("OPENAI_API_KEY is not set")
-    return key
+    """Return the OpenAI key from the process environment only.
+
+    Accepts OPENAI_API_KEY, or VOICE_TOOLS_OPENAI_KEY as the local alias.
+    Never looks up secrets. Never prints the key.
+    """
+    for name in ("OPENAI_API_KEY", "VOICE_TOOLS_OPENAI_KEY"):
+        key = _strip_wrapping_quotes(os.environ.get(name, "") or "")
+        if key:
+            return key
+    raise SystemExit("OPENAI_API_KEY is not set (VOICE_TOOLS_OPENAI_KEY also empty)")
 
 
 def generate_one(client, text: str, path: Path) -> None:
@@ -63,13 +86,32 @@ def generate_one(client, text: str, path: Path) -> None:
 
 
 def main() -> int:
+    args = parse_args(sys.argv[1:])
+
+    # Selection happens before the venv re-exec so it survives the exec.
+    entries = ENTRIES
+    if args.ids:
+        wanted = set(args.ids)
+        unknown = wanted - {e["id"] for e in ENTRIES}
+        if unknown:
+            raise SystemExit(f"unknown ids: {sorted(unknown)}")
+        entries = [e for e in ENTRIES if e["id"] in wanted]
+    elif args.only_missing:
+        entries = [e for e in ENTRIES if not (OUT / e["file"]).is_file()]
+        if not entries:
+            print("nothing missing; all clips present")
+            return 0
+
     # Prefer Hermes venv (has openai package) when available.
     if HERMES_PY.is_file() and Path(sys.executable).resolve() != HERMES_PY.resolve():
         # Fail fast if the key is missing before re-exec; child inherits env.
         resolve_openai_api_key()
         env = os.environ.copy()
+        forward = ["--only-missing"] if args.only_missing else []
+        if args.ids:
+            forward += ["--ids", *args.ids]
         return subprocess.call(
-            [str(HERMES_PY), str(Path(__file__).resolve()), *sys.argv[1:]],
+            [str(HERMES_PY), str(Path(__file__).resolve()), *forward],
             env=env,
         )
 
@@ -78,7 +120,7 @@ def main() -> int:
     key = resolve_openai_api_key()
     print(
         f"BATCH provider={PROVIDER} model={MODEL} voice={VOICE} "
-        f"format={RESPONSE_FORMAT} n={len(ENTRIES)} openai_api_key=yes",
+        f"format={RESPONSE_FORMAT} n={len(entries)} openai_api_key=yes",
         flush=True,
     )
 
@@ -88,7 +130,7 @@ def main() -> int:
     smoke = OUT / "_smoke.mp3"
     print("SMOKE ...", flush=True)
     try:
-        generate_one(client, ENTRIES[0]["text"], smoke)
+        generate_one(client, entries[0]["text"], smoke)
         print(f"SMOKE ok bytes={smoke.stat().st_size}", flush=True)
     finally:
         if smoke.exists():
@@ -96,9 +138,9 @@ def main() -> int:
 
     results = []
     errors = []
-    for i, entry in enumerate(ENTRIES, 1):
+    for i, entry in enumerate(entries, 1):
         path = OUT / entry["file"]
-        print(f"[{i}/{len(ENTRIES)}] {entry['id']} -> {entry['file']}", flush=True)
+        print(f"[{i}/{len(entries)}] {entry['id']} -> {entry['file']}", flush=True)
         t0 = time.time()
         try:
             generate_one(client, entry["text"], path)
