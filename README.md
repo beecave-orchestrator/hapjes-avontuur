@@ -4,10 +4,28 @@ Dutch kids snack-encouragement game. Single-page static app for GitHub Pages.
 
 Live (from `main`): https://beecave-orchestrator.github.io/hapjes-avontuur/
 
-## What’s in this branch (`feat/issue-6-accessible-meal-picker`)
+## What’s in this branch (`feat/issue-5-schatkist`)
 
-This branch adds an accessible **meal picker** (issue #6) on top of the
-already-merged pressure-free end state.
+This branch adds a **quiet, cosmetic reward loop** (issue #5): hap nemen →
+muntje verdienen → doel kiezen → zichtbaar ontgrendelen.
+
+- Every registered hap gives **exactly one muntje**. The old escalating
+  combo multiplier is gone.
+- One savings goal at a time with visible progress, e.g.
+  `🪙 4 van 8 — nog 4 muntjes tot de panda`.
+- The **Schatkist** holds five strictly cosmetic items (Feestconfetti,
+  Feestbord, Dierenvriendje, Regenbooglucht, Feeststrik). Prices act as
+  thresholds on one shared spaarpot: unlocking never deducts muntjes, so
+  the balance can never go negative.
+- Unlocked cosmetics apply immediately and permanently: confetti button,
+  plate rim, panda friend, rainbow sky, bow.
+- **Reset is child-friendly and explicit.** "Opnieuw" starts a new
+  adventure and never touches the spaarpot or unlocked items. The pot only
+  clears through "Opnieuw sparen" inside the Schatkist, which asks for
+  confirmation and always keeps unlocked items.
+- No timers, streaks, quotas, rankings, munt deduction, or food rewards.
+
+This branch also keeps the merged **meal picker** (issue #6):
 
 - "Eten kiezen" opens a dialog with labelled Dutch meals: Aardappels en
   groente, Pasta, Rijst, Noedels, Soep, and the permanent neutral choice
@@ -33,6 +51,7 @@ already-merged pressure-free end state.
 | `scripts/regenerate_edge_tts.py` | Regenerates the current edge-tts clips (no API key) |
 | `scripts/build_manifest.py` | Rebuilds `audio/manifest.json` from disk |
 | `scripts/validate_audio_assets.py` | Non-destructive path/text/header checks |
+| `tests/verify_schatkist.js` | Issue #5 reward-loop and reset behavior checks |
 | `tests/meal_picker.test.mjs` | Zero-dep Node tests: picker behaviour + a11y |
 
 ## Architecture: static audio only
@@ -100,8 +119,10 @@ Do not commit temporary files such as `audio/_generation_run.json` or smoke left
 ## Validation
 
 ```bash
-node --test tests/*.test.mjs   # meal picker behaviour + a11y semantics
-node tests/verify_end_state.js # pressure-free end-state + focus
+node tests/verify_schatkist.js
+node tests/verify_end_state.js
+node tests/verify_document_links.js
+node --test tests/*.test.mjs
 python3 scripts/validate_audio_assets.py
 ```
 

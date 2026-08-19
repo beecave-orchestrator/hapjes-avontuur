@@ -18,6 +18,7 @@ function makeEl(id) {
     className: '',
     style: {},
     disabled: false,
+    setAttribute(k, v) { this['attr_' + k] = v; },
     classList: {
       _set: new Set(),
       add(c) { this._set.add(c); },
