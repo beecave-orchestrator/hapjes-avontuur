@@ -20,6 +20,35 @@ sys.path.insert(0, str(SCRIPTS))
 
 from speech_inventory import CHILD_FACING_CATEGORIES, ENTRIES  # noqa: E402
 
+import subprocess
+
+
+def probe_mp3(path: Path) -> dict:
+    """Read codec facts from the file. Do not hardcode a bitrate profile."""
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "a:0",
+            "-show_entries",
+            "stream=bit_rate,sample_rate,channels",
+            "-of",
+            "json",
+            str(path),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    stream = (json.loads(result.stdout).get("streams") or [{}])[0]
+    return {
+        "bit_rate_bps": int(stream.get("bit_rate") or 0),
+        "sample_rate_hz": int(stream.get("sample_rate") or 0),
+        "channels": int(stream.get("channels") or 0),
+    }
+
 
 def main() -> None:
     clips = {}
@@ -37,6 +66,7 @@ def main() -> None:
         if not (data[:3] == b"ID3" or data[0] == 0xFF):
             raise SystemExit(f"not an MP3 header for {entry['id']}")
         sha = hashlib.sha256(data).hexdigest()
+        probe = probe_mp3(path)
         total += size
         item = {
             "id": entry["id"],
@@ -48,6 +78,9 @@ def main() -> None:
             "bytes": size,
             "sha256": sha,
             "format": "mp3",
+            "bit_rate_bps": probe["bit_rate_bps"],
+            "sample_rate_hz": probe["sample_rate_hz"],
+            "channels": probe["channels"],
         }
         if entry["category"] == "reward":
             item["hapjes"] = entry["hapjes"]
@@ -75,10 +108,10 @@ def main() -> None:
                 "OpenAI gpt-4o-mini-tts voice marin. edge-tts is not an "
                 "accepted fallback."
             ),
-            "sample_rate_hz": 24000,
-            "bit_rate_bps": 48000,
+            "sample_rate_hz": min(c["sample_rate_hz"] for c in clips.values()),
+            "bit_rate_bps": min(c["bit_rate_bps"] for c in clips.values()),
             "codec": "mp3",
-            "channels": "mono",
+            "channels": "mono" if all(c["channels"] == 1 for c in clips.values()) else "mixed",
             "auto_speech_tags": False,
             "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "tooling": "scripts/generate_openai_dutch_v1.py",

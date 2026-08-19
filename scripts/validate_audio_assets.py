@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -288,6 +289,40 @@ def main() -> None:
         errors.append(f"generation.voice must be marin, got {gen.get('voice')!r}")
     if gen.get("provider") == "edge-tts" or "Fenna" in str(gen.get("voice_id", "")):
         errors.append("edge-tts / Fenna is not an accepted fallback")
+
+    # Bytes-level profile: OpenAI marin clips in this repo are 128 kbps CBR.
+    # 48 kbps is the edge-tts Fenna signature. A lying marin manifest must fail.
+    for cid, clip in clips.items():
+        path = AUDIO / clip["file"]
+        if not path.is_file():
+            continue
+        probe = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "a:0",
+                "-show_entries",
+                "stream=bit_rate",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        try:
+            bitrate = int((probe.stdout or "0").strip() or 0)
+        except ValueError:
+            bitrate = 0
+        if gen.get("voice") == "marin" and bitrate and bitrate < 96000:
+            errors.append(
+                f"{cid}: bitrate {bitrate} looks like Fenna (48k), not marin (128k)"
+            )
+        declared = clip.get("bit_rate_bps")
+        if declared and bitrate and declared != bitrate:
+            errors.append(f"{cid}: bit_rate_bps manifest={declared} file={bitrate}")
 
     # index.html must still have no network TTS / API keys
     bad_patterns = [
