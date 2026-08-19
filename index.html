@@ -773,42 +773,43 @@
        meal picker and Schatkist; holds the AI-voice disclosure, restart,
        and the sound setting so they live outside the child hap flow. */
     .oudermenu {
+      position: fixed;
+      inset: 0;
+      z-index: 46;
+      display: none;
+      overflow: auto;
+    }
+
+    .oudermenu.show {
+      display: block;
+    }
+
+    .oudermenu-scrim {
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       left: 0;
-      width: 100%;
       min-height: 100%;
-      height: auto;
-      margin: 0;
-      background: rgba(45, 42, 74, 0.72);
-      display: none;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 18px;
-      z-index: 46;
-    }
-
-    .oudermenu.show {
-      display: flex;
+      background: rgba(45, 42, 74, 0.78);
     }
 
     .oudermenu-box {
-      width: 100%;
+      position: relative;
+      z-index: 1;
+      width: calc(100% - 36px);
       max-width: 380px;
       max-height: calc(100dvh - 48px);
       overflow-y: auto;
-      background: white;
+      margin: 10vh auto 32px;
+      background: #ffffff;
+      opacity: 1;
+      isolation: isolate;
       border-radius: 32px;
       padding: 24px 18px 20px;
       text-align: center;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
-      animation: ouderPop 0.3s ease;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      animation: rewardPop 0.3s ease;
     }
 
     .oudermenu-close {
@@ -1211,6 +1212,7 @@
        restart, and the sound setting. Long-press is deliberately not added:
        the clearly labelled button is keyboard-reachable. -->
   <div class="oudermenu" id="oudermenu" role="dialog" aria-modal="true" aria-labelledby="oudermenuTitle" aria-describedby="oudermenuInfo">
+    <div class="oudermenu-scrim" aria-hidden="true"></div>
     <div class="oudermenu-box">
       <button class="oudermenu-close" id="oudermenuClose" type="button" onclick="sluitOudermenu()" aria-label="Informatie voor ouders sluiten">✕</button>
 
