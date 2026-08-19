@@ -298,6 +298,157 @@
       box-shadow: 0 1px 0 #dad4ff;
     }
 
+    /* Meal picker (issue #6): the chosen meal stays visible in the hero. */
+    .meal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 2px auto 10px;
+      padding: 8px 16px;
+      background: #ffffff;
+      border: 3px dashed var(--pink);
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 1rem;
+      box-shadow: 0 6px 14px rgba(123, 97, 255, 0.12);
+    }
+
+    .meal-chip.chosen {
+      border-style: solid;
+      background: #fff0f7;
+    }
+
+    .meal-chip-emoji {
+      font-size: 1.25rem;
+    }
+
+    /* Meal picker dialog: semantic, keyboard-friendly controls. */
+    .picker {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 42, 74, 0.72);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      z-index: 40;
+    }
+
+    .picker.show {
+      display: flex;
+    }
+
+    .picker-box {
+      width: 100%;
+      max-width: 380px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      background: white;
+      border-radius: 32px;
+      padding: 24px 18px 20px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
+      animation: rewardPop 0.3s ease;
+      position: relative;
+    }
+
+    .picker-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: #f1edff;
+      font-size: 1.2rem;
+      font-weight: 1000;
+      color: var(--dark);
+      cursor: pointer;
+    }
+
+    .picker-title {
+      font-size: 1.5rem;
+      font-weight: 1000;
+      color: var(--purple);
+      margin: 0 0 10px;
+    }
+
+    .picker-note {
+      font-size: 0.95rem;
+      font-weight: 700;
+      opacity: 0.8;
+      margin: 0 0 10px;
+    }
+
+    .meal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0 14px;
+    }
+
+    .meal-option {
+      border: 3px solid #eeeaff;
+      border-radius: 20px;
+      background: white;
+      padding: 12px 8px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: var(--dark);
+      cursor: pointer;
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .meal-option .meal-emoji {
+      font-size: 1.9rem;
+    }
+
+    .meal-option:hover {
+      transform: translateY(-2px);
+    }
+
+    .meal-option.selected {
+      border-color: var(--purple);
+      background: #f1edff;
+      box-shadow: 0 6px 16px rgba(123, 97, 255, 0.25);
+    }
+
+    .meal-option.selected .meal-name::after {
+      content: " ✓";
+      color: var(--green);
+    }
+
+    .meal-option:focus-visible,
+    .picker-box button:focus-visible {
+      outline: 4px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .picker-hint {
+      min-height: 20px;
+      margin: 0 0 8px;
+      font-weight: 800;
+      color: #c04a8f;
+    }
+
+    .picker-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .picker-actions .main-btn,
+    .picker-actions .small-btn {
+      width: 100%;
+    }
+
+    .picker-step[hidden] {
+      display: none !important;
+    }
+
     .reward {
       position: fixed;
       inset: 0;
@@ -345,12 +496,12 @@
     .end {
       position: fixed;
       inset: 0;
-      background: rgba(45, 42, 74, 0.4);
+      background: rgba(45, 42, 74, 0.72);
       display: none;
       justify-content: center;
       align-items: center;
       padding: 18px;
-      z-index: 25;
+      z-index: 45;
     }
 
     .end.show {
@@ -482,6 +633,11 @@
       <div class="counter-label">hapjes genomen</div>
     </section>
 
+    <p class="meal-chip" id="mealChip" aria-live="polite">
+      <span class="meal-chip-emoji" id="mealChipEmoji">🍽️</span>
+      <span id="mealChipText">Nog geen eten gekozen</span>
+    </p>
+
     <div class="message" id="message" aria-live="polite">
       Klaar voor de eerste superhap?
     </div>
@@ -528,10 +684,81 @@
     </section>
 
     <section class="actions">
-      <button class="small-btn" onclick="veranderEten()">Ander eten</button>
+      <button class="small-btn" id="etenKiesButton" onclick="openMealPicker()">Eten kiezen</button>
       <button class="small-btn" onclick="resetGame()">Opnieuw</button>
     </section>
   </main>
+
+  <div class="picker" id="mealPicker" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+    <div class="picker-box">
+      <button class="picker-close" type="button" onclick="closeMealPicker()" aria-label="Kiezen sluiten">✕</button>
+
+      <div class="picker-step" id="pickerStep1">
+        <h2 class="picker-title" id="pickerTitle">Wat eet je vandaag?</h2>
+        <p class="picker-note">Je mag zelf kiezen. Alle keuzes zijn goed.</p>
+        <div class="meal-grid" id="mealGrid" role="radiogroup" aria-label="Kies je eten">
+          <button class="meal-option" type="button" data-meal="aardappels" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥔</span>
+            <span class="meal-name">Aardappels en groente</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="pasta" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍝</span>
+            <span class="meal-name">Pasta</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="rijst" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍚</span>
+            <span class="meal-name">Rijst</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="noedels" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍜</span>
+            <span class="meal-name">Noedels</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="soep" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍲</span>
+            <span class="meal-name">Soep</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="eigen" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍽️</span>
+            <span class="meal-name">Mijn eigen eten</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="picker-step" id="pickerStep2" hidden>
+        <h2 class="picker-title" id="pickerTitle2">Wil je nog wat kiezen?</h2>
+        <p class="picker-note">Dit hoeft niet. Je mag deze stap ook overslaan.</p>
+        <div class="meal-grid" id="extraGrid" role="radiogroup" aria-label="Optionele keuze">
+          <button class="meal-option" type="button" data-extra="groente" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥦</span>
+            <span class="meal-name">Groente</span>
+          </button>
+          <button class="meal-option" type="button" data-extra="vlees" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍗</span>
+            <span class="meal-name">Vlees of vis</span>
+          </button>
+          <button class="meal-option" type="button" data-extra="vegetarisch" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🧀</span>
+            <span class="meal-name">Vegetarisch</span>
+          </button>
+          <button class="meal-option" type="button" data-extra="saus" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥣</span>
+            <span class="meal-name">Saus</span>
+          </button>
+          <button class="meal-option" type="button" data-extra="weetniet" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🤷</span>
+            <span class="meal-name">Weet ik niet</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="picker-hint" id="pickerHint" aria-live="polite"></p>
+
+      <div class="picker-actions">
+        <button class="main-btn" type="button" id="pickerDone" onclick="confirmMealStep()">Klaar</button>
+        <button class="small-btn" type="button" id="pickerSkip" onclick="skipMealStep()">Deze stap overslaan</button>
+      </div>
+    </div>
+  </div>
 
   <div class="reward" id="reward">
     <div class="reward-box">
@@ -560,7 +787,6 @@
     let coins = 0;
     let combo = 0;
     let soundOn = true;
-    let currentFoodIndex = 0;
     let adventureDone = false;
     let bonusMode = false;
 
@@ -569,7 +795,27 @@
     // completes the main flow and opens the positive end state.
     const ADVENTURE_END = 20;
 
-    const foods = ["🍝", "🥦", "🥕", "🍚", "🥔", "🍗", "🍲", "🥪", "🍛", "🥗"];
+    // Recognizable Dutch meals (issue #6). Text labels carry the meaning;
+    // emoji are supplementary decoration only. "Mijn eigen eten" is a
+    // permanently available neutral choice.
+    const meals = {
+      aardappels: { emoji: "🥔", name: "Aardappels en groente" },
+      pasta: { emoji: "🍝", name: "Pasta" },
+      rijst: { emoji: "🍚", name: "Rijst" },
+      noedels: { emoji: "🍜", name: "Noedels" },
+      soep: { emoji: "🍲", name: "Soep" },
+      eigen: { emoji: "🍽️", name: "Mijn eigen eten" }
+    };
+
+    // Optional second-step choices. Never required; "Weet ik niet" and the
+    // skip button both let the child pass without answering.
+    const extras = {
+      groente: "Groente",
+      vlees: "Vlees of vis",
+      vegetarisch: "Vegetarisch",
+      saus: "Saus",
+      weetniet: "Weet ik niet"
+    };
 
     const messages = [
       "Wat een lekkere hap!",
@@ -850,33 +1096,235 @@
       playSpeech("bonus");
     }
 
-    // Keep keyboard focus in the modal until the child chooses an exit.
+    // Escape closes the end dialog back to the game (no pressure to
+    // continue) and also closes the meal picker without changing anything.
+    // While the end dialog is open, Tab stays trapped inside it.
     document.addEventListener("keydown", function (e) {
       const end = document.getElementById("end");
-      if (!end.classList.contains("show")) return;
+      if (end.classList.contains("show")) {
+        if (e.key === "Escape") {
+          klaarMetEten();
+          return;
+        }
 
-      if (e.key === "Escape") {
-        klaarMetEten();
+        if (e.key === "Tab") {
+          const buttons = endDialogButtons();
+          if (!buttons.length) return;
+          e.preventDefault();
+          const currentIndex = buttons.indexOf(document.activeElement);
+          const direction = e.shiftKey ? -1 : 1;
+          const nextIndex = (currentIndex + direction + buttons.length) % buttons.length;
+          buttons[nextIndex].focus();
+        }
         return;
       }
 
-      if (e.key === "Tab") {
-        const buttons = endDialogButtons();
-        if (!buttons.length) return;
-        e.preventDefault();
-        const currentIndex = buttons.indexOf(document.activeElement);
-        const direction = e.shiftKey ? -1 : 1;
-        const nextIndex = (currentIndex + direction + buttons.length) % buttons.length;
-        buttons[nextIndex].focus();
+      if (e.key === "Escape" && pickerOpenStep !== 0) {
+        closeMealPicker();
       }
     });
 
-    function veranderEten() {
-      currentFoodIndex = (currentFoodIndex + 1) % foods.length;
-      document.getElementById("food").textContent = foods[currentFoodIndex];
+    // Keep Tab focus inside the open picker dialog (aria-modal).
+    (function () {
+      const box = document.querySelector("#mealPicker .picker-box");
+      box.addEventListener("keydown", function (e) {
+        if (e.key !== "Tab") return;
+        const focusables = Array.from(box.querySelectorAll("button")).filter(
+          (b) => b.closest("[hidden]") === null
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
+    })();
+
+    // ---- Meal picker (issue #6) -------------------------------------------
+    // Replaces the old "Ander eten" emoji carousel. The child picks a
+    // labelled meal; the choice stays visible for the whole session and can
+    // be changed deliberately via the same picker. No automatic rotation.
+
+    let selectedMealKey = null;
+    let selectedExtraKey = null;
+    let pickerOpenStep = 0; // 0 = closed, 1 = meal step, 2 = optional step
+
+    function mealOptionButtons() {
+      return Array.from(document.querySelectorAll("#mealGrid .meal-option"));
+    }
+
+    function extraOptionButtons() {
+      return Array.from(document.querySelectorAll("#extraGrid .meal-option"));
+    }
+
+    function setRadioState(button, chosen) {
+      button.setAttribute("aria-checked", chosen ? "true" : "false");
+      button.classList.toggle("selected", chosen);
+    }
+
+    function syncPickerRadios() {
+      // Roving tabindex: the selected option (or the first, when nothing
+      // is selected) is the tab stop; arrows move within the group.
+      const syncGrid = function (buttons, dataAttr, selectedKey) {
+        const hasChecked = buttons.some(function (btn) {
+          return btn.dataset[dataAttr] === selectedKey;
+        });
+        buttons.forEach(function (btn, i) {
+          const chosen = btn.dataset[dataAttr] === selectedKey;
+          setRadioState(btn, chosen);
+          btn.tabIndex = chosen || (!hasChecked && i === 0) ? 0 : -1;
+        });
+      };
+
+      syncGrid(mealOptionButtons(), "meal", selectedMealKey);
+      syncGrid(extraOptionButtons(), "extra", selectedExtraKey);
+    }
+
+    function updateMealDisplay() {
+      const chip = document.getElementById("mealChip");
+      const chipEmoji = document.getElementById("mealChipEmoji");
+      const chipText = document.getElementById("mealChipText");
+
+      if (selectedMealKey && meals[selectedMealKey]) {
+        const meal = meals[selectedMealKey];
+        document.getElementById("food").textContent = meal.emoji;
+        chipEmoji.textContent = meal.emoji;
+        chipText.textContent = "Je eet nu: " + meal.name;
+        chip.classList.add("chosen");
+      } else {
+        document.getElementById("food").textContent = "🍽️";
+        chipEmoji.textContent = "🍽️";
+        chipText.textContent = "Nog geen eten gekozen";
+        chip.classList.remove("chosen");
+      }
+    }
+
+    function setPickerHint(text) {
+      document.getElementById("pickerHint").textContent = text;
+    }
+
+    function showPickerStep(step) {
+      pickerOpenStep = step;
+      document.getElementById("pickerStep1").hidden = step !== 1;
+      document.getElementById("pickerStep2").hidden = step !== 2;
+      document.getElementById("mealPicker").classList.add("show");
+
+      // The dialog label and action labels follow the visible step.
+      document
+        .getElementById("mealPicker")
+        .setAttribute(
+          "aria-labelledby",
+          step === 2 ? "pickerTitle2" : "pickerTitle"
+        );
+      document.getElementById("pickerDone").textContent =
+        step === 2 ? "Klaar" : "Verder";
+      document.getElementById("pickerSkip").textContent =
+        step === 2 ? "Deze stap overslaan" : "Niet kiezen";
+    }
+
+    function openMealPicker() {
+      selectedExtraKey = null;
+      syncPickerRadios();
+      setPickerHint("");
+      showPickerStep(1);
+
+      // Focus the current choice so changing it is immediate; otherwise
+      // focus the first option so keyboard users land on the controls.
+      const current = mealOptionButtons().find(
+        (btn) => btn.dataset.meal === selectedMealKey
+      );
+      (current || mealOptionButtons()[0]).focus();
+    }
+
+    function selectMeal(key) {
+      selectedMealKey = key;
+      syncPickerRadios();
+      updateMealDisplay();
+      setPickerHint(meals[key].name + " gekozen. Je kunt het nog veranderen.");
       playPopSound();
       popFood();
     }
+
+    function selectExtra(key) {
+      selectedExtraKey = key;
+      syncPickerRadios();
+      setPickerHint(extras[key] + " gekozen.");
+      playPopSound();
+    }
+
+    function confirmMealStep() {
+      if (pickerOpenStep === 1) {
+        // Advance to the optional second step; the meal choice is already
+        // saved, so backing out of step 2 never loses it.
+        setPickerHint("");
+        showPickerStep(2);
+        const current = extraOptionButtons().find(
+          (btn) => btn.dataset.extra === selectedExtraKey
+        );
+        (current || extraOptionButtons()[0]).focus();
+        return;
+      }
+      closeMealPicker();
+    }
+
+    function skipMealStep() {
+      // Skipping never removes an earlier choice; it only passes on the
+      // optional question (step 2) or leaves the meal unchanged (step 1).
+      if (pickerOpenStep === 2) {
+        selectedExtraKey = null;
+        syncPickerRadios();
+      }
+      closeMealPicker();
+    }
+
+    function closeMealPicker() {
+      pickerOpenStep = 0;
+      document.getElementById("mealPicker").classList.remove("show");
+      document.getElementById("etenKiesButton").focus();
+    }
+
+    // Arrow-key navigation inside each radiogroup: the selected option
+    // moves with the arrows so the group works like native radio buttons.
+    function bindGridKeyboard(gridId, selectFn) {
+      const grid = document.getElementById(gridId);
+      grid.addEventListener("keydown", function (e) {
+        const keys = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
+        if (!keys.includes(e.key)) return;
+
+        e.preventDefault();
+        const buttons = Array.from(grid.querySelectorAll(".meal-option"));
+        const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+        const index = buttons.findIndex((btn) => btn === document.activeElement);
+        const next = buttons[(index + delta + buttons.length) % buttons.length];
+        next.focus();
+        selectFn(next.dataset.meal || next.dataset.extra);
+      });
+    }
+
+    bindGridKeyboard("mealGrid", function (key) {
+      if (key) selectMeal(key);
+    });
+    bindGridKeyboard("extraGrid", function (key) {
+      if (key) selectExtra(key);
+    });
+
+    mealOptionButtons().forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        selectMeal(btn.dataset.meal);
+      });
+    });
+
+    extraOptionButtons().forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        selectExtra(btn.dataset.extra);
+      });
+    });
+    // ---- End meal picker --------------------------------------------------
 
     function resetGame() {
       const end = document.getElementById("end");
@@ -886,6 +1334,8 @@
       combo = 0;
       adventureDone = false;
       bonusMode = false;
+      // Intentionally keep selectedMealKey / selectedExtraKey so "Opnieuw"
+      // starts a new adventure with the same chosen meal.
 
       document.getElementById("message").textContent = "Klaar voor de eerste superhap?";
       document.querySelectorAll(".badge").forEach(badge => {
@@ -990,6 +1440,7 @@
     }
 
     updateUI();
+    updateMealDisplay();
   </script>
 </body>
 </html>
