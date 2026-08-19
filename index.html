@@ -2003,10 +2003,10 @@
       // is selected) is the tab stop; arrows move within the group.
       const syncGrid = function (buttons, dataAttr, selectedKey) {
         const hasChecked = buttons.some(function (btn) {
-          return btn.dataset[dataAttr] === selectedKey;
+          return btn.dataset && btn.dataset[dataAttr] === selectedKey;
         });
         buttons.forEach(function (btn, i) {
-          const chosen = btn.dataset[dataAttr] === selectedKey;
+          const chosen = !!(btn.dataset && btn.dataset[dataAttr] === selectedKey);
           setRadioState(btn, chosen);
           btn.tabIndex = chosen || (!hasChecked && i === 0) ? 0 : -1;
         });
