@@ -591,28 +591,49 @@
       gap: 8px;
     }
 
-    /* Meal picker (issue #6): the chosen meal stays visible in the hero. */
+    /* Meal picker: the chip is the main invite until a meal is chosen. */
     .meal-chip {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      margin: 2px auto 10px;
-      padding: 8px 16px;
-      background: #ffffff;
-      border: 3px dashed var(--pink);
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      margin: 14px auto 6px;
+      padding: 16px 18px;
+      border: 0;
       border-radius: 999px;
-      font-weight: 900;
-      font-size: 1rem;
-      box-shadow: 0 6px 14px rgba(123, 97, 255, 0.12);
+      font-family: inherit;
+      font-weight: 1000;
+      font-size: 1.15rem;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ff8ec8 0%, #7b61ff 100%);
+      box-shadow: 0 8px 0 #5a46c7, 0 14px 24px rgba(123, 97, 255, 0.22);
+    }
+
+    .meal-chip:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #5a46c7, 0 8px 16px rgba(123, 97, 255, 0.18);
+    }
+
+    .meal-chip:focus-visible {
+      outline: 4px solid var(--blue);
+      outline-offset: 3px;
     }
 
     .meal-chip.chosen {
-      border-style: solid;
+      color: var(--dark);
       background: #fff0f7;
+      border: 3px solid var(--pink);
+      box-shadow: 0 6px 14px rgba(123, 97, 255, 0.12);
     }
 
     .meal-chip-emoji {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
+    }
+
+    #playArea[hidden] {
+      display: none !important;
     }
 
     /* Meal picker dialog: semantic, keyboard-friendly controls. */
@@ -1040,18 +1061,19 @@
       <div class="plate" id="plate">
         <span class="vriendje" id="vriendje" aria-hidden="true">🐼</span>
         <span class="strijkje" id="strijkje" aria-hidden="true">🎀</span>
-        <div class="food" id="food">🍝</div>
+        <div class="food" id="food">🍽️</div>
       </div>
 
       <div class="counter" id="counter">0</div>
       <div class="counter-label">hapjes genomen</div>
     </section>
 
-    <p class="meal-chip" id="mealChip" aria-live="polite">
-      <span class="meal-chip-emoji" id="mealChipEmoji">🍽️</span>
-      <span id="mealChipText">Nog geen eten gekozen</span>
-    </p>
+    <button class="meal-chip" id="mealChip" type="button" onclick="openMealPicker()" aria-live="polite">
+      <span class="meal-chip-emoji" id="mealChipEmoji" aria-hidden="true">🍽️</span>
+      <span id="mealChipText">Kies je eten</span>
+    </button>
 
+    <div id="playArea" hidden="">
     <div class="message" id="message" aria-live="polite">
       Klaar voor de eerste superhap?
     </div>
@@ -1111,6 +1133,7 @@
       <button class="small-btn eten-kies-knop" id="etenKiesButton" onclick="openMealPicker()">Eten kiezen</button>
       <button class="small-btn feest-knop" id="feestKnop" hidden onclick="maakConfetti(); playRewardSound();">Feest! 🎉</button>
     </section>
+    </div>
   </main>
 
   <div class="picker" id="mealPicker" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
@@ -1462,6 +1485,10 @@
     }
 
     function hapGenomen() {
+      if (!selectedMealKey) {
+        openMealPicker();
+        return;
+      }
       // Once the main adventure is complete, the hap button no longer
       // continues the main flow. In bonus mode it keeps counting at the
       // child's own pace; otherwise it reopens the end state.
@@ -2000,11 +2027,15 @@
         chipEmoji.textContent = meal.emoji;
         chipText.textContent = "Je eet nu: " + meal.name;
         chip.classList.add("chosen");
+        chip.setAttribute("aria-label", "Eten veranderen, nu " + meal.name);
+        document.getElementById("playArea").hidden = false;
       } else {
         document.getElementById("food").textContent = "🍽️";
         chipEmoji.textContent = "🍽️";
-        chipText.textContent = "Nog geen eten gekozen";
+        chipText.textContent = "Kies je eten";
         chip.classList.remove("chosen");
+        chip.setAttribute("aria-label", "Kies je eten");
+        document.getElementById("playArea").hidden = true;
       }
     }
 
@@ -2091,7 +2122,7 @@
       pickerOpenStep = 0;
       document.getElementById("mealPicker").classList.remove("show");
       syncPageScrollLock();
-      document.getElementById("etenKiesButton").focus();
+      document.getElementById("mealChip").focus();
     }
 
     // Arrow-key navigation inside each radiogroup: the selected option

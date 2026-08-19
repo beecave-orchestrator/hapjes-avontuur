@@ -449,7 +449,7 @@ test("the oudermenu sound action mirrors the shared sound state", () => {
 });
 
 test("Opnieuw beginnen resets the adventure and closes the menu", () => {
-  // Build up adventure progress first.
+  sandbox.selectMeal("pasta");
   sandbox.hapGenomen();
   sandbox.hapGenomen();
   sandbox.hapGenomen();

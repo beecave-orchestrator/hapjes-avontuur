@@ -136,6 +136,7 @@ function dispatchKey(key, shiftKey = false) {
 
 // Run the game script.
 eval(code);
+selectMeal("pasta");
 
 function latestKiesKnopVoor(doelId) {
   // renderSchatkist appends rows in schatkistItems order; the "kies" button
