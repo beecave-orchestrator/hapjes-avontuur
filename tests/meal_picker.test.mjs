@@ -544,22 +544,36 @@ test("aardappels, rijst of noedels, and pasta preselect their basis tile", () =>
   sandbox.closeMealPicker();
 });
 
-test("yoghurt, boterhammen, pannenkoeken, and eigen have no basis preselect", () => {
-  for (const key of ["yoghurt_kwark_pap", "boterhammen", "pannenkoeken", "eigen"]) {
+test("yoghurt, boterhammen, and pannenkoeken skip step 2 and start the game", () => {
+  for (const key of ["yoghurt_kwark_pap", "boterhammen", "pannenkoeken"]) {
     sandbox.openMealPicker();
     click(mealButton(key));
     sandbox.confirmMealStep();
-    for (const basis of ["aardappels", "pasta", "rijst_of_noedels"]) {
-      assert.equal(
-        extraButton(basis).getAttribute("aria-checked"),
-        "false",
-        `${key} preselects nothing (${basis} stayed off)`
-      );
-    }
-    click(extraButton("groente"));
-    assert.equal(extraButton("groente").getAttribute("aria-checked"), "true");
-    sandbox.closeMealPicker();
+    assert.ok(
+      !document.getElementById("mealPicker").classList.contains("show"),
+      `${key} closes the picker instead of opening the plate step`
+    );
+    assert.equal(document.getElementById("pickerStep2").hidden, true);
+    assert.ok(!document.getElementById("playArea").hidden);
   }
+});
+
+test("eigen eten still opens step 2 with no basis preselect", () => {
+  sandbox.openMealPicker();
+  click(mealButton("eigen"));
+  sandbox.confirmMealStep();
+  assert.equal(document.getElementById("pickerStep1").hidden, true);
+  assert.equal(document.getElementById("pickerStep2").hidden, false);
+  for (const basis of ["aardappels", "pasta", "rijst_of_noedels"]) {
+    assert.equal(
+      extraButton(basis).getAttribute("aria-checked"),
+      "false",
+      `eigen preselects nothing (${basis} stayed off)`
+    );
+  }
+  click(extraButton("groente"));
+  assert.equal(extraButton("groente").getAttribute("aria-checked"), "true");
+  sandbox.closeMealPicker();
 });
 
 test("confirming extras keeps multi-select for the session", () => {

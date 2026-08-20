@@ -1391,6 +1391,18 @@
       return [];
     }
 
+    // PR #21 review: yoghurt/boterhammen/pannenkoeken are already a complete
+    // kind of meal. Step 2 ("Wat ligt er op je bord?") only opens for the
+    // starch categories and for Mijn eigen eten. No extra topping model here.
+    function mealNeedsPlateStep(mealKey) {
+      return (
+        mealKey === "aardappels" ||
+        mealKey === "rijst_of_noedels" ||
+        mealKey === "pasta" ||
+        mealKey === "eigen"
+      );
+    }
+
     const messages = [
       "Wat een lekkere hap!",
       "Wat fijn dat je eet!",
@@ -2244,12 +2256,12 @@
         if (selectedMealKey) {
           selectedExtraKeys = presetExtras(selectedMealKey).slice();
         }
+        if (selectedMealKey && !mealNeedsPlateStep(selectedMealKey)) {
+          closeMealPicker();
+          return;
+        }
         setPickerHint("");
         showPickerStep(2);
-        // Issue #19 review: stap 2 always asks the same composition question.
-        // The earlier "nog meer" variant for pasta diverged from the frozen
-        // picker_title_2 clip; three categories now preselect a basis tile,
-        // so the plain title is the honest one for all of them.
         document.getElementById("pickerTitle2").textContent =
           "Wat ligt er op je bord?";
         const current = extraOptionButtons().find(
