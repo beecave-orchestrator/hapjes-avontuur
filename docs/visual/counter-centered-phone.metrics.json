@@ -1,0 +1,28 @@
+{
+  "viewport": {
+    "w": 390,
+    "h": 844
+  },
+  "appCenter": 195,
+  "plateCenter": 195,
+  "chipCenter": 195,
+  "counterTextRect": {
+    "left": 170.6,
+    "right": 219.4,
+    "top": 389.4,
+    "bottom": 471.4,
+    "center": 195
+  },
+  "labelTextRect": {
+    "left": 113.3,
+    "right": 276.7,
+    "top": 468.1,
+    "bottom": 488.1,
+    "center": 195
+  },
+  "counterText": "2",
+  "labelText": "hapjes genomen",
+  "pixelInkCenter": 194.5,
+  "pixelInkMinX": 176.0,
+  "pixelInkMaxX": 213.0
+}
