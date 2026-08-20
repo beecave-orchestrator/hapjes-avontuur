@@ -157,6 +157,9 @@
       color: var(--purple);
       line-height: 0.95;
       text-shadow: 3px 3px 0 #efeaff;
+      /* Meal-first layout: the counter left .hero for #playArea (a plain
+         div), so the inherited centering was lost. Center it explicitly. */
+      text-align: center;
       margin: 4px 0;
     }
 
@@ -164,6 +167,7 @@
       font-size: 1.1rem;
       font-weight: 800;
       opacity: 0.8;
+      text-align: center;
     }
 
     .message {
