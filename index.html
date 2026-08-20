@@ -717,6 +717,27 @@
       margin: 10px 0 14px;
     }
 
+    /* Issue #19 review: stap 1 is een 3x2 raster van herkenbare
+       hoofdcategorieën; de zevende tegel ("Mijn eigen eten") spat de volle
+       breedte eronder. Alleen het eerste scherm; stap 2 houdt 2 kolommen. */
+    #mealGrid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    #mealGrid .meal-option {
+      padding: 10px 4px;
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+
+    #mealGrid .meal-option .meal-emoji {
+      font-size: 1.7rem;
+    }
+
+    .meal-option--breed {
+      grid-column: 1 / -1;
+    }
+
     .meal-option {
       border: 3px solid #eeeaff;
       border-radius: 20px;
@@ -1150,34 +1171,38 @@
       <button class="picker-close" type="button" onclick="closeMealPicker()" aria-label="Kiezen sluiten">✕</button>
 
       <div class="picker-step" id="pickerStep1">
-        <h2 class="picker-title" id="pickerTitle">Wat eet je vandaag?</h2>
+        <h2 class="picker-title" id="pickerTitle">Wat voor soort eten heb je vandaag?</h2>
         <p class="picker-note">Je mag zelf kiezen. Alle keuzes zijn goed.</p>
-        <div class="meal-grid" id="mealGrid" role="radiogroup" aria-label="Kies je eten">
+        <!-- Issue #19 review: stap 1 is herkenning (soort eten), niet samenstelling.
+             Zes hoofdcategorieën in een 3x2 grid; losse gerechten als stamppot,
+             nasi, macaroni of soep vallen onder de brede categorie of onder
+             "Mijn eigen eten". -->
+        <div class="meal-grid" id="mealGrid" role="radiogroup" aria-label="Kies je soort eten">
           <button class="meal-option" type="button" data-meal="aardappels" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥔</span>
             <span class="meal-name">Aardappels</span>
-          </button>
-          <button class="meal-option" type="button" data-meal="stamppot" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🥕</span>
-            <span class="meal-name">Stamppot</span>
-          </button>
-          <button class="meal-option" type="button" data-meal="pasta" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🍝</span>
-            <span class="meal-name">Pasta</span>
           </button>
           <button class="meal-option" type="button" data-meal="rijst_of_noedels" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍚</span>
             <span class="meal-name">Rijst of noedels</span>
           </button>
-          <button class="meal-option" type="button" data-meal="soep" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🍲</span>
-            <span class="meal-name">Soep</span>
+          <button class="meal-option" type="button" data-meal="pasta" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍝</span>
+            <span class="meal-name">Pasta</span>
           </button>
-          <button class="meal-option" type="button" data-meal="pannenkoek" role="radio" aria-checked="false">
+          <button class="meal-option" type="button" data-meal="yoghurt_kwark_pap" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥣</span>
+            <span class="meal-name">Yoghurt, kwark of pap</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="boterhammen" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍞</span>
+            <span class="meal-name">Boterhammen</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="pannenkoeken" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥞</span>
-            <span class="meal-name">Pannenkoek</span>
+            <span class="meal-name">Pannenkoeken</span>
           </button>
-          <button class="meal-option" type="button" data-meal="eigen" role="radio" aria-checked="false">
+          <button class="meal-option meal-option--breed" type="button" data-meal="eigen" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍽️</span>
             <span class="meal-name">Mijn eigen eten</span>
           </button>
@@ -1326,16 +1351,21 @@
     // completes the main flow and opens the positive end state.
     const ADVENTURE_END = 20;
 
-    // Recognizable Dutch meals (issue #6). Text labels carry the meaning;
-    // emoji are supplementary decoration only. "Mijn eigen eten" is a
-    // permanently available neutral choice.
+    // Recognizable Dutch meal categories (issue #19 + review). Step 1 asks
+    // "what kind of food", so the tiles are broad categories a young child
+    // recognizes: aardappels covers gekookte aardappels, krieltjes, puree,
+    // stamppot en friet, rijst of noedels covers nasi/bami/mie/curry, pasta
+    // covers macaroni/spaghetti/lasagne. Yoghurt/kwark/pap and boterhammen
+    // are real evening meals for kids even when not a hot dinner.
+    // "Mijn eigen eten" stays as the permanently available neutral choice.
+    // Text labels carry the meaning; emoji are supplementary decoration only.
     const meals = {
       aardappels: { emoji: "🥔", name: "Aardappels" },
-      stamppot: { emoji: "🥕", name: "Stamppot" },
-      pasta: { emoji: "🍝", name: "Pasta" },
       rijst_of_noedels: { emoji: "🍚", name: "Rijst of noedels" },
-      soep: { emoji: "🍲", name: "Soep" },
-      pannenkoek: { emoji: "🥞", name: "Pannenkoek" },
+      pasta: { emoji: "🍝", name: "Pasta" },
+      yoghurt_kwark_pap: { emoji: "🥣", name: "Yoghurt, kwark of pap" },
+      boterhammen: { emoji: "🍞", name: "Boterhammen" },
+      pannenkoeken: { emoji: "🥞", name: "Pannenkoeken" },
       eigen: { emoji: "🍽️", name: "Mijn eigen eten" }
     };
 
@@ -1351,11 +1381,13 @@
       saus: "Saus"
     };
 
+    // Only the three classic starch bases preselect their step-2 tile
+    // (issue #19 review): the other categories have no basis tile in step 2,
+    // so nothing is preselected and the child composes freely.
     function presetExtras(mealKey) {
-      if (mealKey === "pasta") return ["pasta"];
       if (mealKey === "aardappels") return ["aardappels"];
       if (mealKey === "rijst_of_noedels") return ["rijst_of_noedels"];
-      if (mealKey === "stamppot") return ["aardappels", "groente"];
+      if (mealKey === "pasta") return ["pasta"];
       return [];
     }
 
@@ -1486,11 +1518,11 @@
       picker_title_1: "picker_title_1.mp3",
       picker_title_2: "picker_title_2.mp3",
       meal_aardappels: "meal_aardappels.mp3",
-      meal_stamppot: "meal_stamppot.mp3",
-      meal_pasta: "meal_pasta.mp3",
       meal_rijst_of_noedels: "meal_rijst_of_noedels.mp3",
-      meal_soep: "meal_soep.mp3",
-      meal_pannenkoek: "meal_pannenkoek.mp3",
+      meal_pasta: "meal_pasta.mp3",
+      meal_yoghurt_kwark_pap: "meal_yoghurt_kwark_pap.mp3",
+      meal_boterhammen: "meal_boterhammen.mp3",
+      meal_pannenkoeken: "meal_pannenkoeken.mp3",
       meal_eigen: "meal_eigen.mp3",
       extra_aardappels: "extra_aardappels.mp3",
       extra_pasta: "extra_pasta.mp3",
@@ -1501,11 +1533,11 @@
       extra_saus: "extra_saus.mp3",
       chip_kies: "chip_kies.mp3",
       chip_eat_aardappels: "chip_eat_aardappels.mp3",
-      chip_eat_stamppot: "chip_eat_stamppot.mp3",
-      chip_eat_pasta: "chip_eat_pasta.mp3",
       chip_eat_rijst_of_noedels: "chip_eat_rijst_of_noedels.mp3",
-      chip_eat_soep: "chip_eat_soep.mp3",
-      chip_eat_pannenkoek: "chip_eat_pannenkoek.mp3",
+      chip_eat_yoghurt_kwark_pap: "chip_eat_yoghurt_kwark_pap.mp3",
+      chip_eat_boterhammen: "chip_eat_boterhammen.mp3",
+      chip_eat_pannenkoeken: "chip_eat_pannenkoeken.mp3",
+      chip_eat_pasta: "chip_eat_pasta.mp3",
       chip_eat_eigen: "chip_eat_eigen.mp3",
       schatkist_intro: "schatkist_intro.mp3",
       schatkist_actief: "schatkist_actief.mp3",
@@ -2214,12 +2246,12 @@
         }
         setPickerHint("");
         showPickerStep(2);
-        const title = document.getElementById("pickerTitle2");
-        if (selectedMealKey === "pasta") {
-          title.textContent = "Wat ligt er nog meer op je bord?";
-        } else {
-          title.textContent = "Wat ligt er op je bord?";
-        }
+        // Issue #19 review: stap 2 always asks the same composition question.
+        // The earlier "nog meer" variant for pasta diverged from the frozen
+        // picker_title_2 clip; three categories now preselect a basis tile,
+        // so the plain title is the honest one for all of them.
+        document.getElementById("pickerTitle2").textContent =
+          "Wat ligt er op je bord?";
         const current = extraOptionButtons().find(
           (btn) => selectedExtraKeys.indexOf(btn.dataset.extra) !== -1
         );

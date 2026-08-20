@@ -391,8 +391,8 @@ test("selecting a meal speaks the chosen meal name", () => {
   resetLog();
   click(mealButton("pasta"));
   assert.equal(lastClip(), "audio/meal_pasta.mp3");
-  click(mealButton("soep"));
-  assert.equal(lastClip(), "audio/meal_soep.mp3");
+  click(mealButton("pannenkoeken"));
+  assert.equal(lastClip(), "audio/meal_pannenkoeken.mp3");
   sandbox.closeMealPicker();
 });
 
@@ -417,7 +417,7 @@ test("first confirmed meal plays the start clip once, later closes speak the chi
   sandbox.openMealPicker();
   resetLog();
   sandbox.closeMealPicker();
-  assert.equal(lastClip(), "audio/chip_eat_soep.mp3");
+  assert.equal(lastClip(), "audio/chip_eat_pannenkoeken.mp3");
   const starts = playedSince().filter((s) => s === "audio/start.mp3");
   assert.equal(starts.length, 0, "start clip not replayed on later picker closes");
 });

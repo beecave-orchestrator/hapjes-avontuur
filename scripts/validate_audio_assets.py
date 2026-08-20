@@ -235,8 +235,8 @@ def main() -> None:
             if e["id"].startswith("chip_eat_")
         },
         # picker titles: title + note are separate visible elements
-        "picker_title_1": ("Wat eet je vandaag?" in html and "Je mag zelf kiezen. Alle keuzes zijn goed." in html),
-        "picker_title_2": ("Wil je nog wat kiezen?" in html and "Dit hoeft niet. Je mag deze stap ook overslaan." in html),
+        "picker_title_1": ("Wat voor soort eten heb je vandaag?" in html and "Je mag zelf kiezen. Alle keuzes zijn goed." in html),
+        "picker_title_2": ("Wat ligt er op je bord?" in html and "Je mag meerdere dingen kiezen. Overslaan mag ook." in html),
         # schatkist intro: title + standing question
         "schatkist_intro": (">Schatkist</h2>" in html and "Waar spaar jij voor? Elke hap geeft één muntje." in html),
         # unlocked status: emoji suffix is decorative
