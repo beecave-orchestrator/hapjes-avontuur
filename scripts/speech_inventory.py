@@ -181,18 +181,24 @@ ENTRIES = [
     {
         "id": "picker_title_2",
         "category": "picker",
-        "text": "Wil je nog wat kiezen? Dit hoeft niet. Je mag deze stap ook overslaan.",
+        "text": "Wat ligt er op je bord? Je mag meerdere dingen kiezen. Overslaan mag ook.",
         "file": "picker_title_2.mp3",
         "source": "picker step 2 title + note",
     },
-    # ── issue #15: meal + extra names (spoken on selection, match the
-    #    picker hint line "X gekozen" visible after selecting) ──────────────
+    # ── issue #19: meal + extra names ──────────────────────────────────────
     {
         "id": "meal_aardappels",
         "category": "picker_name",
-        "text": "Aardappels en groente",
+        "text": "Aardappels",
         "file": "meal_aardappels.mp3",
         "source": "meals.aardappels.name",
+    },
+    {
+        "id": "meal_stamppot",
+        "category": "picker_name",
+        "text": "Stamppot",
+        "file": "meal_stamppot.mp3",
+        "source": "meals.stamppot.name",
     },
     {
         "id": "meal_pasta",
@@ -202,18 +208,11 @@ ENTRIES = [
         "source": "meals.pasta.name",
     },
     {
-        "id": "meal_rijst",
+        "id": "meal_rijst_of_noedels",
         "category": "picker_name",
-        "text": "Rijst",
-        "file": "meal_rijst.mp3",
-        "source": "meals.rijst.name",
-    },
-    {
-        "id": "meal_noedels",
-        "category": "picker_name",
-        "text": "Noedels",
-        "file": "meal_noedels.mp3",
-        "source": "meals.noedels.name",
+        "text": "Rijst of noedels",
+        "file": "meal_rijst_of_noedels.mp3",
+        "source": "meals.rijst_of_noedels.name",
     },
     {
         "id": "meal_soep",
@@ -223,6 +222,13 @@ ENTRIES = [
         "source": "meals.soep.name",
     },
     {
+        "id": "meal_pannenkoek",
+        "category": "picker_name",
+        "text": "Pannenkoek",
+        "file": "meal_pannenkoek.mp3",
+        "source": "meals.pannenkoek.name",
+    },
+    {
         "id": "meal_eigen",
         "category": "picker_name",
         "text": "Mijn eigen eten",
@@ -230,9 +236,30 @@ ENTRIES = [
         "source": "meals.eigen.name",
     },
     {
+        "id": "extra_aardappels",
+        "category": "picker_name",
+        "text": "Aardappels",
+        "file": "extra_aardappels.mp3",
+        "source": "extras.aardappels",
+    },
+    {
+        "id": "extra_pasta",
+        "category": "picker_name",
+        "text": "Pasta",
+        "file": "extra_pasta.mp3",
+        "source": "extras.pasta",
+    },
+    {
+        "id": "extra_rijst_of_noedels",
+        "category": "picker_name",
+        "text": "Rijst of noedels",
+        "file": "extra_rijst_of_noedels.mp3",
+        "source": "extras.rijst_of_noedels",
+    },
+    {
         "id": "extra_groente",
         "category": "picker_name",
-        "text": "Groente",
+        "text": "Groente of fruit",
         "file": "extra_groente.mp3",
         "source": "extras.groente",
     },
@@ -246,7 +273,7 @@ ENTRIES = [
     {
         "id": "extra_vegetarisch",
         "category": "picker_name",
-        "text": "Vegetarisch",
+        "text": "Ei, kaas of iets vegetarisch",
         "file": "extra_vegetarisch.mp3",
         "source": "extras.vegetarisch",
     },
@@ -258,14 +285,6 @@ ENTRIES = [
         "source": "extras.saus",
     },
     {
-        "id": "extra_weetniet",
-        "category": "picker_name",
-        "text": "Weet ik niet",
-        "file": "extra_weetniet.mp3",
-        "source": "extras.weetniet",
-    },
-    # ── issue #15: meal chip lines ─────────────────────────────────────────
-    {
         "id": "chip_kies",
         "category": "chip",
         "text": "Kies je eten",
@@ -275,46 +294,53 @@ ENTRIES = [
     {
         "id": "chip_eat_aardappels",
         "category": "chip",
-        "text": "Je eet nu: Aardappels en groente",
+        "text": "Je eet nu: Aardappels",
         "file": "chip_eat_aardappels.mp3",
-        "source": "meal chip \"Je eet nu: \" + name",
+        "source": "meal chip Je eet nu + name",
+    },
+    {
+        "id": "chip_eat_stamppot",
+        "category": "chip",
+        "text": "Je eet nu: Stamppot",
+        "file": "chip_eat_stamppot.mp3",
+        "source": "meal chip Je eet nu + name",
     },
     {
         "id": "chip_eat_pasta",
         "category": "chip",
         "text": "Je eet nu: Pasta",
         "file": "chip_eat_pasta.mp3",
-        "source": "meal chip \"Je eet nu: \" + name",
+        "source": "meal chip Je eet nu + name",
     },
     {
-        "id": "chip_eat_rijst",
+        "id": "chip_eat_rijst_of_noedels",
         "category": "chip",
-        "text": "Je eet nu: Rijst",
-        "file": "chip_eat_rijst.mp3",
-        "source": "meal chip \"Je eet nu: \" + name",
-    },
-    {
-        "id": "chip_eat_noedels",
-        "category": "chip",
-        "text": "Je eet nu: Noedels",
-        "file": "chip_eat_noedels.mp3",
-        "source": "meal chip \"Je eet nu: \" + name",
+        "text": "Je eet nu: Rijst of noedels",
+        "file": "chip_eat_rijst_of_noedels.mp3",
+        "source": "meal chip Je eet nu + name",
     },
     {
         "id": "chip_eat_soep",
         "category": "chip",
         "text": "Je eet nu: Soep",
         "file": "chip_eat_soep.mp3",
-        "source": "meal chip \"Je eet nu: \" + name",
+        "source": "meal chip Je eet nu + name",
+    },
+    {
+        "id": "chip_eat_pannenkoek",
+        "category": "chip",
+        "text": "Je eet nu: Pannenkoek",
+        "file": "chip_eat_pannenkoek.mp3",
+        "source": "meal chip Je eet nu + name",
     },
     {
         "id": "chip_eat_eigen",
         "category": "chip",
         "text": "Je eet nu: Mijn eigen eten",
         "file": "chip_eat_eigen.mp3",
-        "source": "meal chip \"Je eet nu: \" + name",
+        "source": "meal chip Je eet nu + name",
     },
-    # ── issue #15: Schatkist dialog copy ───────────────────────────────────
+        # ── issue #15: Schatkist dialog copy ───────────────────────────────────
     # Note: the "Hiervoor sparen" button label is an action label, not a
     # progress/unlock/status line, and stays unspoken like every other
     # button in the game (standing pattern: messages/titles/status speak,

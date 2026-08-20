@@ -701,6 +701,15 @@
       margin: 0 0 10px;
     }
 
+    .picker-group-label {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-align: left;
+      opacity: 0.75;
+    }
+
     .meal-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1146,23 +1155,27 @@
         <div class="meal-grid" id="mealGrid" role="radiogroup" aria-label="Kies je eten">
           <button class="meal-option" type="button" data-meal="aardappels" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥔</span>
-            <span class="meal-name">Aardappels en groente</span>
+            <span class="meal-name">Aardappels</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="stamppot" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥕</span>
+            <span class="meal-name">Stamppot</span>
           </button>
           <button class="meal-option" type="button" data-meal="pasta" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍝</span>
             <span class="meal-name">Pasta</span>
           </button>
-          <button class="meal-option" type="button" data-meal="rijst" role="radio" aria-checked="false">
+          <button class="meal-option" type="button" data-meal="rijst_of_noedels" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍚</span>
-            <span class="meal-name">Rijst</span>
-          </button>
-          <button class="meal-option" type="button" data-meal="noedels" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🍜</span>
-            <span class="meal-name">Noedels</span>
+            <span class="meal-name">Rijst of noedels</span>
           </button>
           <button class="meal-option" type="button" data-meal="soep" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍲</span>
             <span class="meal-name">Soep</span>
+          </button>
+          <button class="meal-option" type="button" data-meal="pannenkoek" role="radio" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥞</span>
+            <span class="meal-name">Pannenkoek</span>
           </button>
           <button class="meal-option" type="button" data-meal="eigen" role="radio" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍽️</span>
@@ -1172,28 +1185,39 @@
       </div>
 
       <div class="picker-step" id="pickerStep2" hidden>
-        <h2 class="picker-title" id="pickerTitle2">Wil je nog wat kiezen?</h2>
-        <p class="picker-note">Dit hoeft niet. Je mag deze stap ook overslaan.</p>
-        <div class="meal-grid" id="extraGrid" role="radiogroup" aria-label="Optionele keuze">
-          <button class="meal-option" type="button" data-extra="groente" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🥦</span>
-            <span class="meal-name">Groente</span>
+        <h2 class="picker-title" id="pickerTitle2">Wat ligt er op je bord?</h2>
+        <p class="picker-note">Je mag meerdere dingen kiezen. Overslaan mag ook.</p>
+        <div class="meal-grid" id="extraGrid" role="group" aria-label="Wat ligt er op je bord?">
+          <p class="picker-group-label">Basis</p>
+          <button class="meal-option" type="button" data-extra="aardappels" role="checkbox" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥔</span>
+            <span class="meal-name">Aardappels</span>
           </button>
-          <button class="meal-option" type="button" data-extra="vlees" role="radio" aria-checked="false">
+          <button class="meal-option" type="button" data-extra="pasta" role="checkbox" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍝</span>
+            <span class="meal-name">Pasta</span>
+          </button>
+          <button class="meal-option" type="button" data-extra="rijst_of_noedels" role="checkbox" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🍚</span>
+            <span class="meal-name">Rijst of noedels</span>
+          </button>
+          <p class="picker-group-label">Erbij</p>
+          <button class="meal-option" type="button" data-extra="groente" role="checkbox" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥦</span>
+            <span class="meal-name">Groente of fruit</span>
+          </button>
+          <button class="meal-option" type="button" data-extra="vlees" role="checkbox" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🍗</span>
             <span class="meal-name">Vlees of vis</span>
           </button>
-          <button class="meal-option" type="button" data-extra="vegetarisch" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🧀</span>
-            <span class="meal-name">Vegetarisch</span>
+          <button class="meal-option" type="button" data-extra="vegetarisch" role="checkbox" aria-checked="false">
+            <span class="meal-emoji" aria-hidden="true">🥚</span>
+            <span class="meal-name">Ei, kaas of iets vegetarisch</span>
           </button>
-          <button class="meal-option" type="button" data-extra="saus" role="radio" aria-checked="false">
+          <p class="picker-group-label">Extra</p>
+          <button class="meal-option" type="button" data-extra="saus" role="checkbox" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥣</span>
             <span class="meal-name">Saus</span>
-          </button>
-          <button class="meal-option" type="button" data-extra="weetniet" role="radio" aria-checked="false">
-            <span class="meal-emoji" aria-hidden="true">🤷</span>
-            <span class="meal-name">Weet ik niet</span>
           </button>
         </div>
       </div>
@@ -1306,23 +1330,34 @@
     // emoji are supplementary decoration only. "Mijn eigen eten" is a
     // permanently available neutral choice.
     const meals = {
-      aardappels: { emoji: "🥔", name: "Aardappels en groente" },
+      aardappels: { emoji: "🥔", name: "Aardappels" },
+      stamppot: { emoji: "🥕", name: "Stamppot" },
       pasta: { emoji: "🍝", name: "Pasta" },
-      rijst: { emoji: "🍚", name: "Rijst" },
-      noedels: { emoji: "🍜", name: "Noedels" },
+      rijst_of_noedels: { emoji: "🍚", name: "Rijst of noedels" },
       soep: { emoji: "🍲", name: "Soep" },
+      pannenkoek: { emoji: "🥞", name: "Pannenkoek" },
       eigen: { emoji: "🍽️", name: "Mijn eigen eten" }
     };
 
-    // Optional second-step choices. Never required; "Weet ik niet" and the
-    // skip button both let the child pass without answering.
+    // Plate composition tiles (issue #19). Multi-select; skip is a
+    // separate action, not a food tile.
     const extras = {
-      groente: "Groente",
+      aardappels: "Aardappels",
+      pasta: "Pasta",
+      rijst_of_noedels: "Rijst of noedels",
+      groente: "Groente of fruit",
       vlees: "Vlees of vis",
-      vegetarisch: "Vegetarisch",
-      saus: "Saus",
-      weetniet: "Weet ik niet"
+      vegetarisch: "Ei, kaas of iets vegetarisch",
+      saus: "Saus"
     };
+
+    function presetExtras(mealKey) {
+      if (mealKey === "pasta") return ["pasta"];
+      if (mealKey === "aardappels") return ["aardappels"];
+      if (mealKey === "rijst_of_noedels") return ["rijst_of_noedels"];
+      if (mealKey === "stamppot") return ["aardappels", "groente"];
+      return [];
+    }
 
     const messages = [
       "Wat een lekkere hap!",
@@ -1451,22 +1486,26 @@
       picker_title_1: "picker_title_1.mp3",
       picker_title_2: "picker_title_2.mp3",
       meal_aardappels: "meal_aardappels.mp3",
+      meal_stamppot: "meal_stamppot.mp3",
       meal_pasta: "meal_pasta.mp3",
-      meal_rijst: "meal_rijst.mp3",
-      meal_noedels: "meal_noedels.mp3",
+      meal_rijst_of_noedels: "meal_rijst_of_noedels.mp3",
       meal_soep: "meal_soep.mp3",
+      meal_pannenkoek: "meal_pannenkoek.mp3",
       meal_eigen: "meal_eigen.mp3",
+      extra_aardappels: "extra_aardappels.mp3",
+      extra_pasta: "extra_pasta.mp3",
+      extra_rijst_of_noedels: "extra_rijst_of_noedels.mp3",
       extra_groente: "extra_groente.mp3",
       extra_vlees: "extra_vlees.mp3",
       extra_vegetarisch: "extra_vegetarisch.mp3",
       extra_saus: "extra_saus.mp3",
-      extra_weetniet: "extra_weetniet.mp3",
       chip_kies: "chip_kies.mp3",
       chip_eat_aardappels: "chip_eat_aardappels.mp3",
+      chip_eat_stamppot: "chip_eat_stamppot.mp3",
       chip_eat_pasta: "chip_eat_pasta.mp3",
-      chip_eat_rijst: "chip_eat_rijst.mp3",
-      chip_eat_noedels: "chip_eat_noedels.mp3",
+      chip_eat_rijst_of_noedels: "chip_eat_rijst_of_noedels.mp3",
       chip_eat_soep: "chip_eat_soep.mp3",
+      chip_eat_pannenkoek: "chip_eat_pannenkoek.mp3",
       chip_eat_eigen: "chip_eat_eigen.mp3",
       schatkist_intro: "schatkist_intro.mp3",
       schatkist_actief: "schatkist_actief.mp3",
@@ -2034,7 +2073,7 @@
     // be changed deliberately via the same picker. No automatic rotation.
 
     let selectedMealKey = null;
-    let selectedExtraKey = null;
+    let selectedExtraKeys = [];
     let pickerOpenStep = 0; // 0 = closed, 1 = meal step, 2 = optional step
     // Issue #15: whether the start clip has already been asked for this
     // session. The start line only "appears" once per game start; later
@@ -2049,27 +2088,38 @@
       return Array.from(document.querySelectorAll("#extraGrid .meal-option"));
     }
 
-    function setRadioState(button, chosen) {
+    function setCheckedState(button, chosen) {
       button.setAttribute("aria-checked", chosen ? "true" : "false");
       button.classList.toggle("selected", chosen);
     }
 
     function syncPickerRadios() {
-      // Roving tabindex: the selected option (or the first, when nothing
-      // is selected) is the tab stop; arrows move within the group.
-      const syncGrid = function (buttons, dataAttr, selectedKey) {
-        const hasChecked = buttons.some(function (btn) {
-          return btn.dataset && btn.dataset[dataAttr] === selectedKey;
-        });
-        buttons.forEach(function (btn, i) {
-          const chosen = !!(btn.dataset && btn.dataset[dataAttr] === selectedKey);
-          setRadioState(btn, chosen);
-          btn.tabIndex = chosen || (!hasChecked && i === 0) ? 0 : -1;
-        });
-      };
+      const mealButtons = mealOptionButtons();
+      const hasChecked = mealButtons.some(function (btn) {
+        return btn.dataset && btn.dataset.meal === selectedMealKey;
+      });
+      mealButtons.forEach(function (btn, i) {
+        const chosen = !!(btn.dataset && btn.dataset.meal === selectedMealKey);
+        setCheckedState(btn, chosen);
+        btn.tabIndex = chosen || (!hasChecked && i === 0) ? 0 : -1;
+      });
 
-      syncGrid(mealOptionButtons(), "meal", selectedMealKey);
-      syncGrid(extraOptionButtons(), "extra", selectedExtraKey);
+      const extraButtons = extraOptionButtons();
+      const extraHas = extraButtons.some(function (btn) {
+        return btn.dataset && selectedExtraKeys.indexOf(btn.dataset.extra) !== -1;
+      });
+      let firstTab = true;
+      extraButtons.forEach(function (btn, i) {
+        const key = btn.dataset && btn.dataset.extra;
+        const chosen = selectedExtraKeys.indexOf(key) !== -1;
+        setCheckedState(btn, chosen);
+        if (extraHas) {
+          btn.tabIndex = chosen && firstTab ? 0 : -1;
+          if (chosen && firstTab) firstTab = false;
+        } else {
+          btn.tabIndex = i === 0 ? 0 : -1;
+        }
+      });
     }
 
     function updateMealDisplay() {
@@ -2125,13 +2175,10 @@
     }
 
     function openMealPicker() {
-      selectedExtraKey = null;
       syncPickerRadios();
       setPickerHint("");
       showPickerStep(1);
 
-      // Focus the current choice so changing it is immediate; otherwise
-      // focus the first option so keyboard users land on the controls.
       const current = mealOptionButtons().find(
         (btn) => btn.dataset.meal === selectedMealKey
       );
@@ -2140,32 +2187,41 @@
 
     function selectMeal(key) {
       selectedMealKey = key;
+      selectedExtraKeys = presetExtras(key).slice();
       syncPickerRadios();
       updateMealDisplay();
       setPickerHint(meals[key].name + " gekozen. Je kunt het nog veranderen.");
-      // Issue #15: speak the chosen name; it matches the visible hint line.
       playSpeech("meal_" + key);
       playPopSound();
       popFood();
     }
 
-    function selectExtra(key) {
-      selectedExtraKey = key;
+    function toggleExtra(key) {
+      const idx = selectedExtraKeys.indexOf(key);
+      if (idx === -1) selectedExtraKeys.push(key);
+      else selectedExtraKeys.splice(idx, 1);
       syncPickerRadios();
-      setPickerHint(extras[key] + " gekozen.");
-      // Issue #15: speak the chosen name; it matches the visible hint line.
+      const on = selectedExtraKeys.indexOf(key) !== -1;
+      setPickerHint(on ? extras[key] + " gekozen." : extras[key] + " niet meer.");
       playSpeech("extra_" + key);
       playPopSound();
     }
 
     function confirmMealStep() {
       if (pickerOpenStep === 1) {
-        // Advance to the optional second step; the meal choice is already
-        // saved, so backing out of step 2 never loses it.
+        if (selectedMealKey) {
+          selectedExtraKeys = presetExtras(selectedMealKey).slice();
+        }
         setPickerHint("");
         showPickerStep(2);
+        const title = document.getElementById("pickerTitle2");
+        if (selectedMealKey === "pasta") {
+          title.textContent = "Wat ligt er nog meer op je bord?";
+        } else {
+          title.textContent = "Wat ligt er op je bord?";
+        }
         const current = extraOptionButtons().find(
-          (btn) => btn.dataset.extra === selectedExtraKey
+          (btn) => selectedExtraKeys.indexOf(btn.dataset.extra) !== -1
         );
         (current || extraOptionButtons()[0]).focus();
         return;
@@ -2174,10 +2230,8 @@
     }
 
     function skipMealStep() {
-      // Skipping never removes an earlier choice; it only passes on the
-      // optional question (step 2) or leaves the meal unchanged (step 1).
-      if (pickerOpenStep === 2) {
-        selectedExtraKey = null;
+      if (pickerOpenStep === 2 && selectedMealKey) {
+        selectedExtraKeys = presetExtras(selectedMealKey).slice();
         syncPickerRadios();
       }
       closeMealPicker();
@@ -2207,7 +2261,7 @@
 
     // Arrow-key navigation inside each radiogroup: the selected option
     // moves with the arrows so the group works like native radio buttons.
-    function bindGridKeyboard(gridId, selectFn) {
+    function bindGridKeyboard(gridId, onActivate, arrowsSelect) {
       const grid = document.getElementById(gridId);
       grid.addEventListener("keydown", function (e) {
         const keys = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
@@ -2219,16 +2273,18 @@
         const index = buttons.findIndex((btn) => btn === document.activeElement);
         const next = buttons[(index + delta + buttons.length) % buttons.length];
         next.focus();
-        selectFn(next.dataset.meal || next.dataset.extra);
+        if (arrowsSelect) {
+          onActivate(next.dataset.meal || next.dataset.extra);
+        }
       });
     }
 
     bindGridKeyboard("mealGrid", function (key) {
       if (key) selectMeal(key);
-    });
+    }, true);
     bindGridKeyboard("extraGrid", function (key) {
-      if (key) selectExtra(key);
-    });
+      if (key) toggleExtra(key);
+    }, false);
 
     mealOptionButtons().forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -2238,7 +2294,7 @@
 
     extraOptionButtons().forEach(function (btn) {
       btn.addEventListener("click", function () {
-        selectExtra(btn.dataset.extra);
+        toggleExtra(btn.dataset.extra);
       });
     });
     // ---- End meal picker --------------------------------------------------

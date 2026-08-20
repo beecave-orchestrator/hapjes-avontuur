@@ -335,24 +335,25 @@ test("index.html no longer contains the automatic emoji rotation", () => {
 
 test("all required labelled meals and extras exist with text names", () => {
   for (const name of [
-    "Aardappels en groente",
+    "Aardappels",
+    "Stamppot",
     "Pasta",
-    "Rijst",
-    "Noedels",
+    "Rijst of noedels",
     "Soep",
+    "Pannenkoek",
     "Mijn eigen eten",
   ]) {
     assert.ok(html.includes(`>${name}</span>`), `meal label present: ${name}`);
   }
   for (const name of [
-    "Groente",
+    "Groente of fruit",
     "Vlees of vis",
-    "Vegetarisch",
+    "Ei, kaas of iets vegetarisch",
     "Saus",
-    "Weet ik niet",
   ]) {
     assert.ok(html.includes(`>${name}</span>`), `extra label present: ${name}`);
   }
+  assert.ok(!html.includes("Weet ik niet"), "weetniet is not a food tile");
 });
 
 test("meal options are semantic radios with decorative emoji", () => {
@@ -360,7 +361,7 @@ test("meal options are semantic radios with decorative emoji", () => {
   const options = document.querySelectorAll("#mealGrid .meal-option");
 
   assert.equal(grid.getAttribute("role"), "radiogroup");
-  assert.ok(options.length >= 6, "at least six meal options");
+  assert.equal(options.length, 7, "seven meal presets");
   for (const btn of options) {
     assert.equal(btn.getAttribute("role"), "radio");
     assert.equal(btn.tagName, "BUTTON");
@@ -368,6 +369,14 @@ test("meal options are semantic radios with decorative emoji", () => {
     assert.ok(emoji, "emoji span present");
     assert.equal(emoji.getAttribute("aria-hidden"), "true");
     assert.ok(btn.querySelector(".meal-name").textContent.length > 0);
+  }
+});
+
+test("step 2 is a checkbox group, not a radiogroup", () => {
+  const grid = document.getElementById("extraGrid");
+  assert.equal(grid.getAttribute("role"), "group");
+  for (const btn of document.querySelectorAll("#extraGrid .meal-option")) {
+    assert.equal(btn.getAttribute("role"), "checkbox");
   }
 });
 
@@ -437,99 +446,144 @@ test("meal choice persists in the session and can be changed deliberately", () =
   assert.equal(mealButton("soep").getAttribute("aria-checked"), "true");
 });
 
-test("step 2 is optional and skippable without pressure", () => {
+test("step 2 is optional, multi-select, and skippable without pressure", () => {
   sandbox.openMealPicker();
-  click(mealButton("rijst"));
+  click(mealButton("rijst_of_noedels"));
 
   sandbox.confirmMealStep();
   assert.equal(document.getElementById("pickerStep1").hidden, true);
   assert.equal(document.getElementById("pickerStep2").hidden, false);
   assert.equal(
-    document.getElementById("mealPicker").getAttribute("aria-labelledby"),
-    "pickerTitle2"
-  );
-  assert.equal(document.getElementById("pickerDone").textContent, "Klaar");
-  assert.equal(
-    document.getElementById("pickerSkip").textContent,
-    "Deze stap overslaan"
+    extraButton("rijst_of_noedels").getAttribute("aria-checked"),
+    "true",
+    "preset preselects rijst of noedels"
   );
 
-  // Pick an extra, then skip anyway: skip wins, no pressure.
   click(extraButton("groente"));
+  click(extraButton("vlees"));
   assert.equal(extraButton("groente").getAttribute("aria-checked"), "true");
+  assert.equal(extraButton("vlees").getAttribute("aria-checked"), "true");
+  assert.equal(
+    extraButton("rijst_of_noedels").getAttribute("aria-checked"),
+    "true",
+    "multi-select keeps the starch tile"
+  );
 
   sandbox.skipMealStep();
-
   assert.ok(!document.getElementById("mealPicker").classList.contains("show"));
+  assert.equal(
+    extraButton("rijst_of_noedels").getAttribute("aria-checked"),
+    "true",
+    "skip restores the preset preselect"
+  );
   assert.equal(extraButton("groente").getAttribute("aria-checked"), "false");
   assert.equal(
     document.getElementById("mealChipText").textContent,
-    "Je eet nu: Rijst",
-    "skipping the optional step never changes the meal"
-  );
-
-  // Skip on step 1 keeps the previous meal untouched.
-  sandbox.openMealPicker();
-  sandbox.skipMealStep();
-  assert.ok(!document.getElementById("mealPicker").classList.contains("show"));
-  assert.equal(
-    document.getElementById("mealChipText").textContent,
-    "Je eet nu: Rijst",
-    "'Niet kiezen' keeps the previous meal"
+    "Je eet nu: Rijst of noedels"
   );
 });
 
-test("confirming an extra keeps it for the session", () => {
+test("pasta preselects pasta; stamppot implies aardappel + groente", () => {
   sandbox.openMealPicker();
+  click(mealButton("pasta"));
   sandbox.confirmMealStep();
-  click(extraButton("vegetarisch"));
-  sandbox.confirmMealStep(); // step 2: close
-
-  assert.ok(!document.getElementById("mealPicker").classList.contains("show"));
-  assert.equal(extraButton("vegetarisch").getAttribute("aria-checked"), "true");
-
-  // Reopening resets only the optional extra, never the meal.
-  sandbox.openMealPicker();
-  assert.equal(
-    document.getElementById("mealChipText").textContent,
-    "Je eet nu: Rijst"
+  assert.equal(extraButton("pasta").getAttribute("aria-checked"), "true");
+  assert.match(
+    document.getElementById("pickerTitle2").textContent,
+    /nog meer/
   );
+  sandbox.closeMealPicker();
+
+  sandbox.openMealPicker();
+  click(mealButton("stamppot"));
+  sandbox.confirmMealStep();
+  assert.equal(extraButton("aardappels").getAttribute("aria-checked"), "true");
+  assert.equal(extraButton("groente").getAttribute("aria-checked"), "true");
   sandbox.closeMealPicker();
 });
 
-test("arrow keys move and select inside the radiogroup with roving tabindex", () => {
+test("soep and pannenkoek have no basis preselect", () => {
+  sandbox.openMealPicker();
+  click(mealButton("soep"));
+  sandbox.confirmMealStep();
+  for (const key of ["aardappels", "pasta", "rijst_of_noedels"]) {
+    assert.equal(extraButton(key).getAttribute("aria-checked"), "false");
+  }
+  sandbox.closeMealPicker();
+
+  sandbox.openMealPicker();
+  click(mealButton("pannenkoek"));
+  sandbox.confirmMealStep();
+  for (const key of ["aardappels", "pasta", "rijst_of_noedels"]) {
+    assert.equal(extraButton(key).getAttribute("aria-checked"), "false");
+  }
+  click(extraButton("groente"));
+  assert.equal(extraButton("groente").getAttribute("aria-checked"), "true");
+  sandbox.closeMealPicker();
+});
+
+test("confirming extras keeps multi-select for the session", () => {
+  sandbox.openMealPicker();
+  click(mealButton("pasta"));
+  sandbox.confirmMealStep();
+  click(extraButton("vegetarisch"));
+  sandbox.confirmMealStep();
+
+  assert.ok(!document.getElementById("mealPicker").classList.contains("show"));
+  assert.equal(extraButton("pasta").getAttribute("aria-checked"), "true");
+  assert.equal(extraButton("vegetarisch").getAttribute("aria-checked"), "true");
+});
+
+test("arrow keys move and select inside the meal radiogroup with roving tabindex", () => {
   sandbox.openMealPicker();
   const buttons = document.querySelectorAll("#mealGrid .meal-option");
-  const rijst = mealButton("rijst");
-  assert.equal(document.activeElement, rijst, "focus on current choice");
-  assert.equal(rijst.tabIndex, 0, "selected option is the tab stop");
+  const pasta = mealButton("pasta");
+  click(pasta);
+  assert.equal(document.activeElement, pasta);
+  assert.equal(pasta.tabIndex, 0, "selected option is the tab stop");
   for (const b of buttons) {
-    if (b !== rijst)
+    if (b !== pasta)
       assert.equal(b.tabIndex, -1, "others removed from tab order");
   }
 
-  pressKey(rijst, "ArrowRight");
-  const noedels = mealButton("noedels");
+  pressKey(pasta, "ArrowRight");
+  const rijst = mealButton("rijst_of_noedels");
 
-  assert.equal(document.activeElement, noedels);
-  assert.equal(noedels.getAttribute("aria-checked"), "true");
-  assert.equal(rijst.getAttribute("aria-checked"), "false");
-  assert.equal(
-    document.getElementById("mealChipText").textContent,
-    "Je eet nu: Noedels"
-  );
-  assert.equal(noedels.tabIndex, 0, "tab stop moved with selection");
-  assert.equal(rijst.tabIndex, -1);
-
-  pressKey(noedels, "ArrowLeft");
   assert.equal(document.activeElement, rijst);
   assert.equal(rijst.getAttribute("aria-checked"), "true");
+  assert.equal(pasta.getAttribute("aria-checked"), "false");
+  assert.equal(
+    document.getElementById("mealChipText").textContent,
+    "Je eet nu: Rijst of noedels"
+  );
 
-  // ArrowUp from the first option wraps to the last (focus follows keys).
+  pressKey(rijst, "ArrowLeft");
+  assert.equal(document.activeElement, pasta);
+  assert.equal(pasta.getAttribute("aria-checked"), "true");
+
   const eerst = mealButton("aardappels");
   eerst.focus();
   pressKey(eerst, "ArrowUp");
   assert.equal(document.activeElement, mealButton("eigen"));
+});
+
+test("step 2 arrows move focus only and do not toggle checkboxes", () => {
+  sandbox.openMealPicker();
+  click(mealButton("soep"));
+  sandbox.confirmMealStep();
+  const first = extraOptionButtonsWait();
+  function extraOptionButtonsWait() {
+    return document.querySelectorAll("#extraGrid .meal-option");
+  }
+  const start = extraOptionButtonsWait()[0];
+  start.focus();
+  const startChecked = start.getAttribute("aria-checked");
+  pressKey(start, "ArrowDown");
+  const active = document.activeElement;
+  assert.notEqual(active, start);
+  assert.equal(start.getAttribute("aria-checked"), startChecked);
+  assert.equal(active.getAttribute("role"), "checkbox");
+  sandbox.closeMealPicker();
 });
 
 test("Tab is trapped inside the open dialog and Escape closes it", () => {
@@ -565,12 +619,5 @@ test("step transition moves focus into the visible step", () => {
     step2Buttons.includes(document.activeElement),
     "focus lands on a step-2 option"
   );
-
-  // Arrow selection also works in the extras grid.
-  pressKey(document.activeElement, "ArrowDown");
-  const active = document.activeElement;
-  assert.equal(active.getAttribute("aria-checked"), "true");
-  assert.equal(active.getAttribute("role"), "radio");
-
   sandbox.closeMealPicker();
 });
