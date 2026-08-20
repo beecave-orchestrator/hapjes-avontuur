@@ -1,10 +1,11 @@
 # AGENTS.md — Hapjes Avontuur
 
-This file is the operating manual for agents working in this repository.
-Read it before changing `index.html`, `audio/`, or opening a PR.
+What any contributor or coding agent needs to know to safely change this
+repository. This file is **project policy**, not harness policy. It must
+stay useful from any checkout, with any editor or coding agent.
 
 The product is a Dutch, child-facing snack game. A child sees it. A parent
-trusts it. Agents are guests.
+trusts it.
 
 ## What this is
 
@@ -12,11 +13,10 @@ trusts it. Agents are guests.
   bundler, no backend, no accounts.
 - Hosted from `main` on GitHub Pages:
   https://beecave-orchestrator.github.io/hapjes-avontuur/
-- Host clone: `/home/elvee/projects/hapjes-avontuur`
-- Feature work lives in git worktrees under `.worktrees/`. Do not commit
-  `.worktrees/`.
-- Kanban board slug: `hapjes-avontuur`. Do not park this work on
-  `agent-output`.
+- Work from any valid git checkout on a branch based on current
+  `origin/main`. Isolate feature work on its own branch. Local extra
+  checkouts (including a `.worktrees/` directory) are optional and must
+  stay untracked.
 
 ## Product rules (non-negotiable)
 
@@ -43,9 +43,10 @@ Required generator: `scripts/generate_openai_dutch_v1.py`
 
 - Model: `gpt-4o-mini-tts`
 - Voice: `marin`
-- Key: `OPENAI_API_KEY` in the process environment (local alias
-  `VOICE_TOOLS_OPENAI_KEY` is accepted by the generator). Never print it.
-  Never put BWS IDs or secret lookup in this repo.
+- Key: `OPENAI_API_KEY` in the process environment (the generator also
+  accepts `VOICE_TOOLS_OPENAI_KEY`). Never print it. Never commit
+  credentials, secret values, secret-manager identifiers, or generation
+  metadata that may contain sensitive information.
 
 **Fail closed.** If the key is missing or rejected, stop. Do not generate
 edge-tts / `nl-NL-FennaNeural`. Do not ship a mixed pack. Do not claim
@@ -100,13 +101,16 @@ Compliant today (picker, Schatkist, end, oudermenu):
 confetti can sit on the Beloning card. Do not document reward as fixed
 until that lands.
 
-Look at a **full-page** screenshot yourself. A cropped dialog hid the
-“shade stops halfway” bug more than once.
+### 6. Visual changes must be verified, or reported unverified
 
-### 6. Look at the pixels
+Visual changes require **full-page** verification of the affected state
+(open dialog, not a crop). Use any available browser or screenshot
+tooling. If visual inspection cannot be performed in the current
+environment, say so explicitly. Do not claim the UI is correct.
 
-If the change is visual, you must inspect a full-page shot before claiming
-it is fine. Do not invent diffs for images you did not open.
+If supplied screenshots or other visual evidence are relevant, inspect
+them when the environment supports it. Otherwise state that the visual
+evidence could not be verified.
 
 On GitHub, relative `![x](docs/…)` in a PR **body** usually does not
 render. After push, comment with:
@@ -159,15 +163,14 @@ Need `ffprobe` for manifest bitrate probes.
 
 ## Git and PRs
 
-- Branch from current `origin/main`. Work in a worktree.
+- Branch from current `origin/main`.
 - Commits: `<type> <emoji>: <imperative>` (`feat ✨`, `fix 🐛`, `docs 📝`, …).
 - One concern per commit. Do not mix speech files with unrelated CSS.
-- Label GitHub issues/PRs with `agent:<profile>` (and `enhancement` /
-  `bug` as needed).
+- Use existing repo labels such as `enhancement` / `bug` when they fit.
 - Merge PRs that both touch `index.html` **one at a time**. Rebase the
   other after the first lands.
-- Reviews one at a time. Independent APPROVE is local readiness. Do not
-  merge on a self-report.
+- Do not merge on an unverified self-report. Required checks and visual
+  verification (or an explicit unverified note) must be in the PR.
 - Pages only updates when `main` updates. A commit is not live until
   merged.
 
@@ -181,11 +184,10 @@ Need `ffprobe` for manifest bitrate probes.
   MP3 text.
 - Hide play UI until a meal exists.
 - Put overlay shade behind an opaque card, full viewport.
-- Inspect full-page visuals yourself.
-- Stop when `OPENAI_API_KEY` is missing.
-- English or Dutch in agent output. Never Chinese.
+- Verify visuals or report them unverified.
+- Stop when `OPENAI_API_KEY` (or the generator alias) is missing.
 
-### Ask first
+### Requires maintainer approval
 
 - New child-facing features that change the loop (map, new rewards, new
   meals).
@@ -198,13 +200,13 @@ Need `ffprobe` for manifest bitrate probes.
 ### Never
 
 - Fall back to edge-tts / Fenna when OpenAI is unavailable.
-- Commit secrets, BWS IDs, or `_generation_run.json`.
+- Commit credentials, secret-manager identifiers, or
+  `_generation_run.json`.
 - Add runtime `speechSynthesis` or provider fetches from `index.html`.
-- Claim a screenshot is good without opening it.
+- Claim a screenshot is good without inspecting it, or when inspection
+  was not possible.
 - Ship a mixed-voice pack with a lying marin manifest.
 - Pressure copy, dark patterns, tracking, ads, accounts.
-- Start parked work (for example issue #9) while a merge-blocking speech
-  or overlay defect is open.
 
 ## Common tasks
 
@@ -221,12 +223,13 @@ Need `ffprobe` for manifest bitrate probes.
 1. Reuse the dimmer recipe: full-viewport scrim, solid card, z-index
    above confetti (30).
 2. Lock page scroll while open if the page can grow past one screen.
-3. Full-page Playwright or browser shot of the **open** dialog, not a
-   crop. Comment it on the PR with `?raw=true`.
+3. Capture a full-page shot of the **open** dialog (any browser or
+   screenshot tool). If you cannot, say unverified. Comment on the PR
+   with `?raw=true`.
 
-### Fix a visual bug Elvee circled
+### Fix a visual bug from a screenshot
 
-1. Open the attached image with vision. Do not guess.
+1. Inspect the attached image if the environment can. Do not guess.
 2. Patch, then take a new full-page shot of the same state.
 3. Compare. If the leak is still there, do not push “fixed”.
 
@@ -238,12 +241,11 @@ Need `ffprobe` for manifest bitrate probes.
 | Shade stops halfway down the page | Only the long-page/oudermenu pattern needs a document-tall scrim. Viewport-fixed `inset: 0` dialogs are already correct — do not “fix” those. |
 | Confetti on top of copy | Dialog below z-index 30 (today: `.reward`). Raise the dialog, or see issue #18. |
 | Validator green, voice still Fenna | Manifest claimed openai; files were 48 kbps. Probe bitrate. |
-| Worker “finished” TTS without a key | It used edge-tts. Reject the pack. Block the card. |
+| TTS assets appeared without OpenAI credentials | Reject the pack and check provenance. Do not ship mixed or Fenna files as marin. |
 | End / Schatkist tests fail after meal-first | Stub never called `selectMeal`. |
 | PR image missing on GitHub | Body used a relative path. Post a comment with blob `?raw=true`. |
 | Two `index.html` PRs conflict | Merge one, rebase the other. |
 
 ## Language
 
-Product copy is Dutch. Agent discussion may be Dutch or English. Do not
-output Chinese. Do not “improve” child lines into adult phrasing.
+Product copy is Dutch. Do not “improve” child lines into adult phrasing.
