@@ -219,6 +219,23 @@ def main() -> None:
         if needle not in html:
             errors.append(f"issue #15: playSpeech hook missing for {label}")
 
+    # Issue #15: new child-facing spoken/hint copy cannot bypass the inventory.
+    # Decorative group headings must be aria-hidden; spoken lines must exist
+    # in speech_inventory. Deselect hints must reuse extra names, not invent
+    # "niet meer." copy.
+    spoken_group_labels = re.findall(
+        r'class="picker-group-label"(?![^>]*aria-hidden="true")>([^<]+)<',
+        html,
+    )
+    inventory_texts = {e["text"] for e in ENTRIES}
+    for label in spoken_group_labels:
+        if label not in inventory_texts:
+            errors.append(
+                f"issue #15: spoken picker group label {label!r} missing from speech_inventory"
+            )
+    if "niet meer." in html:
+        errors.append("issue #15: deselect hint copy must use an inventory line, not 'niet meer.'")
+
     # The start clip may only play while its line is visible: the first
     # game start (picker close with the play area visible) and resetGame.
     if "startClipGevraagd" not in html:

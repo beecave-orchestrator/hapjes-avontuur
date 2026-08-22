@@ -323,6 +323,16 @@ function mealButton(key) {
 // Static checks: pack wiring
 // ---------------------------------------------------------------------------
 
+
+test("picker group headings are decorative and hints do not invent extra copy", () => {
+  const labels = [...html.matchAll(/class="picker-group-label"([^>]*)>([^<]+)</g)];
+  assert.ok(labels.length >= 3, "group labels present");
+  for (const [, attrs, label] of labels) {
+    assert.match(attrs, /aria-hidden="true"/, `${label} is aria-hidden`);
+  }
+  assert.equal(html.includes("niet meer."), false, "deselect hint does not invent extra copy");
+});
+
 test("SPEECH_MAP mirrors the frozen inventory in speech_inventory.py", () => {
   const block = html.match(/const SPEECH_MAP = \{(.*?)\};/s);
   assert.ok(block, "SPEECH_MAP present");

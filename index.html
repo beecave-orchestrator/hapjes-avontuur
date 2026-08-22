@@ -1213,7 +1213,7 @@
         <h2 class="picker-title" id="pickerTitle2">Wat ligt er op je bord?</h2>
         <p class="picker-note">Je mag meerdere dingen kiezen. Overslaan mag ook.</p>
         <div class="meal-grid" id="extraGrid" role="group" aria-label="Wat ligt er op je bord?">
-          <p class="picker-group-label">Basis</p>
+          <p class="picker-group-label" aria-hidden="true">Basis</p>
           <button class="meal-option" type="button" data-extra="aardappels" role="checkbox" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥔</span>
             <span class="meal-name">Aardappels</span>
@@ -1226,7 +1226,7 @@
             <span class="meal-emoji" aria-hidden="true">🍚</span>
             <span class="meal-name">Rijst of noedels</span>
           </button>
-          <p class="picker-group-label">Erbij</p>
+          <p class="picker-group-label" aria-hidden="true">Erbij</p>
           <button class="meal-option" type="button" data-extra="groente" role="checkbox" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥦</span>
             <span class="meal-name">Groente of fruit</span>
@@ -1239,7 +1239,7 @@
             <span class="meal-emoji" aria-hidden="true">🥚</span>
             <span class="meal-name">Ei, kaas of iets vegetarisch</span>
           </button>
-          <p class="picker-group-label">Extra</p>
+          <p class="picker-group-label" aria-hidden="true">Extra</p>
           <button class="meal-option" type="button" data-extra="saus" role="checkbox" aria-checked="false">
             <span class="meal-emoji" aria-hidden="true">🥣</span>
             <span class="meal-name">Saus</span>
@@ -2234,7 +2234,7 @@
       selectedExtraKeys = presetExtras(key).slice();
       syncPickerRadios();
       updateMealDisplay();
-      setPickerHint(meals[key].name + " gekozen. Je kunt het nog veranderen.");
+      setPickerHint(meals[key].name);
       playSpeech("meal_" + key);
       playPopSound();
       popFood();
@@ -2245,8 +2245,7 @@
       if (idx === -1) selectedExtraKeys.push(key);
       else selectedExtraKeys.splice(idx, 1);
       syncPickerRadios();
-      const on = selectedExtraKeys.indexOf(key) !== -1;
-      setPickerHint(on ? extras[key] + " gekozen." : extras[key] + " niet meer.");
+      setPickerHint(extras[key]);
       playSpeech("extra_" + key);
       playPopSound();
     }
