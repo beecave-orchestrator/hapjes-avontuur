@@ -1,3 +1,6 @@
+# Local worktrees (never commit)
+.worktrees/
+
 # Local TTS generation scratch (never commit)
 audio/_generation_run.json
 audio/_smoke.mp3
