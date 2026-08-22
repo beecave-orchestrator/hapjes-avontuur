@@ -282,6 +282,7 @@ class AudioStub {
     return this._src;
   }
   play() {
+    if (typeof this.onended === "function") this.onended();
     return { catch() {} };
   }
   pause() {
@@ -333,6 +334,7 @@ test("picker group headings have inventory clips and hints do not invent extra c
     assert.ok(texts.includes(label), `inventory covers group label ${label}`);
   }
   assert.equal(html.includes("niet meer."), false, "deselect hint does not invent extra copy");
+  assert.match(html, /playSpeechSequence\(\[[\s\S]*picker_group_basis[\s\S]*picker_group_erbij[\s\S]*picker_group_extra/);
 });
 
 test("SPEECH_MAP mirrors the frozen inventory in speech_inventory.py", () => {
@@ -394,7 +396,24 @@ test("picker step titles are spoken as one title+note clip per step", () => {
   sandbox.openMealPicker();
   assert.equal(lastClip(), "audio/picker_title_1.mp3");
   sandbox.confirmMealStep(); // advance to step 2
-  assert.equal(lastClip(), "audio/picker_title_2.mp3");
+  assert.ok(playedSince().includes("audio/picker_title_2.mp3"));
+  sandbox.closeMealPicker();
+});
+
+test("step 2 speaks visible group labels Basis, Erbij, Extra after the title", () => {
+  resetLog();
+  sandbox.openMealPicker();
+  sandbox.confirmMealStep();
+  const clips = playedSince();
+  const expected = [
+    "audio/picker_title_2.mp3",
+    "audio/picker_group_basis.mp3",
+    "audio/picker_group_erbij.mp3",
+    "audio/picker_group_extra.mp3",
+  ];
+  const idx = expected.map((c) => clips.indexOf(c));
+  assert.ok(idx.every((i) => i >= 0), `group labels spoken; got ${JSON.stringify(clips)}`);
+  assert.ok(idx[0] < idx[1] && idx[1] < idx[2] && idx[2] < idx[3], "title then Basis, Erbij, Extra");
   sandbox.closeMealPicker();
 });
 
@@ -586,6 +605,7 @@ function makeFreshSandbox() {
       return this._src;
     }
     play() {
+      if (typeof this.onended === "function") this.onended();
       return { catch() {} };
     }
     pause() {

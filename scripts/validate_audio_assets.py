@@ -219,10 +219,22 @@ def main() -> None:
         if needle not in html:
             errors.append(f"issue #15: playSpeech hook missing for {label}")
 
+    seq_block = re.search(r"playSpeechSequence\(\[(.*?)\]\)", html, re.S)
+    if seq_block is None:
+        errors.append("issue #15: playSpeech hook missing for picker group labels")
+    else:
+        for clip, label in (
+            ("picker_group_basis", "picker group Basis"),
+            ("picker_group_erbij", "picker group Erbij"),
+            ("picker_group_extra", "picker group Extra"),
+        ):
+            if f'"{clip}"' not in seq_block.group(1):
+                errors.append(f"issue #15: playSpeech hook missing for {label}")
+
     # Issue #15: new child-facing spoken/hint copy cannot bypass the inventory.
-    # Decorative group headings must be aria-hidden; spoken lines must exist
-    # in speech_inventory. Deselect hints must reuse extra names, not invent
-    # "niet meer." copy.
+    # Visible group headings must exist in speech_inventory and have a
+    # playSpeech hook (checked above). Deselect hints must reuse extra names,
+    # not invent "niet meer." copy.
     spoken_group_labels = re.findall(
         r'class="picker-group-label"(?![^>]*aria-hidden="true")>([^<]+)<',
         html,

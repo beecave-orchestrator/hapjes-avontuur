@@ -1572,6 +1572,8 @@
     };
 
     let speechAudio = null;
+    let speechFollowUp = [];
+    let speechSeq = 0;
 
     // Lazily create the Audio element inside the first user gesture so the
     // browser's autoplay policy unlocks playback. Returns the shared element.
@@ -1585,26 +1587,53 @@
     }
 
     function stopSpeech() {
+      speechSeq += 1;
+      speechFollowUp = [];
       if (!speechAudio) return;
+      speechAudio.onended = null;
       const p = speechAudio.pause();
       if (p && typeof p.catch === "function") p.catch(function () {});
       speechAudio.currentTime = 0;
     }
 
-    // Play a clip by stable ID. No-op when sound is off, when the ID is
-    // unknown, or when the browser refuses the gesture (caught silently).
-    function playSpeech(id) {
-      if (!soundOn) return;
+    function startSpeechClip(id) {
       const file = SPEECH_MAP[id];
       if (!file) return;
-
       const audio = ensureSpeechAudio();
-      stopSpeech();
+      const token = ++speechSeq;
+      if (speechAudio) speechAudio.onended = null;
+      const paused = speechAudio && speechAudio.pause && speechAudio.pause();
+      if (paused && typeof paused.catch === "function") paused.catch(function () {});
+      audio.onended = function () {
+        if (token !== speechSeq) return;
+        const next = speechFollowUp.shift();
+        if (next) startSpeechClip(next);
+      };
       audio.src = SPEECH_BASE + file;
       const p = audio.play();
       if (p && typeof p.catch === "function") {
         p.catch(function () { /* autoplay rejected; next gesture retries */ });
       }
+    }
+
+    // Play a clip by stable ID. No-op when sound is off, when the ID is
+    // unknown, or when the browser refuses the gesture (caught silently).
+    // A new playSpeech call interrupts any queued follow-up clips.
+    function playSpeech(id) {
+      if (!soundOn) return;
+      if (!SPEECH_MAP[id]) return;
+      speechFollowUp = [];
+      startSpeechClip(id);
+    }
+
+    // Play clips in order (title, then visible group labels). Interrupted
+    // by any later playSpeech so the last shown child line still wins.
+    function playSpeechSequence(ids) {
+      if (!soundOn) return;
+      const known = ids.filter(function (id) { return SPEECH_MAP[id]; });
+      if (!known.length) return;
+      speechFollowUp = known.slice(1);
+      startSpeechClip(known[0]);
     }
 
     function hapGenomen() {
@@ -2216,9 +2245,19 @@
         step === 2 ? "Deze stap overslaan" : "Niet kiezen";
 
       // Issue #15: the visible title + note are spoken as one clip when the
-      // step appears. playSpeech stops any earlier clip, so the last shown
-      // line always wins.
-      playSpeech("picker_title_" + step);
+      // step appears. On step 2 the visible group labels (Basis / Erbij /
+      // Extra) follow that title clip so every child-facing line is spoken.
+      // A later playSpeech still interrupts the queue.
+      if (step === 2) {
+        playSpeechSequence([
+          "picker_title_2",
+          "picker_group_basis",
+          "picker_group_erbij",
+          "picker_group_extra",
+        ]);
+      } else {
+        playSpeech("picker_title_" + step);
+      }
     }
 
     function openMealPicker() {
