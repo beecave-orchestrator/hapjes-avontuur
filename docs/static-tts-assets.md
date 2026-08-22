@@ -14,6 +14,7 @@ Stable IDs are frozen against `index.html` copy. `scripts/speech_inventory.py` i
 | `reward_3` … `reward_20` | reward | title + body |
 | `end`, `end_done`, `bonus` | end state | completion-dialog lines |
 | `picker_title_1`, `picker_title_2` | picker | "Wat voor soort eten heb je vandaag?" / "Wat ligt er op je bord?" (title + note per step) |
+| `picker_group_basis`, `picker_group_erbij`, `picker_group_extra` | picker | Step 2 headings Basis / Erbij / Extra |
 | `meal_<key>`, `extra_<key>` | names | meal and extra names as shown on chips |
 | `chip_kies`, `chip_eat_<key>` | chip status | "Kies je eten" / "Je eet nu: X" |
 | `schatkist_intro`, `schatkist_actief`, `schatkist_vrij` | schatkist | title/standing question, "Hier spaar je voor", "Van jou!" |
@@ -22,7 +23,7 @@ Stable IDs are frozen against `index.html` copy. `scripts/speech_inventory.py` i
 
 Each reward is one spoken clip combining `{title} {body}`. The three end-state clips support the pressure-free completion dialog.
 
-Spoken text matches the visible line exactly (issue #15 rule). Numeric status lines (pot counts, "nog 4 muntjes", "3 van 8") are deliberately not frozen or spoken: there are 39+ numeric combinations, and re-speaking counts on every change works against the pressure-free design. Step 2 group headings (`Basis`, `Erbij`, `Extra`) are visual-only (`aria-hidden`) and stay silent, like buttons. Picker hints reuse the meal/extra name clips instead of inventing select/deselect sentences. Buttons stay silent: action labels such as "Hiervoor sparen" are not progress or status lines, so no `schatkist_kies` clip exists.
+Spoken text matches the visible line exactly (issue #15 rule). Numeric status lines (pot counts, "nog 4 muntjes", "3 van 8") are deliberately not frozen or spoken: there are 39+ numeric combinations, and re-speaking counts on every change works against the pressure-free design. Picker hints reuse the meal/extra name clips instead of inventing select/deselect sentences. Buttons stay silent: action labels such as "Hiervoor sparen" are not progress or status lines, so no `schatkist_kies` clip exists.
 
 ## Current pack provenance
 
