@@ -17,7 +17,7 @@
     "codec": "mp3",
     "channels": "mono",
     "auto_speech_tags": false,
-    "generated_at_utc": "2026-08-20T21:49:50Z",
+    "generated_at_utc": "2026-08-22T19:54:40Z",
     "tooling": "scripts/generate_openai_dutch_v1.py"
   },
   "decisions": {
@@ -28,17 +28,17 @@
     "oudermenu_silent": "The parent/info menu (issue #8) is not child-facing and stays silent by standing merge rule."
   },
   "counts": {
-    "clips": 58,
+    "clips": 61,
     "chip": 8,
     "encouragement": 10,
     "end_state": 3,
-    "picker": 2,
+    "picker": 5,
     "picker_name": 14,
     "reward": 5,
     "schatkist": 5,
     "start_reset": 1,
     "unlock": 10,
-    "total_bytes": 2877696
+    "total_bytes": 2943744
   },
   "clips": {
     "start": {
@@ -350,6 +350,48 @@
       "source": "picker step 2 title + note",
       "bytes": 93696,
       "sha256": "586c09fb0585e064c5d08491901ff22e3e89ffe32bf01faa59c5e28ac62cb65b",
+      "format": "mp3",
+      "bit_rate_bps": 128000,
+      "sample_rate_hz": 24000,
+      "channels": 1
+    },
+    "picker_group_basis": {
+      "id": "picker_group_basis",
+      "category": "picker",
+      "text": "Basis",
+      "file": "picker_group_basis.mp3",
+      "path": "audio/picker_group_basis.mp3",
+      "source": "picker step 2 group label Basis",
+      "bytes": 23424,
+      "sha256": "fa67c79269a1f32b836aff7afb48b21cb801d9454f1dea64d09810bceeeb2330",
+      "format": "mp3",
+      "bit_rate_bps": 128000,
+      "sample_rate_hz": 24000,
+      "channels": 1
+    },
+    "picker_group_erbij": {
+      "id": "picker_group_erbij",
+      "category": "picker",
+      "text": "Erbij",
+      "file": "picker_group_erbij.mp3",
+      "path": "audio/picker_group_erbij.mp3",
+      "source": "picker step 2 group label Erbij",
+      "bytes": 22656,
+      "sha256": "478538a380f9a09d96af864a6ea0d9c04f0fe5025918714b94bf80c03be45460",
+      "format": "mp3",
+      "bit_rate_bps": 128000,
+      "sample_rate_hz": 24000,
+      "channels": 1
+    },
+    "picker_group_extra": {
+      "id": "picker_group_extra",
+      "category": "picker",
+      "text": "Extra",
+      "file": "picker_group_extra.mp3",
+      "path": "audio/picker_group_extra.mp3",
+      "source": "picker step 2 group label Extra",
+      "bytes": 19968,
+      "sha256": "40bedbc686ec829e06711ec877e4f4100c03973eb2ec26f6fe8d844e550fbb14",
       "format": "mp3",
       "bit_rate_bps": 128000,
       "sample_rate_hz": 24000,
@@ -948,5 +990,5 @@
     "schatkist",
     "unlock"
   ],
-  "built_at_utc": "2026-08-20T21:49:50Z"
+  "built_at_utc": "2026-08-22T19:54:40Z"
 }

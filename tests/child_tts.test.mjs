@@ -324,11 +324,13 @@ function mealButton(key) {
 // ---------------------------------------------------------------------------
 
 
-test("picker group headings are decorative and hints do not invent extra copy", () => {
-  const labels = [...html.matchAll(/class="picker-group-label"([^>]*)>([^<]+)</g)];
+test("picker group headings have inventory clips and hints do not invent extra copy", () => {
+  const inventorySrc = readFileSync(path.join(ROOT, "scripts", "speech_inventory.py"), "utf-8");
+  const texts = [...inventorySrc.matchAll(/"text": "([^"]+)"/g)].map((m) => m[1]);
+  const labels = [...html.matchAll(/class="picker-group-label">([^<]+)</g)].map((m) => m[1]);
   assert.ok(labels.length >= 3, "group labels present");
-  for (const [, attrs, label] of labels) {
-    assert.match(attrs, /aria-hidden="true"/, `${label} is aria-hidden`);
+  for (const label of labels) {
+    assert.ok(texts.includes(label), `inventory covers group label ${label}`);
   }
   assert.equal(html.includes("niet meer."), false, "deselect hint does not invent extra copy");
 });

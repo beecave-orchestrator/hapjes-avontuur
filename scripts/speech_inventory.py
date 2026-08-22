@@ -185,6 +185,27 @@ ENTRIES = [
         "file": "picker_title_2.mp3",
         "source": "picker step 2 title + note",
     },
+    {
+        "id": "picker_group_basis",
+        "category": "picker",
+        "text": "Basis",
+        "file": "picker_group_basis.mp3",
+        "source": "picker step 2 group label Basis",
+    },
+    {
+        "id": "picker_group_erbij",
+        "category": "picker",
+        "text": "Erbij",
+        "file": "picker_group_erbij.mp3",
+        "source": "picker step 2 group label Erbij",
+    },
+    {
+        "id": "picker_group_extra",
+        "category": "picker",
+        "text": "Extra",
+        "file": "picker_group_extra.mp3",
+        "source": "picker step 2 group label Extra",
+    },
     # ── issue #19: meal + extra names ──────────────────────────────────────
     {
         "id": "meal_aardappels",
