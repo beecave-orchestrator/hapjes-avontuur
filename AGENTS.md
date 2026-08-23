@@ -96,10 +96,9 @@ Compliant today (picker, Schatkist, end, oudermenu):
   scrim, card stays in the viewport). Do not convert a working
   `inset: 0` dialog into the oudermenu shape, or the reverse.
 
-**Known deviation (issue #18):** `.reward` is still z-index `20` with a
-`0.35` scrim. `hapGenomen()` fires confetti then `toonBeloning()`, so
-confetti can sit on the Beloning card. Do not document reward as fixed
-until that lands.
+The reward ("Beloning") dialog follows the recipe too since issue #18:
+z-index `40` with the `0.72` scrim, above the confetti layer. Guarded by
+`tests/reward_overlay.test.mjs`.
 
 ### 6. Visual changes must be verified, or reported unverified
 
