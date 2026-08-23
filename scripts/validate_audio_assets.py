@@ -219,6 +219,35 @@ def main() -> None:
         if needle not in html:
             errors.append(f"issue #15: playSpeech hook missing for {label}")
 
+    seq_block = re.search(r"playSpeechSequence\(\[(.*?)\]\)", html, re.S)
+    if seq_block is None:
+        errors.append("issue #15: playSpeech hook missing for picker group labels")
+    else:
+        for clip, label in (
+            ("picker_group_basis", "picker group Basis"),
+            ("picker_group_erbij", "picker group Erbij"),
+            ("picker_group_extra", "picker group Extra"),
+        ):
+            if f'"{clip}"' not in seq_block.group(1):
+                errors.append(f"issue #15: playSpeech hook missing for {label}")
+
+    # Issue #15: new child-facing spoken/hint copy cannot bypass the inventory.
+    # Visible group headings must exist in speech_inventory and have a
+    # playSpeech hook (checked above). Deselect hints must reuse extra names,
+    # not invent "niet meer." copy.
+    spoken_group_labels = re.findall(
+        r'class="picker-group-label"(?![^>]*aria-hidden="true")>([^<]+)<',
+        html,
+    )
+    inventory_texts = {e["text"] for e in ENTRIES}
+    for label in spoken_group_labels:
+        if label not in inventory_texts:
+            errors.append(
+                f"issue #15: spoken picker group label {label!r} missing from speech_inventory"
+            )
+    if "niet meer." in html:
+        errors.append("issue #15: deselect hint copy must use an inventory line, not 'niet meer.'")
+
     # The start clip may only play while its line is visible: the first
     # game start (picker close with the play area visible) and resetGame.
     if "startClipGevraagd" not in html:
@@ -235,8 +264,8 @@ def main() -> None:
             if e["id"].startswith("chip_eat_")
         },
         # picker titles: title + note are separate visible elements
-        "picker_title_1": ("Wat eet je vandaag?" in html and "Je mag zelf kiezen. Alle keuzes zijn goed." in html),
-        "picker_title_2": ("Wil je nog wat kiezen?" in html and "Dit hoeft niet. Je mag deze stap ook overslaan." in html),
+        "picker_title_1": ("Wat voor soort eten heb je vandaag?" in html and "Je mag zelf kiezen. Alle keuzes zijn goed." in html),
+        "picker_title_2": ("Wat ligt er op je bord?" in html and "Je mag meerdere dingen kiezen. Overslaan mag ook." in html),
         # schatkist intro: title + standing question
         "schatkist_intro": (">Schatkist</h2>" in html and "Waar spaar jij voor? Elke hap geeft één muntje." in html),
         # unlocked status: emoji suffix is decorative

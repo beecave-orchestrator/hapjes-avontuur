@@ -282,6 +282,7 @@ class AudioStub {
     return this._src;
   }
   play() {
+    if (typeof this.onended === "function") this.onended();
     return { catch() {} };
   }
   pause() {
@@ -322,6 +323,19 @@ function mealButton(key) {
 // ---------------------------------------------------------------------------
 // Static checks: pack wiring
 // ---------------------------------------------------------------------------
+
+
+test("picker group headings have inventory clips and hints do not invent extra copy", () => {
+  const inventorySrc = readFileSync(path.join(ROOT, "scripts", "speech_inventory.py"), "utf-8");
+  const texts = [...inventorySrc.matchAll(/"text": "([^"]+)"/g)].map((m) => m[1]);
+  const labels = [...html.matchAll(/class="picker-group-label">([^<]+)</g)].map((m) => m[1]);
+  assert.ok(labels.length >= 3, "group labels present");
+  for (const label of labels) {
+    assert.ok(texts.includes(label), `inventory covers group label ${label}`);
+  }
+  assert.equal(html.includes("niet meer."), false, "deselect hint does not invent extra copy");
+  assert.match(html, /playSpeechSequence\(\[[\s\S]*picker_group_basis[\s\S]*picker_group_erbij[\s\S]*picker_group_extra/);
+});
 
 test("SPEECH_MAP mirrors the frozen inventory in speech_inventory.py", () => {
   const block = html.match(/const SPEECH_MAP = \{(.*?)\};/s);
@@ -382,7 +396,24 @@ test("picker step titles are spoken as one title+note clip per step", () => {
   sandbox.openMealPicker();
   assert.equal(lastClip(), "audio/picker_title_1.mp3");
   sandbox.confirmMealStep(); // advance to step 2
-  assert.equal(lastClip(), "audio/picker_title_2.mp3");
+  assert.ok(playedSince().includes("audio/picker_title_2.mp3"));
+  sandbox.closeMealPicker();
+});
+
+test("step 2 speaks visible group labels Basis, Erbij, Extra after the title", () => {
+  resetLog();
+  sandbox.openMealPicker();
+  sandbox.confirmMealStep();
+  const clips = playedSince();
+  const expected = [
+    "audio/picker_title_2.mp3",
+    "audio/picker_group_basis.mp3",
+    "audio/picker_group_erbij.mp3",
+    "audio/picker_group_extra.mp3",
+  ];
+  const idx = expected.map((c) => clips.indexOf(c));
+  assert.ok(idx.every((i) => i >= 0), `group labels spoken; got ${JSON.stringify(clips)}`);
+  assert.ok(idx[0] < idx[1] && idx[1] < idx[2] && idx[2] < idx[3], "title then Basis, Erbij, Extra");
   sandbox.closeMealPicker();
 });
 
@@ -391,8 +422,8 @@ test("selecting a meal speaks the chosen meal name", () => {
   resetLog();
   click(mealButton("pasta"));
   assert.equal(lastClip(), "audio/meal_pasta.mp3");
-  click(mealButton("soep"));
-  assert.equal(lastClip(), "audio/meal_soep.mp3");
+  click(mealButton("pannenkoeken"));
+  assert.equal(lastClip(), "audio/meal_pannenkoeken.mp3");
   sandbox.closeMealPicker();
 });
 
@@ -417,7 +448,7 @@ test("first confirmed meal plays the start clip once, later closes speak the chi
   sandbox.openMealPicker();
   resetLog();
   sandbox.closeMealPicker();
-  assert.equal(lastClip(), "audio/chip_eat_soep.mp3");
+  assert.equal(lastClip(), "audio/chip_eat_pannenkoeken.mp3");
   const starts = playedSince().filter((s) => s === "audio/start.mp3");
   assert.equal(starts.length, 0, "start clip not replayed on later picker closes");
 });
@@ -574,6 +605,7 @@ function makeFreshSandbox() {
       return this._src;
     }
     play() {
+      if (typeof this.onended === "function") this.onended();
       return { catch() {} };
     }
     pause() {
